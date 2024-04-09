@@ -44,7 +44,8 @@ class BusinessExceptionHandler extends ExceptionHandler
             case $throwable instanceof ValidationException:
                 return $this->response->fail(ErrorCode::INVALID_PARAMS->value, $throwable->validator->errors()->first());
             case $throwable instanceof AuthException:
-                return $this->response->fail(ErrorCode::UNAUTHORIZED->value, $throwable->getMessage());
+                $this->logger->warning(format_throwable($throwable));
+                return $this->response->fail(ErrorCode::UNAUTHORIZED->value, ErrorCode::UNAUTHORIZED->getMessage());
             case $throwable instanceof HttpException:
                 return $this->response->handleException($throwable);
             case $throwable instanceof BusinessException:

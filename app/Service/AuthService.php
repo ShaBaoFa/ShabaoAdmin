@@ -30,4 +30,9 @@ class AuthService extends BaseService
     {
         return $this->auth->guard('jwt')->user();
     }
+
+    public function logout()
+    {
+        return $this->auth->guard('jwt')->logout();
+    }
 }
