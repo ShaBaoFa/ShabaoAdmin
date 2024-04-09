@@ -17,11 +17,11 @@ use Qbhy\HyperfAuth\AuthMiddleware;
 Router::addGroup('/api/v1', function () {
     Router::post('/register', [LoginController::class, 'register']);
     Router::post('/login', [LoginController::class, 'login']);
-    Router::delete('/logout', [LoginController::class, 'logout']);
 
     // 个人中心
     Router::addGroup('/self', function () {
         Router::get('', [UserController::class, 'self'], ['middleware' => [AuthMiddleware::class]]);
+        Router::delete('/logout', [LoginController::class, 'logout'], ['middleware' => [AuthMiddleware::class]]);
     });
 
     // Add more routes here

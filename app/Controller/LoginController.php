@@ -44,6 +44,7 @@ class LoginController extends Controller
 
     public function logout(): ResponsePlusInterface
     {
+        $this->authService->logout();
         return $this->response->success();
     }
 }

@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace App\Model;
 
 use Carbon\Carbon;
-use Qbhy\HyperfAuth\AuthAbility;
 use Qbhy\HyperfAuth\Authenticatable;
 
 /**
@@ -26,8 +25,6 @@ use Qbhy\HyperfAuth\Authenticatable;
  */
 class User extends Model implements Authenticatable
 {
-    use AuthAbility;
-
     /**
      * The table associated with the model.
      */
@@ -42,4 +39,14 @@ class User extends Model implements Authenticatable
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function getId(): int
+    {
+        return self::getKey();
+    }
+
+    public static function retrieveById($key): ?Authenticatable
+    {
+        return self::findFromCache($key);
+    }
 }
