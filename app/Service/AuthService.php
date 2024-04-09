@@ -12,8 +12,11 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Constants\AuthGuardType;
+use App\Constants\ErrorCode;
+use App\Exception\BusinessException;
+use App\Service\Dao\UserDao;
 use Hyperf\Di\Annotation\Inject;
-use Qbhy\HyperfAuth\Authenticatable;
 use Qbhy\HyperfAuth\AuthManager;
 
 class AuthService extends BaseService
@@ -21,18 +24,31 @@ class AuthService extends BaseService
     #[Inject]
     protected AuthManager $auth;
 
-    public function jwt(Authenticatable $model)
+    #[Inject]
+    protected UserDao $userDao;
+
+    public function register(array $input, AuthGuardType $guard = AuthGuardType::JWT): string
     {
-        return $this->auth->guard('jwt')->login($model);
+        $model = $this->userDao->save($input);
+        return $this->auth->guard($guard->value)->login($model);
     }
 
-    public function user(): ?Authenticatable
+    public function login(array $input, AuthGuardType $guard = AuthGuardType::JWT): string
     {
-        return $this->auth->guard('jwt')->user();
+        $model = $this->userDao->findByAccount($input, true);
+        return $this->auth->guard($guard->value)->login($model);
     }
 
-    public function logout()
+    public function logout(AuthGuardType $guard = AuthGuardType::JWT)
     {
-        return $this->auth->guard('jwt')->logout();
+        return $this->auth->guard($guard->value)->logout();
+    }
+
+    public function checkAndGetId(AuthGuardType $guard = AuthGuardType::JWT): int
+    {
+        if (! $this->auth->guard($guard->value)->check()) {
+            throw new BusinessException(ErrorCode::UNAUTHORIZED);
+        }
+        return $this->auth->guard($guard->value)->id();
     }
 }

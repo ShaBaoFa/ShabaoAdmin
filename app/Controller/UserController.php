@@ -14,6 +14,7 @@ namespace App\Controller;
 
 use App\Request\UserRequest;
 use App\Service\AuthService;
+use App\Service\UserService;
 use Hyperf\Di\Annotation\Inject;
 use Swow\Psr7\Message\ResponsePlusInterface;
 
@@ -22,8 +23,12 @@ class UserController extends Controller
     #[Inject]
     protected AuthService $authService;
 
+    #[Inject]
+    protected UserService $userService;
+
     public function self(UserRequest $request): ResponsePlusInterface
     {
-        return $this->response->success($this->authService->user());
+        $resource = $this->userService->info($this->authService->checkAndGetId());
+        return $this->response->success($resource);
     }
 }

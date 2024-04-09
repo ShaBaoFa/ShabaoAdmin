@@ -28,17 +28,13 @@ class LoginController extends Controller
 
     public function register(AuthRequest $request): ResponsePlusInterface
     {
-        $input = $request->all();
-        $model = $this->userService->store($input);
-        $token = $this->authService->jwt($model);
+        $token = $this->authService->register($request->all());
         return $this->response->success($token);
     }
 
     public function login(AuthRequest $request): ResponsePlusInterface
     {
-        $input = $request->all();
-        $model = $this->userService->login($input);
-        $token = $this->authService->jwt($model);
+        $token = $this->authService->login($request->all());
         return $this->response->success($token);
     }
 
