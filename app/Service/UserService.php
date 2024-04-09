@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Model\User;
+use App\Resource\UserResource;
 use App\Service\Dao\UserDao;
 use Hyperf\Di\Annotation\Inject;
 
@@ -29,5 +30,12 @@ class UserService extends BaseService
     public function login(array $data): User
     {
         return $this->userDao->findByAccount(['account' => $data['account'], 'password' => $data['password']]);
+    }
+
+    public function info(int $checkAndGetId): UserResource
+    {
+        $model = $this->userDao->first($checkAndGetId, true);
+
+        return new UserResource($model);
     }
 }

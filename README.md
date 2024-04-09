@@ -12,6 +12,8 @@ composer require "hyperf/validation:3.1.*" -W
 composer require "limingxinleo/hyperf-utils" -W
 # auth 权限验证
 php bin/hyperf.php vendor:publish 96qbhy/hyperf-auth
+# hyperf resource
+composer require "hyperf/resource:3.1.*" -W
 ```
 
 # 发布配置

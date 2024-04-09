@@ -45,7 +45,6 @@ class UserDao extends BaseDao
         if (hash_equals($model?->password, hash('sha256', $array['password'])) === false) {
             throw new BusinessException(ErrorCode::USER_PASSWORD_ERROR);
         }
-        var_dump($model->toArray());
         return $model;
     }
 }
