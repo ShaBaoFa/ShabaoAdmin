@@ -19,9 +19,11 @@ use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Exception\CircularDependencyException;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Exception\HttpException;
+use Hyperf\Validation\ValidationException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use Qbhy\HyperfAuth\Exception\AuthException;
 use Throwable;
 
 class BusinessExceptionHandler extends ExceptionHandler
@@ -39,6 +41,10 @@ class BusinessExceptionHandler extends ExceptionHandler
     public function handle(Throwable $throwable, ResponseInterface $response)
     {
         switch (true) {
+            case $throwable instanceof ValidationException:
+                return $this->response->fail(ErrorCode::INVALID_PARAMS->value, $throwable->validator->errors()->first());
+            case $throwable instanceof AuthException:
+                return $this->response->fail(ErrorCode::UNAUTHORIZED->value, $throwable->getMessage());
             case $throwable instanceof HttpException:
                 return $this->response->handleException($throwable);
             case $throwable instanceof BusinessException:
