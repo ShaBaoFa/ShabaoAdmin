@@ -14,15 +14,11 @@ namespace App\Controller;
 
 use App\Request\AuthRequest;
 use App\Service\AuthService;
-use App\Service\UserService;
 use Hyperf\Di\Annotation\Inject;
 use Swow\Psr7\Message\ResponsePlusInterface;
 
 class LoginController extends Controller
 {
-    #[Inject]
-    protected UserService $userService;
-
     #[Inject]
     protected AuthService $authService;
 

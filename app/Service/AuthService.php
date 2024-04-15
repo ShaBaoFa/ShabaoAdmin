@@ -16,6 +16,7 @@ use App\Constants\AuthGuardType;
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
 use App\Service\Dao\UserDao;
+use Carbon\Carbon;
 use Hyperf\Di\Annotation\Inject;
 use Qbhy\HyperfAuth\AuthManager;
 
@@ -27,16 +28,16 @@ class AuthService extends BaseService
     #[Inject]
     protected UserDao $userDao;
 
-    public function register(array $input, AuthGuardType $guard = AuthGuardType::JWT): string
+    public function register(array $input, AuthGuardType $guard = AuthGuardType::JWT): array
     {
         $model = $this->userDao->save($input);
-        return $this->auth->guard($guard->value)->login($model);
+        return $this->formatToken($this->auth->guard($guard->value)->login($model), $guard);
     }
 
-    public function login(array $input, AuthGuardType $guard = AuthGuardType::JWT): string
+    public function login(array $input, AuthGuardType $guard = AuthGuardType::JWT): array
     {
         $model = $this->userDao->findByAccount($input, true);
-        return $this->auth->guard($guard->value)->login($model);
+        return $this->formatToken($this->auth->guard($guard->value)->login($model), $guard);
     }
 
     public function logout(AuthGuardType $guard = AuthGuardType::JWT)
@@ -50,5 +51,15 @@ class AuthService extends BaseService
             throw new BusinessException(ErrorCode::UNAUTHORIZED);
         }
         return $this->auth->guard($guard->value)->id();
+    }
+
+    private function formatToken(string $token, AuthGuardType $guard = AuthGuardType::JWT): array
+    {
+        $dataArray = $this->auth->guard($guard->value)->getPayload($token);
+        return [
+            'token_type' => 'Bearer',
+            'expires_in' => Carbon::parse($dataArray['exp'])->toDateTimeString(),
+            'access_token' => $token,
+        ];
     }
 }
