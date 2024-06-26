@@ -30,6 +30,9 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('USER_PASSWORD_ERROR')]
     case USER_PASSWORD_ERROR = 10002;
 
+    #[Message('USER_BAN')]
+    case USER_BAN = 10003;
+
     #[Message('UNAUTHORIZED')]
     case UNAUTHORIZED = 401;
 

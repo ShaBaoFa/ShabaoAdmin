@@ -14,9 +14,37 @@ namespace App\Model;
 
 use Hyperf\DbConnection\Model\Model as BaseModel;
 use Hyperf\ModelCache\Cacheable;
-use Hyperf\ModelCache\CacheableInterface;
 
-abstract class Model extends BaseModel implements CacheableInterface
+class Model extends BaseModel
 {
     use Cacheable;
+
+    /**
+     * 隐藏的字段列表.
+     * @var string[]
+     */
+    protected array $hidden = ['deleted_at'];
+
+    protected string $dataScopeField = 'created_by';
+
+    public function save(array $options = []): bool
+    {
+        return parent::save($options);
+    }
+
+    public function update(array $attributes = [], array $options = []): bool
+    {
+        return parent::update($attributes, $options);
+    }
+
+    public function getDataScopeField(): string
+    {
+        return $this->dataScopeField;
+    }
+
+    public function setDataScopeField(string $name): self
+    {
+        $this->dataScopeField = $name;
+        return $this;
+    }
 }

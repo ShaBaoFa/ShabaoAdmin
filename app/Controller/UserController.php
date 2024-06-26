@@ -31,4 +31,10 @@ class UserController extends Controller
         $resource = $this->userService->info($this->authService->checkAndGetId());
         return $this->response->success($resource);
     }
+
+    public function save(UserRequest $request): ResponsePlusInterface
+    {
+        $resource = $this->userService->store($request->validated());
+        return $this->response->success($resource);
+    }
 }

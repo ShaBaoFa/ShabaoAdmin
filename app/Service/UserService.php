@@ -22,14 +22,15 @@ class UserService extends BaseService
     #[Inject]
     protected UserDao $userDao;
 
-    public function store(array $data): User
+    public function store(array $data): UserResource
     {
-        return $this->userDao->save($data);
+        $model = $this->userDao->save($data);
+        return new UserResource($model);
     }
 
     public function login(array $data): User
     {
-        return $this->userDao->findByAccount(['account' => $data['account'], 'password' => $data['password']]);
+        return $this->userDao->findByUsername(['username' => $data['username'], 'password' => $data['password']]);
     }
 
     public function info(int $checkAndGetId): UserResource

@@ -50,7 +50,8 @@
         "hyperf/utils": "3.1.*",
         "hyperf/validation": "3.1.*",
         "limingxinleo/hyperf-utils": "^3.9",
-        "wlfpanda1012/simple-jwt-classmap": "1.0.3"
+        "wlfpanda1012/simple-jwt-classmap": "1.0.3",
+        "zoujingli/ip2region": "^2.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
@@ -65,7 +66,8 @@
             "App\\": "app/"
         },
         "files": [
-            "app/Kernel/Functions.php"
+            "app/Kernel/Functions.php",
+            "app/Helper/Functions.php"
         ]
     },
     "autoload-dev": {
