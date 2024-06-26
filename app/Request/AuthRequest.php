@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace App\Request;
 
+use JetBrains\PhpStorm\ArrayShape;
+
 class AuthRequest extends FormRequest
 {
     /**
@@ -20,7 +22,7 @@ class AuthRequest extends FormRequest
     public function registerRules(): array
     {
         return [
-            'account' => 'required|string|unique:users,account',
+            'username' => 'required|string|unique:users,username',
             'password' => 'required|string',
         ];
     }
@@ -28,8 +30,20 @@ class AuthRequest extends FormRequest
     public function loginRules(): array
     {
         return [
-            'account' => 'required|string|exists:users,account',
+            'username' => 'required|string|exists:users,username',
             'password' => 'required|string',
+        ];
+    }
+
+    #[ArrayShape([
+        'username' => 'string',
+        'password' => 'string',
+    ])]
+    public function commonAttributes(): array
+    {
+        return [
+            'username' => '用户名',
+            'password' => '密码',
         ];
     }
 }

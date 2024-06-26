@@ -13,22 +13,19 @@ use Hyperf\Database\Migrations\Migration;
 use Hyperf\Database\Schema\Blueprint;
 use Hyperf\Database\Schema\Schema;
 
-class CreateUsersTable extends Migration
+class CreateOrganizationsTable extends Migration
 {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('username', 20)->unique()->comment('账号');
-            $table->string('password', 100)->comment('密码');
+        Schema::create('organizations', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->addColumn('string', 'name', ['length' => 30, 'comment' => '组织名称']);
             $table->addColumn('smallInteger', 'status', ['default' => 1, 'comment' => '状态 (1正常 2停用)'])->index()->nullable();
-            $table->addColumn('ipAddress', 'login_ip', ['comment' => '最后登陆IP'])->nullable();
-            $table->datetime('login_time')->nullable()->comment('最后登陆时间');
-            $table->addColumn('bigInteger', 'created_by', ['comment' => '创建者'])->nullable()->index();
-            $table->addColumn('bigInteger', 'updated_by', ['comment' => '更新者'])->nullable()->index();
+            $table->addColumn('bigInteger', 'created_by', ['comment' => '创建者'])->index()->nullable();
+            $table->addColumn('bigInteger', 'updated_by', ['comment' => '更新者'])->index()->nullable();
             $table->addColumn('string', 'remark', ['length' => 255, 'comment' => '备注'])->nullable();
             $table->datetimes();
             $table->softDeletes();
@@ -40,6 +37,6 @@ class CreateUsersTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('organizations');
     }
 }

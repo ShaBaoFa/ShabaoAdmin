@@ -14,6 +14,8 @@ composer require "limingxinleo/hyperf-utils" -W
 php bin/hyperf.php vendor:publish 96qbhy/hyperf-auth
 # hyperf resource
 composer require "hyperf/resource:3.1.*" -W
+# ip2region
+composer require "zoujingli/ip2region" -W
 ```
 
 # 发布配置

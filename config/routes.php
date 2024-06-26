@@ -24,5 +24,9 @@ Router::addGroup('/api/v1', function () {
         Router::delete('/logout', [LoginController::class, 'logout'], ['middleware' => [AuthMiddleware::class]]);
     });
 
+    // 用户管理
+    Router::addGroup('/user', function () {
+        Router::post('/save', [UserController::class, 'save']);
+    });
     // Add more routes here
 });

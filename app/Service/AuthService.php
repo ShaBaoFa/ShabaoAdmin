@@ -14,10 +14,13 @@ namespace App\Service;
 
 use App\Constants\AuthGuardType;
 use App\Constants\ErrorCode;
+use App\Events\AfterLogin;
 use App\Exception\BusinessException;
+use App\Model\User;
 use App\Service\Dao\UserDao;
 use Carbon\Carbon;
 use Hyperf\Di\Annotation\Inject;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Qbhy\HyperfAuth\AuthManager;
 
 class AuthService extends BaseService
@@ -36,7 +39,22 @@ class AuthService extends BaseService
 
     public function login(array $input, AuthGuardType $guard = AuthGuardType::JWT): array
     {
-        $model = $this->userDao->findByAccount($input, true);
+        $model = $this->userDao->findByUsername($input, true);
+        $eventDispatcher = di()->get(EventDispatcherInterface::class);
+        $afterLogin = new AfterLogin($model->toArray());
+        if (hash_equals($model->password, hash('sha256', $input['password'])) === false) {
+            $afterLogin->message = '用户名或密码错误';
+            $eventDispatcher->dispatch($afterLogin);
+            throw new BusinessException(ErrorCode::USER_PASSWORD_ERROR);
+        }
+        if ($model->status === User::STATUS_DISABLE) {
+            $afterLogin->message = '用户已被禁用';
+            $eventDispatcher->dispatch($afterLogin);
+            throw new BusinessException(ErrorCode::USER_BAN);
+        }
+        $afterLogin->loginStatus = true;
+        $afterLogin->message = '登录成功';
+        $eventDispatcher->dispatch($afterLogin);
         return $this->formatToken($this->auth->guard($guard->value)->login($model), $guard);
     }
 
