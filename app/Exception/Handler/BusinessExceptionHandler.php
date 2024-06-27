@@ -40,6 +40,8 @@ class BusinessExceptionHandler extends ExceptionHandler
 
     public function handle(Throwable $throwable, ResponseInterface $response)
     {
+        var_dump('get_bus_err');
+        var_dump(get_class($throwable));
         switch (true) {
             case $throwable instanceof ValidationException:
                 return $this->response->fail(ErrorCode::INVALID_PARAMS->value, $throwable->validator->errors()->first())->withStatus(ErrorCode::INVALID_PARAMS->value);
@@ -58,7 +60,7 @@ class BusinessExceptionHandler extends ExceptionHandler
 
         $this->logger->error(format_throwable($throwable));
 
-        return $this->response->fail(ErrorCode::SERVER_ERROR->value, 'Server Error');
+        return $this->response->fail(ErrorCode::SERVER_ERROR->value, ErrorCode::SERVER_ERROR->getMessage());
     }
 
     public function isValid(Throwable $throwable): bool

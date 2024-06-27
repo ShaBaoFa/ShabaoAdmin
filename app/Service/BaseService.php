@@ -12,8 +12,11 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use Han\Utils\Service;
+use App\Service\Trait\ServiceTrait;
 
-class BaseService extends Service
+abstract class BaseService
 {
+    use ServiceTrait;
+
+    public $dao;
 }

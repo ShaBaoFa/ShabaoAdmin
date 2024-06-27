@@ -24,7 +24,7 @@ namespace App\Model;
  *                   * @property string $login_time 登录时间
  *                   * @property string $remark 备注
  */
-class LoginLog extends Model
+class LoginLog extends BaseModel
 {
     public const SUCCESS = 1;
 

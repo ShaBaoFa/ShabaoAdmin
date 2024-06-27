@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace App\Service\Dao;
+namespace App\Dao;
 
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
@@ -18,6 +18,13 @@ use App\Model\User;
 
 class UserDao extends BaseDao
 {
+    public $model;
+
+    public function assignModel(): void
+    {
+        $this->model = User::class;
+    }
+
     public function first(int $id, bool $throw = false): ?User
     {
         $model = User::findFromCache($id);
@@ -27,11 +34,11 @@ class UserDao extends BaseDao
         return $model;
     }
 
-    public function save(array $input): User
+    public function save(array $data): User
     {
         $model = new User();
-        $model->username = $input['username'];
-        $model->password = password_hash($input['password'], PASSWORD_DEFAULT);
+        $model->username = $data['username'];
+        $model->password = password_hash($data['password'], PASSWORD_DEFAULT);
         $model->save();
         return $model;
     }

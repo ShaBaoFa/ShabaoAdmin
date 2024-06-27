@@ -14,10 +14,11 @@ namespace App\Service;
 
 use App\Constants\AuthGuardType;
 use App\Constants\ErrorCode;
+use App\Dao\UserDao;
 use App\Events\AfterLogin;
+use App\Exception\AuthException;
 use App\Exception\BusinessException;
 use App\Model\User;
-use App\Service\Dao\UserDao;
 use Carbon\Carbon;
 use Hyperf\Di\Annotation\Inject;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -28,18 +29,20 @@ class AuthService extends BaseService
     #[Inject]
     protected AuthManager $auth;
 
-    #[Inject]
-    protected UserDao $userDao;
+    public function __construct(UserDao $dao)
+    {
+        $this->dao = $dao;
+    }
 
     public function register(array $input, AuthGuardType $guard = AuthGuardType::JWT): array
     {
-        $model = $this->userDao->save($input);
+        $model = $this->dao->save($input);
         return $this->formatToken($this->auth->guard($guard->value)->login($model), $guard);
     }
 
     public function login(array $input, AuthGuardType $guard = AuthGuardType::JWT): array
     {
-        $model = $this->userDao->findByUsername($input, true);
+        $model = $this->dao->findByUsername($input, true);
         $eventDispatcher = di()->get(EventDispatcherInterface::class);
         $afterLogin = new AfterLogin($model->toArray());
 
@@ -67,7 +70,7 @@ class AuthService extends BaseService
     public function checkAndGetId(AuthGuardType $guard = AuthGuardType::JWT): int
     {
         if (! $this->auth->guard($guard->value)->check()) {
-            throw new BusinessException(ErrorCode::UNAUTHORIZED);
+            throw new AuthException(ErrorCode::UNAUTHORIZED);
         }
         return $this->auth->guard($guard->value)->id();
     }

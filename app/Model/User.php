@@ -29,7 +29,7 @@ use Qbhy\HyperfAuth\Authenticatable;
  * @property Carbon $updated_at
  * @property Carbon $deleted_at
  */
-class User extends Model implements Authenticatable
+class User extends BaseModel implements Authenticatable
 {
     public const STATUS_NORMAL = 1;
 

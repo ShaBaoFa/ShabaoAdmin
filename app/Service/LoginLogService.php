@@ -12,16 +12,12 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Service\Dao\LoginLogDao;
-use Hyperf\Di\Annotation\Inject;
+use App\Dao\LoginLogDao;
 
 class LoginLogService extends BaseService
 {
-    #[Inject]
-    protected LoginLogDao $dao;
-
-    public function save(array $data): void
+    public function __construct(LoginLogDao $dao)
     {
-        $this->dao->save($data);
+        $this->dao = $dao;
     }
 }
