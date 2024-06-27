@@ -25,7 +25,7 @@ use Carbon\Carbon;
  * @property Carbon $updated_at
  * @property string $deleted_at
  */
-class Organization extends Model
+class Organization extends BaseModel
 {
     /**
      * The table associated with the model.

@@ -10,10 +10,16 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace App\Service\Dao;
+namespace App\Dao;
 
-use Han\Utils\Service;
+use App\Model\LoginLog;
 
-class BaseDao extends Service
+class LoginLogDao extends BaseDao
 {
+    public $model;
+
+    public function assignModel(): void
+    {
+        $this->model = LoginLog::class;
+    }
 }

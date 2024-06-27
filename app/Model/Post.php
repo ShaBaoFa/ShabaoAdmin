@@ -26,7 +26,7 @@ use Carbon\Carbon;
  * @property Carbon $updated_at
  * @property string $deleted_at
  */
-class Post extends Model
+class Post extends BaseModel
 {
     /**
      * The table associated with the model.

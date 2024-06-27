@@ -12,30 +12,31 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Dao\UserDao;
 use App\Model\User;
 use App\Resource\UserResource;
-use App\Service\Dao\UserDao;
-use Hyperf\Di\Annotation\Inject;
 
 class UserService extends BaseService
 {
-    #[Inject]
-    protected UserDao $userDao;
-
-    public function store(array $data): UserResource
+    public function __construct(UserDao $dao)
     {
-        $model = $this->userDao->save($data);
+        $this->dao = $dao;
+    }
+
+    public function save(array $data): UserResource
+    {
+        $model = $this->dao->save($data);
         return new UserResource($model);
     }
 
     public function login(array $data): User
     {
-        return $this->userDao->findByUsername(['username' => $data['username'], 'password' => $data['password']]);
+        return $this->dao->findByUsername(['username' => $data['username'], 'password' => $data['password']]);
     }
 
     public function info(int $checkAndGetId): UserResource
     {
-        $model = $this->userDao->first($checkAndGetId, true);
+        $model = $this->dao->first($checkAndGetId, true);
 
         return new UserResource($model);
     }

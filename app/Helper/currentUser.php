@@ -14,7 +14,7 @@ namespace App\Helper;
 
 use App\Constants\AuthGuardType;
 use App\Constants\ErrorCode;
-use App\Exception\BusinessException;
+use App\Exception\AuthException;
 use Qbhy\HyperfAuth\AuthGuard;
 use Qbhy\HyperfAuth\AuthManager;
 
@@ -45,7 +45,7 @@ class currentUser
     public function check(): void
     {
         if (! $this->guard->check()) {
-            throw new BusinessException(ErrorCode::UNAUTHORIZED);
+            throw new AuthException(ErrorCode::UNAUTHORIZED);
         }
     }
 }

@@ -12,29 +12,24 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Annotation\Auth;
 use App\Request\UserRequest;
-use App\Service\AuthService;
 use App\Service\UserService;
 use Hyperf\Di\Annotation\Inject;
+use Hyperf\HttpServer\Annotation\Controller as CA;
+use Hyperf\HttpServer\Annotation\PostMapping;
 use Swow\Psr7\Message\ResponsePlusInterface;
 
+#[CA(prefix: 'api/v1/users')]
 class UserController extends Controller
 {
     #[Inject]
-    protected AuthService $authService;
-
-    #[Inject]
     protected UserService $userService;
 
-    public function self(UserRequest $request): ResponsePlusInterface
-    {
-        $resource = $this->userService->info($this->authService->checkAndGetId());
-        return $this->response->success($resource);
-    }
-
+    #[PostMapping('save'),Auth]
     public function save(UserRequest $request): ResponsePlusInterface
     {
-        $resource = $this->userService->store($request->validated());
+        $resource = $this->userService->save($request->validated());
         return $this->response->success($resource);
     }
 }
