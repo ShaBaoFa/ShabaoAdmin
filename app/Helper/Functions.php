@@ -9,14 +9,15 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+use App\Constants\AuthGuardType;
 use App\Helper\currentUser;
 
 if (! function_exists('user')) {
     /**
      * 获取当前登录用户实例.
      */
-    function user(): currentUser
+    function user(AuthGuardType $guardType = AuthGuardType::JWT): currentUser
     {
-        return new currentUser();
+        return new currentUser($guardType);
     }
 }

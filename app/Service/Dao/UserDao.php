@@ -31,7 +31,7 @@ class UserDao extends BaseDao
     {
         $model = new User();
         $model->username = $input['username'];
-        $model->password = hash('sha256', $input['password']);
+        $model->password = password_hash($input['password'], PASSWORD_DEFAULT);
         $model->save();
         return $model;
     }

@@ -13,9 +13,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Kernel\Http\Response;
+use Hyperf\HttpServer\Annotation\Controller as CA;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Container\ContainerInterface;
 
+#[CA(prefix: '/api/v1')]
 abstract class Controller
 {
     protected Response $response;
