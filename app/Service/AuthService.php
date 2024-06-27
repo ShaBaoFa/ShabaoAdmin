@@ -42,7 +42,8 @@ class AuthService extends BaseService
         $model = $this->userDao->findByUsername($input, true);
         $eventDispatcher = di()->get(EventDispatcherInterface::class);
         $afterLogin = new AfterLogin($model->toArray());
-        if (hash_equals($model->password, hash('sha256', $input['password'])) === false) {
+
+        if (password_verify($input['password'], $model->password) === false) {
             $afterLogin->message = '用户名或密码错误';
             $eventDispatcher->dispatch($afterLogin);
             throw new BusinessException(ErrorCode::USER_PASSWORD_ERROR);
