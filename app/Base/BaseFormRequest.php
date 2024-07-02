@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of web-api.
  *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
  */
 
-namespace App\Request;
+namespace App\Base;
 
 use Hyperf\HttpServer\Router\Dispatched;
-use Hyperf\Validation\Request\FormRequest as BaseFormRequest;
+use Hyperf\Validation\Request\FormRequest;
 
-class FormRequest extends BaseFormRequest
+class BaseFormRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

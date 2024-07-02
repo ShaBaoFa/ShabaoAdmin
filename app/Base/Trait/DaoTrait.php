@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of web-api.
  *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
  */
 
-namespace App\Dao\Trait;
+namespace App\Base\Trait;
 
-use App\Model\BaseModel;
+use App\Base\BaseModel;
 
 trait DaoTrait
 {
@@ -21,6 +21,9 @@ trait DaoTrait
      */
     public $model;
 
+    /**
+     * 过滤新增或写入不存在的字段.
+     */
     public function filterExecuteAttributes(array &$data, bool $removePk = false): void
     {
         $model = new $this->model();
@@ -37,6 +40,9 @@ trait DaoTrait
         $model = null;
     }
 
+    /**
+     * 新增数据.
+     */
     public function save(array $data): mixed
     {
         $this->filterExecuteAttributes($data, $this->getModel()->incrementing);

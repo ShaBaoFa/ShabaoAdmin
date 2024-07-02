@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of web-api.
  *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
  */
 
-namespace App\Model;
+namespace App\Base;
 
 use Hyperf\DbConnection\Model\Model;
 use Hyperf\ModelCache\Cacheable;
@@ -18,6 +18,18 @@ use Hyperf\ModelCache\Cacheable;
 class BaseModel extends Model
 {
     use Cacheable;
+
+    /**
+     * 状态
+     */
+    public const ENABLE = 1;
+
+    public const DISABLE = 2;
+
+    /**
+     * 默认每页记录数.
+     */
+    public const PAGE_SIZE = 15;
 
     /**
      * 隐藏的字段列表.

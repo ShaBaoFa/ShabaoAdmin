@@ -10,12 +10,13 @@ composer require "hyperf/swagger:3.1.*" -W
 composer require "hyperf/validation:3.1.*" -W
 # hyperf-utils 工具包
 composer require "limingxinleo/hyperf-utils" -W
-# auth 权限验证
-php bin/hyperf.php vendor:publish 96qbhy/hyperf-auth
 # hyperf resource
 composer require "hyperf/resource:3.1.*" -W
 # ip2region
 composer require "zoujingli/ip2region" -W
+# Excel （需要 ext-xml）
+composer require "phpoffice/phpspreadsheet:^1.24" -W
+
 ```
 
 # 发布配置
@@ -26,6 +27,7 @@ php bin/hyperf.php vendor:publish hyperf/swagger
 # [hyperf/validation] publishes [en] successfully.
 php bin/hyperf.php vendor:publish hyperf/validation
 php bin/hyperf.php vendor:publish hyperf/translation
+# auth 权限验证
 php bin/hyperf.php vendor:publish 96qbhy/hyperf-auth
 ```
 

@@ -2,25 +2,27 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of web-api.
  *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
  */
 
 namespace App\Exception\Handler;
 
+use App\Base\BaseResponse;
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
-use App\Kernel\Http\Response;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Exception\CircularDependencyException;
 use Hyperf\ExceptionHandler\ExceptionHandler;
 use Hyperf\HttpMessage\Exception\HttpException;
 use Hyperf\Validation\ValidationException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use Qbhy\HyperfAuth\Exception\AuthException;
@@ -28,16 +30,20 @@ use Throwable;
 
 class BusinessExceptionHandler extends ExceptionHandler
 {
-    protected Response $response;
+    protected BaseResponse $response;
 
     protected LoggerInterface $logger;
 
     public function __construct(protected ContainerInterface $container)
     {
-        $this->response = $container->get(Response::class);
+        $this->response = $container->get(BaseResponse::class);
         $this->logger = $container->get(StdoutLoggerInterface::class);
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     */
     public function handle(Throwable $throwable, ResponseInterface $response)
     {
         var_dump('get_bus_err');
