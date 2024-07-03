@@ -34,7 +34,7 @@ return [
             ],
         ],
     ],
-    'settings' => array(
+    'settings' => [
         Constant::OPTION_ENABLE_COROUTINE => true,
         Constant::OPTION_WORKER_NUM => swoole_cpu_num(),
         Constant::OPTION_PID_FILE => BASE_PATH . '/runtime/hyperf.pid',
@@ -44,7 +44,7 @@ return [
         Constant::OPTION_MAX_REQUEST => 0,
         Constant::OPTION_SOCKET_BUFFER_SIZE => 2 * 1024 * 1024,
         Constant::OPTION_PACKAGE_MAX_LENGTH => 2 * 1024 * 1024,
-    ),
+    ],
     'callbacks' => [
         Event::ON_BEFORE_START => [ServerStartCallback::class, 'beforeStart'],
         Event::ON_WORKER_START => [WorkerStartCallback::class, 'onWorkerStart'],
