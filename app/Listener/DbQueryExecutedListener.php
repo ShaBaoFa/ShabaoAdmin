@@ -19,6 +19,7 @@ use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Logger\LoggerFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+
 use function Hyperf\Support\env;
 
 #[Listener]
@@ -57,7 +58,7 @@ class DbQueryExecutedListener implements ListenerInterface
                     $position += strlen($value);
                 }
             }
-            if (env('PRINT_SQL_LOG')){
+            if (env('PRINT_SQL_LOG')) {
                 $this->logger->info(sprintf('[%s:%s] %s', $event->connectionName, $event->time, $sql));
             }
         }

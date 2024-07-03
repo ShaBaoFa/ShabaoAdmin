@@ -53,7 +53,7 @@ class AuthAspect extends AbstractAspect
         }
         $currentUser = user($scene);
 
-        $currentUser->check(scene:$scene);
+        $currentUser->check(scene: $scene);
 
         return $proceedingJoinPoint->process();
     }
