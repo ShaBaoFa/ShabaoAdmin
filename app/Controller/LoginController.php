@@ -14,6 +14,7 @@ namespace App\Controller;
 
 use App\Annotation\Auth;
 use App\Base\BaseController;
+use App\Helper\currentUser;
 use App\Request\AuthRequest;
 use App\Service\AuthService;
 use App\Service\UserService;
@@ -26,6 +27,7 @@ use Hyperf\HttpServer\Annotation\PostMapping;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\SimpleCache\InvalidArgumentException;
 
 #[Controller(prefix: 'api/v1/auth')]
 class LoginController extends BaseController
@@ -53,6 +55,7 @@ class LoginController extends BaseController
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
      */
     #[DeleteMapping('logout'),Auth]
     public function logout(): ResponseInterface
@@ -68,6 +71,18 @@ class LoginController extends BaseController
     #[GetMapping('self'),Auth]
     public function self(): ResponseInterface
     {
-        return $this->response->success($this->userService->info($this->authService->checkAndGetId()));
+        return $this->response->success($this->userService->info());
+    }
+
+    /**
+     * 刷新token.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
+     */
+    #[PostMapping('refresh')]
+    public function refresh(currentUser $user): ResponseInterface
+    {
+        return $this->response->success(['token' => $user->refresh()]);
     }
 }

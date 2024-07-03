@@ -13,10 +13,10 @@ declare(strict_types=1);
 namespace App\Exception;
 
 use App\Constants\ErrorCodeInterface;
-use Qbhy\HyperfAuth\Exception\AuthException as BaseAuthException;
+use Hyperf\Server\Exception\ServerException;
 use Throwable;
 
-class AuthException extends BaseAuthException
+class AuthException extends ServerException
 {
     public function __construct(ErrorCodeInterface $code, ?string $message = null, ?Throwable $previous = null)
     {

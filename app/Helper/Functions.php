@@ -9,15 +9,20 @@ declare(strict_types=1);
  * @gitee    https://gitee.com/wlfpanda/web-api
  * @contact  mail@wlfpanda1012.com
  */
-use App\Constants\AuthGuardType;
 use App\Helper\currentUser;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 if (! function_exists('user')) {
     /**
      * 获取当前登录用户实例.
      */
-    function user(AuthGuardType $guardType = AuthGuardType::JWT): currentUser
+    function user(?string $scene = 'default'): currentUser
     {
-        return new currentUser($guardType);
+        try {
+            return new currentUser($scene);
+        } catch (NotFoundExceptionInterface $e) {
+        } catch (ContainerExceptionInterface $e) {
+        }
     }
 }

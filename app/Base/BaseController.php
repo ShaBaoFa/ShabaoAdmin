@@ -12,7 +12,9 @@ declare(strict_types=1);
 
 namespace App\Base;
 
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 abstract class BaseController
 {
@@ -20,6 +22,10 @@ abstract class BaseController
 
     protected BaseRequest $request;
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function __construct(protected ContainerInterface $container)
     {
         $this->response = $container->get(BaseResponse::class);

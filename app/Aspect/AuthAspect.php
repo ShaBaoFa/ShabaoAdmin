@@ -13,11 +13,13 @@ declare(strict_types=1);
 namespace App\Aspect;
 
 use App\Annotation\Auth;
-use App\Constants\AuthGuardType;
 use Hyperf\Di\Annotation\Aspect;
 use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
+use Hyperf\Di\Exception\Exception;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 #[Aspect]
 class AuthAspect extends AbstractAspect
@@ -30,24 +32,28 @@ class AuthAspect extends AbstractAspect
     {
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws Exception
+     * @throws NotFoundExceptionInterface
+     */
     public function process(ProceedingJoinPoint $proceedingJoinPoint)
     {
-        $guard = 'jwt';
+        $scene = 'default';
 
         /* @var $auth Auth */
         if (isset($proceedingJoinPoint->getAnnotationMetadata()->class[Auth::class])) {
             $auth = $proceedingJoinPoint->getAnnotationMetadata()->class[Auth::class];
-            $guard = $auth->guard ?? 'jwt';
+            $scene = $auth->scene ?? 'default';
         }
 
         if (isset($proceedingJoinPoint->getAnnotationMetadata()->method[Auth::class])) {
             $auth = $proceedingJoinPoint->getAnnotationMetadata()->method[Auth::class];
-            $guard = $auth->guard ?? 'default';
+            $scene = $auth->scene ?? 'default';
         }
-        $guard = AuthGuardType::from($guard);
-        $currentUser = user($guard);
+        $currentUser = user($scene);
 
-        $currentUser->check();
+        $currentUser->check(scene:$scene);
 
         return $proceedingJoinPoint->process();
     }

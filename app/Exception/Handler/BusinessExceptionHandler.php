@@ -14,6 +14,7 @@ namespace App\Exception\Handler;
 
 use App\Base\BaseResponse;
 use App\Constants\ErrorCode;
+use App\Exception\AuthException;
 use App\Exception\BusinessException;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Exception\CircularDependencyException;
@@ -25,7 +26,6 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use Qbhy\HyperfAuth\Exception\AuthException;
 use Throwable;
 
 class BusinessExceptionHandler extends ExceptionHandler
@@ -46,8 +46,6 @@ class BusinessExceptionHandler extends ExceptionHandler
      */
     public function handle(Throwable $throwable, ResponseInterface $response)
     {
-        var_dump('get_bus_err');
-        var_dump(get_class($throwable));
         switch (true) {
             case $throwable instanceof ValidationException:
                 return $this->response->fail(ErrorCode::INVALID_PARAMS->value, $throwable->validator->errors()->first())->withStatus(ErrorCode::INVALID_PARAMS->value);

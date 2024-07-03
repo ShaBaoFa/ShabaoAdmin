@@ -19,7 +19,9 @@ use App\Service\UserService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\PostMapping;
-use Swow\Psr7\Message\ResponsePlusInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ResponseInterface;
 
 #[Controller(prefix: 'api/v1/users')]
 class UserController extends BaseController
@@ -27,10 +29,13 @@ class UserController extends BaseController
     #[Inject]
     protected UserService $userService;
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     #[PostMapping('save'),Auth]
-    public function save(UserRequest $request): ResponsePlusInterface
+    public function save(UserRequest $request): ResponseInterface
     {
-        $resource = $this->userService->save($request->validated());
-        return $this->response->success($resource);
+        return $this->response->success(['id' => $this->userService->save($request->validated())]);
     }
 }

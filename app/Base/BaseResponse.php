@@ -28,11 +28,6 @@ class BaseResponse extends Response
 
     public const ERROR = 500;
 
-    public function getResponse(): ResponsePlusInterface
-    {
-        return parent::getResponse();
-    }
-
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -92,7 +87,12 @@ class BaseResponse extends Response
             ->withBody(new SwooleStream($image));
     }
 
-    private function handleHeader(ResponseInterface $response): ResponseInterface
+    public function getResponse(): ResponsePlusInterface
+    {
+        return parent::getResponse();
+    }
+
+    private function handleHeader(ResponsePlusInterface $response): ResponseInterface
     {
         $headers = config('base-common.http.headers', [
             'Server' => 'web-api',
