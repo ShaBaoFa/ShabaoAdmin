@@ -16,6 +16,6 @@ return [
     'default' => [
         'driver' => RedisDriver::class,
         'packer' => PhpSerializerPacker::class,
-        'prefix' => 'c:',
+        'prefix' => 'WlfPanda1012:',
     ],
 ];

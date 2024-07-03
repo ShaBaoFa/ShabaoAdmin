@@ -20,6 +20,7 @@ use App\Events\AfterLogin;
 use App\Exception\AuthException;
 use App\Exception\BusinessException;
 use App\Model\User;
+use App\Vo\UserServiceVo;
 use Carbon\Carbon;
 use Hyperf\Di\Annotation\Inject;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -41,13 +42,12 @@ class AuthService extends BaseService
         return $this->formatToken($this->auth->guard($guard->value)->login($model), $guard);
     }
 
-    public function login(array $input, AuthGuardType $guard = AuthGuardType::JWT): array
+    public function login(UserServiceVo $vo, AuthGuardType $guard = AuthGuardType::JWT): array
     {
-        $model = $this->dao->findByUsername($input, true);
+        $model = $this->dao->findByUsername($vo->getUsername(), true);
         $eventDispatcher = di()->get(EventDispatcherInterface::class);
         $afterLogin = new AfterLogin($model->toArray());
-
-        if (password_verify($input['password'], $model->password) === false) {
+        if (password_verify(password: $vo->getPassword(), hash: $model->password) === false) {
             $afterLogin->message = '用户名或密码错误';
             $eventDispatcher->dispatch($afterLogin);
             throw new BusinessException(ErrorCode::USER_PASSWORD_ERROR);
@@ -57,7 +57,9 @@ class AuthService extends BaseService
             $eventDispatcher->dispatch($afterLogin);
             throw new BusinessException(ErrorCode::USER_BAN);
         }
+        $token = $this->auth->guard($guard->value)->login($model);
         $afterLogin->loginStatus = true;
+        $afterLogin->token = $token;
         $afterLogin->message = '登录成功';
         $eventDispatcher->dispatch($afterLogin);
         return $this->formatToken($this->auth->guard($guard->value)->login($model), $guard);

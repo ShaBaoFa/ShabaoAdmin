@@ -12,10 +12,11 @@ declare(strict_types=1);
 
 namespace App\Request;
 
+use App\Base\BaseFormRequest;
 use App\Request\Rules\PasswordRule;
 use JetBrains\PhpStorm\ArrayShape;
 
-class UserRequest extends FormRequest
+class UserRequest extends BaseFormRequest
 {
     public function saveRules(): array
     {
