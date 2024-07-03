@@ -19,9 +19,9 @@ use Hyperf\Di\Annotation\AbstractAnnotation;
 class Auth extends AbstractAnnotation
 {
     /**
-     * @param string $guard 守卫名称
+     * @param string $scene 场景
      */
-    public function __construct(public string $guard = 'jwt')
+    public function __construct(public string $scene = 'default')
     {
     }
 }

@@ -1,5 +1,5 @@
 {
-    "name": "hyperf/biz-skeleton",
+    "name": "wlfpanda1012/web-api",
     "type": "project",
     "keywords": [
         "php",
@@ -9,7 +9,7 @@
         "microservice",
         "middleware"
     ],
-    "description": "A coroutine framework that focuses on hyperspeed and flexible, specifically use for build microservices and middlewares.",
+    "description": "个人框架用",
     "license": "MIT",
     "require": {
         "php": ">=8.1",
@@ -21,9 +21,8 @@
         "ext-pdo_mysql": "*",
         "ext-redis": "*",
         "ext-swoole": ">=5.0",
-        "ext-xml": "*",
         "ext-xlswriter": "*",
-        "96qbhy/hyperf-auth": "^3.1",
+        "ext-xml": "*",
         "hyperf/async-queue": "3.1.*",
         "hyperf/cache": "3.1.*",
         "hyperf/command": "3.1.*",
@@ -55,7 +54,7 @@
         "hyperf/validation": "3.1.*",
         "limingxinleo/hyperf-utils": "^3.9",
         "phpoffice/phpspreadsheet": "^1.24",
-        "wlfpanda1012/simple-jwt-classmap": "1.0.3",
+        "xmo/jwt-auth": "^2.0",
         "zoujingli/ip2region": "^2.0"
     },
     "require-dev": {

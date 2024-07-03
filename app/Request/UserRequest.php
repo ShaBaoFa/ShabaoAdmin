@@ -15,9 +15,15 @@ namespace App\Request;
 use App\Base\BaseFormRequest;
 use App\Request\Rules\PasswordRule;
 use JetBrains\PhpStorm\ArrayShape;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class UserRequest extends BaseFormRequest
 {
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function saveRules(): array
     {
         $passwordRule = di()->get(PasswordRule::class);

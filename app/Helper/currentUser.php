@@ -12,40 +12,113 @@ declare(strict_types=1);
 
 namespace App\Helper;
 
-use App\Constants\AuthGuardType;
+use App\Base\BaseRequest;
 use App\Constants\ErrorCode;
 use App\Exception\AuthException;
-use Qbhy\HyperfAuth\AuthGuard;
-use Qbhy\HyperfAuth\AuthManager;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\SimpleCache\InvalidArgumentException;
+use Throwable;
+use Xmo\JWTAuth\JWT;
+
+use function Hyperf\Support\env;
 
 class currentUser
 {
-    protected AuthGuard $guard;
+    protected JWT $jwt;
 
-    public function __construct(AuthGuardType $guard = AuthGuardType::JWT)
+    protected BaseRequest $request;
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function __construct(string $scene = 'default')
     {
-        $this->guard = di()->get(AuthManager::class)->guard($guard->value);
+        $this->jwt = di()->get(JWT::class)->setScene($scene);
     }
 
-    public function getGuard(): AuthGuard
+    /**
+     * 验证token.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function check(?string $token = null, string $scene = 'default'): bool
     {
-        return $this->guard;
-    }
-
-    public function getId(): int
-    {
-        return $this->guard->id();
-    }
-
-    public function refresh(): void
-    {
-        $this->guard->refresh();
-    }
-
-    public function check(): void
-    {
-        if (! $this->guard->check()) {
+        try {
+            if ($this->jwt->checkToken($token, $scene, true, true, true)) {
+                return true;
+            }
+        } catch (InvalidArgumentException|Throwable $e) {
             throw new AuthException(ErrorCode::UNAUTHORIZED);
         }
+
+        return false;
+    }
+
+    /**
+     * 获取JWT对象
+     */
+    public function getJwt(): JWT
+    {
+        return $this->jwt;
+    }
+
+    /**
+     * 获取当前登录用户信息.
+     */
+    public function getUserInfo(?string $token = null): array
+    {
+        return $this->jwt->getParserData($token);
+    }
+
+    /**
+     * 获取当前登录用户ID.
+     */
+    public function getId(): int
+    {
+        return $this->jwt->getParserData()['id'];
+    }
+
+    /**
+     * 获取当前登录用户名.
+     */
+    public function getUsername(): string
+    {
+        return $this->jwt->getParserData()['username'];
+    }
+
+    /**
+     * 获取当前token用户类型.
+     */
+    public function getUserType(): string
+    {
+        return $this->jwt->getParserData()['user_type'];
+    }
+
+    /**
+     * 是否为超级管理员（创始人），用户禁用对创始人没用.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return env('SUPER_ADMIN') == $this->getId();
+    }
+
+    /**
+     * 获取Token.
+     * @throws InvalidArgumentException
+     */
+    public function getToken(array $user): string
+    {
+        return $this->jwt->getToken($user);
+    }
+
+    /**
+     * 刷新token.
+     * @throws InvalidArgumentException
+     */
+    public function refresh(): string
+    {
+        return $this->jwt->refreshToken();
     }
 }

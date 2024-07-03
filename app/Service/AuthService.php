@@ -13,36 +13,32 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Base\BaseService;
-use App\Constants\AuthGuardType;
 use App\Constants\ErrorCode;
 use App\Dao\UserDao;
 use App\Events\AfterLogin;
-use App\Exception\AuthException;
 use App\Exception\BusinessException;
 use App\Model\User;
 use App\Vo\UserServiceVo;
-use Carbon\Carbon;
-use Hyperf\Di\Annotation\Inject;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-use Qbhy\HyperfAuth\AuthManager;
+use Psr\SimpleCache\InvalidArgumentException;
+
+use function user;
 
 class AuthService extends BaseService
 {
-    #[Inject]
-    protected AuthManager $auth;
-
     public function __construct(UserDao $dao)
     {
         $this->dao = $dao;
     }
 
-    public function register(array $input, AuthGuardType $guard = AuthGuardType::JWT): array
-    {
-        $model = $this->dao->save($input);
-        return $this->formatToken($this->auth->guard($guard->value)->login($model), $guard);
-    }
-
-    public function login(UserServiceVo $vo, AuthGuardType $guard = AuthGuardType::JWT): array
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
+     */
+    public function login(UserServiceVo $vo): array
     {
         $model = $this->dao->findByUsername($vo->getUsername(), true);
         $eventDispatcher = di()->get(EventDispatcherInterface::class);
@@ -57,33 +53,26 @@ class AuthService extends BaseService
             $eventDispatcher->dispatch($afterLogin);
             throw new BusinessException(ErrorCode::USER_BAN);
         }
-        $token = $this->auth->guard($guard->value)->login($model);
         $afterLogin->loginStatus = true;
-        $afterLogin->token = $token;
         $afterLogin->message = '登录成功';
+        $token = user()->getToken($afterLogin->userinfo);
+        $afterLogin->token = $token;
         $eventDispatcher->dispatch($afterLogin);
-        return $this->formatToken($this->auth->guard($guard->value)->login($model), $guard);
+        return $this->formatToken($token);
     }
 
-    public function logout(AuthGuardType $guard = AuthGuardType::JWT)
+    /**
+     * @throws InvalidArgumentException
+     */
+    public function logout(): void
     {
-        return $this->auth->guard($guard->value)->logout();
+        user()->getJwt()->logout();
     }
 
-    public function checkAndGetId(AuthGuardType $guard = AuthGuardType::JWT): int
+    private function formatToken(string $token): array
     {
-        if (! $this->auth->guard($guard->value)->check()) {
-            throw new AuthException(ErrorCode::UNAUTHORIZED);
-        }
-        return $this->auth->guard($guard->value)->id();
-    }
-
-    private function formatToken(string $token, AuthGuardType $guard = AuthGuardType::JWT): array
-    {
-        $dataArray = $this->auth->guard($guard->value)->getPayload($token);
         return [
             'token_type' => 'Bearer',
-            'expires_in' => Carbon::parse($dataArray['exp'])->toDateTimeString(),
             'access_token' => $token,
         ];
     }

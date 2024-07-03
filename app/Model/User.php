@@ -14,7 +14,6 @@ namespace App\Model;
 
 use App\Base\BaseModel;
 use Carbon\Carbon;
-use Qbhy\HyperfAuth\Authenticatable;
 
 /**
  * @property int $id
@@ -30,7 +29,7 @@ use Qbhy\HyperfAuth\Authenticatable;
  * @property Carbon $updated_at
  * @property Carbon $deleted_at
  */
-class User extends BaseModel implements Authenticatable
+class User extends BaseModel
 {
     public const STATUS_NORMAL = 1;
 
@@ -56,11 +55,6 @@ class User extends BaseModel implements Authenticatable
         return self::getKey();
     }
 
-    public static function retrieveById($key): ?Authenticatable
-    {
-        return self::findFromCache($key);
-    }
-
     public static function passwordVerify($password, $hash): bool
     {
         return password_verify($password, $hash);
@@ -68,6 +62,7 @@ class User extends BaseModel implements Authenticatable
 
     /**
      * password 加密.
+     * @param mixed $value
      */
     public function setPasswordAttribute($value): void
     {
