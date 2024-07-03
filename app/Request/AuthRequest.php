@@ -12,9 +12,10 @@ declare(strict_types=1);
 
 namespace App\Request;
 
+use App\Base\BaseFormRequest;
 use JetBrains\PhpStorm\ArrayShape;
 
-class AuthRequest extends FormRequest
+class AuthRequest extends BaseFormRequest
 {
     /**
      * Get the validation rules that apply to the request.

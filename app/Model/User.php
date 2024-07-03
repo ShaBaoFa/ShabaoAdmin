@@ -65,4 +65,12 @@ class User extends BaseModel implements Authenticatable
     {
         return password_verify($password, $hash);
     }
+
+    /**
+     * password 加密.
+     */
+    public function setPasswordAttribute($value): void
+    {
+        $this->attributes['password'] = password_hash($value, PASSWORD_DEFAULT);
+    }
 }

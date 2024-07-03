@@ -13,9 +13,12 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Base\BaseService;
+use App\Constants\ErrorCode;
 use App\Dao\UserDao;
+use App\Exception\BusinessException;
 use App\Model\User;
-use App\Resource\UserResource;
+use Hyperf\Cache\Annotation\Cacheable;
+use Hyperf\Cache\Annotation\CacheEvict;
 
 class UserService extends BaseService
 {
@@ -24,21 +27,88 @@ class UserService extends BaseService
         $this->dao = $dao;
     }
 
-    public function save(array $data): UserResource
+    /**
+     * 新增用户.
+     */
+    public function save(array $data): int
     {
-        $model = $this->dao->save($data);
-        return new UserResource($model);
+        if ($this->dao->existsByUsername($data['username'])) {
+            throw new BusinessException(ErrorCode::USER_NOT_EXIST);
+        }
+        return $this->dao->save($this->handleData($data));
     }
 
-    public function login(array $data): User
+    /**
+     * 获取用户信息.
+     */
+    public function info(?int $userId = null): array
     {
-        return $this->dao->findByUsername(['username' => $data['username'], 'password' => $data['password']]);
+        if ($uid = (is_null($userId) ? user()->getId() : $userId)) {
+            return $this->getCacheInfo($uid);
+        }
+        throw new BusinessException(ErrorCode::USER_NOT_EXIST);
     }
 
-    public function info(int $checkAndGetId): UserResource
+    /**
+     * 更新用户信息.
+     */
+    #[CacheEvict(prefix: 'loginInfo', value: 'userId_#{id}')]
+    public function update(mixed $id, array $data): bool
     {
-        $model = $this->dao->first($checkAndGetId, true);
+        if (isset($data['username'])) {
+            unset($data['username']);
+        }
+        if (isset($data['password'])) {
+            unset($data['password']);
+        }
+        return $this->dao->update($id, $this->handleData($data));
+    }
 
-        return new UserResource($model);
+    /**
+     * 获取缓存用户信息.
+     */
+    #[Cacheable(prefix: 'loginInfo', value: 'userId_#{id}', ttl: 0)]
+    protected function getCacheInfo(int $id): array
+    {
+        $user = $this->dao->getModel()->find($id);
+        $user->addHidden('deleted_at', 'password');
+        $data['user'] = $user->toArray();
+
+        /**
+         * @todo 获取用户角色、部门、岗位信息
+         */
+        //        if (user()->isSuperAdmin()) {
+        //            $data['roles'] = ['superAdmin'];
+        //            $data['routers'] = $this->sysMenuService->mapper->getSuperAdminRouters();
+        //            $data['codes'] = ['*'];
+        //        } else {
+        //            $roles = $this->sysRoleService->mapper->getMenuIdsByRoleIds($user->roles()->pluck('id')->toArray());
+        //            $ids = $this->filterMenuIds($roles);
+        //            $data['roles'] = $user->roles()->pluck('code')->toArray();
+        //            $data['routers'] = $this->sysMenuService->mapper->getRoutersByIds($ids);
+        //            $data['codes'] = $this->sysMenuService->mapper->getMenuCode($ids);
+        //        }
+        return $data;
+    }
+
+    /**
+     * 处理提交数据.
+     * @param mixed $data
+     */
+    protected function handleData(array $data): array
+    {
+        if (! is_array($data['role_ids'])) {
+            $data['role_ids'] = explode(',', $data['role_ids']);
+        }
+        if (($key = array_search(env('ADMIN_ROLE'), $data['role_ids'])) !== false) {
+            unset($data['role_ids'][$key]);
+        }
+        if (! empty($data['post_ids']) && ! is_array($data['post_ids'])) {
+            $data['post_ids'] = explode(',', $data['post_ids']);
+        }
+        if (! empty($data['dept_ids']) && ! is_array($data['dept_ids'])) {
+            $data['dept_ids'] = explode(',', $data['dept_ids']);
+        }
+        return $data;
     }
 }

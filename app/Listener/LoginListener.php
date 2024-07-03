@@ -19,9 +19,14 @@ use App\Model\LoginLog;
 use App\Model\User;
 use App\Service\LoginLogService;
 use Exception;
+use Hyperf\Cache\Cache;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\SimpleCache\InvalidArgumentException;
+use function Hyperf\Config\config;
 
 #[Listener]
 class LoginListener implements ListenerInterface
@@ -37,6 +42,11 @@ class LoginListener implements ListenerInterface
         ];
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws InvalidArgumentException
+     */
     public function process(object $event): void
     {
         /** @var AfterLogin $event */
@@ -60,6 +70,14 @@ class LoginListener implements ListenerInterface
             'message' => $event->message,
             'login_time' => date('Y-m-d H:i:s'),
         ]);
+
+        /**
+         * 目的 : 确认当前在线用户(user logout 会将token加入blacklist)
+         */
+        $key = sprintf('%sToken:%s', config('cache.default.prefix'), $event->userinfo['id']);
+        $cache = di()->get(Cache::class);
+        $cache->del($key);
+        ($event->loginStatus && $event->token) && $cache->set($key, $event->token, config('auth.jwt.ttl'));
 
         if ($event->loginStatus) {
             User::query()->where('id', $event->userinfo['id'])

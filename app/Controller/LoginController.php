@@ -17,12 +17,15 @@ use App\Base\BaseController;
 use App\Request\AuthRequest;
 use App\Service\AuthService;
 use App\Service\UserService;
+use App\Vo\UserServiceVo;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\PostMapping;
-use Swow\Psr7\Message\ResponsePlusInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ResponseInterface;
 
 #[Controller(prefix: 'api/v1/auth')]
 class LoginController extends BaseController
@@ -33,29 +36,38 @@ class LoginController extends BaseController
     #[Inject]
     protected UserService $userService;
 
-    //    public function register(AuthRequest $request): ResponsePlusInterface
-    //    {
-    //        $token = $this->authService->register($request->all());
-    //        return $this->response->success($token);
-    //    }
-
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     #[PostMapping('login')]
-    public function login(AuthRequest $request): ResponsePlusInterface
+    public function login(AuthRequest $request): ResponseInterface
     {
-        return $this->response->success($this->authService->login($request->all()));
+        $requestData = $request->validated();
+        $vo = new UserServiceVo();
+        $vo->setUsername($requestData['username']);
+        $vo->setPassword($requestData['password']);
+        return $this->response->success($this->authService->login($vo));
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     #[DeleteMapping('logout'),Auth]
-    public function logout(): ResponsePlusInterface
+    public function logout(): ResponseInterface
     {
         $this->authService->logout();
         return $this->response->success();
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     #[GetMapping('self'),Auth]
-    public function self(): ResponsePlusInterface
+    public function self(): ResponseInterface
     {
-        $resource = $this->userService->info($this->authService->checkAndGetId());
-        return $this->response->success($resource);
+        return $this->response->success($this->userService->info($this->authService->checkAndGetId()));
     }
 }
