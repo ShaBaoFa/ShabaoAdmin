@@ -28,7 +28,7 @@ use Psr\SimpleCache\InvalidArgumentException;
  * 在线用户监控
  * Class OnlineUserMonitorController.
  */
-#[Controller(prefix: 'api/v1/monitor/online_users'), Auth]
+#[Controller(prefix: 'api/v1/monitor/online_users')]
 class OnlineUserMonitorController extends BaseController
 {
     #[Inject]
@@ -40,7 +40,7 @@ class OnlineUserMonitorController extends BaseController
      * @throws NotFoundExceptionInterface
      * @throws InvalidArgumentException
      */
-    #[GetMapping('index')]
+    #[GetMapping('index'),Auth]
     public function getPageList(): ResponseInterface
     {
         return $this->response->success($this->service->getOnlineUserPageList($this->request->all()));
@@ -53,7 +53,7 @@ class OnlineUserMonitorController extends BaseController
      * @throws InvalidArgumentException
      * @throws \RedisException
      */
-    #[PostMapping('kick')]
+    #[PostMapping('kick'),Auth]
     public function kickUser(): ResponseInterface
     {
         return $this->service->kickUser((string) $this->request->input('id')) ?

@@ -28,6 +28,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use RedisException;
 
+use Xmo\JWTAuth\JWT;
 use function Hyperf\Config\config;
 
 #[Listener]
@@ -74,13 +75,21 @@ class LoginListener implements ListenerInterface
             'login_time' => date('Y-m-d H:i:s'),
         ]);
 
-        /**
-         * 目的 : 确认当前在线用户(user logout 会将token加入blacklist).
-         */
-        $key = sprintf('%sToken:%s', config('cache.default.prefix'), $event->userinfo['id']);
-        $cache = di()->get(Redis::class);
-        $cache->del($key);
-        ($event->loginStatus && $event->token) && $cache->set($key, $event->token, config('auth.jwt.ttl'));
+        if ($event->loginStatus && $event->token) {
+            # 多点登录情况下，只保存一个key会导致最近时刻登录的用户如果登出之后,则该用户不会出现在在线用户监控列表中
+            # 利用 token 设置jwt的jti 来做多点登录token的判断
+            $jwt = di()->get(JWT::class);
+            $parserData = $jwt->getParserData($event->token);
+            $scene = $parserData['jwt_scene'];
+            $config = $jwt->getSceneConfig($scene);
+            $key = match ($config['login_type']) {
+                'sso' => sprintf('%sToken:%s', config('cache.default.prefix'), $event->userinfo['id']),
+                'mpop' => sprintf('%sToken:%s:%s', config('cache.default.prefix'), $event->userinfo['id'], $parserData['jti']),
+            };
+            $redis = di()->get(Redis::class);
+            $redis->del($key);
+            $redis->set($key, $event->token, config('jwt.ttl'));
+        }
 
         if ($event->loginStatus) {
             User::query()->where('id', $event->userinfo['id'])
