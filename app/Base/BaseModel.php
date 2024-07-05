@@ -12,12 +12,14 @@ declare(strict_types=1);
 
 namespace App\Base;
 
+use App\Base\Trait\ModelMacroTrait;
 use Hyperf\DbConnection\Model\Model;
 use Hyperf\ModelCache\Cacheable;
 
 class BaseModel extends Model
 {
     use Cacheable;
+    use ModelMacroTrait;
 
     /**
      * 状态
@@ -38,6 +40,17 @@ class BaseModel extends Model
     protected array $hidden = ['deleted_at'];
 
     protected string $dataScopeField = 'created_by';
+
+
+    public function __construct(array $attributes = [])
+    {
+        parent::__construct($attributes);
+
+        // 注册常用方法
+        $this->registerBase();
+        // 注册用户数据权限方法
+        $this->registerUserDataScope();
+    }
 
     public function save(array $options = []): bool
     {

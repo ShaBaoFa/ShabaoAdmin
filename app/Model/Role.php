@@ -31,6 +31,20 @@ use Carbon\Carbon;
  */
 class Role extends BaseModel
 {
+    // 所有
+    public const ALL_SCOPE = 1;
+
+    // 自定义
+    public const CUSTOM_SCOPE = 2;
+
+    // 本部门
+    public const SELF_DEPT_SCOPE = 3;
+
+    // 本部门及子部门
+    public const DEPT_BELOW_SCOPE = 4;
+
+    // 本人
+    public const SELF_SCOPE = 5;
     /**
      * The table associated with the model.
      */
