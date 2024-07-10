@@ -1,5 +1,15 @@
 <?php
 
+declare(strict_types=1);
+/**
+ * This file is part of web-api.
+ *
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
+ */
+
 namespace App\Base\Trait;
 
 use App\Constants\ErrorCode;
@@ -9,12 +19,12 @@ use App\Model\Role;
 use App\Model\User;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Db;
+
 use function Hyperf\Config\config;
 use function Hyperf\Support\env;
 
 trait ModelMacroTrait
 {
-
     /**
      * 注册自定义方法.
      */
@@ -30,7 +40,7 @@ trait ModelMacroTrait
             $userid = is_null($userid) ? user()->getId() : $userid;
 
             if (empty($userid)) {
-                throw new BusinessException(ErrorCode::SERVER_ERROR,'Data Scope missing user_id');
+                throw new BusinessException(ErrorCode::SERVER_ERROR, 'Data Scope missing user_id');
             }
 
             /* @var Builder $this */
@@ -123,7 +133,6 @@ trait ModelMacroTrait
                                 );
                                 $this->userIds[] = $this->userid;
                                 break;
-                            // no break
                             case Role::SELF_SCOPE:
                                 $this->userIds[] = $this->userid;
                                 break;

@@ -54,6 +54,7 @@
         "hyperf/validation": "3.1.*",
         "limingxinleo/hyperf-utils": "^3.9",
         "phpoffice/phpspreadsheet": "^1.24",
+        "xmo/jwt-auth": "^2.0",
         "zoujingli/ip2region": "^2.0"
     },
     "require-dev": {

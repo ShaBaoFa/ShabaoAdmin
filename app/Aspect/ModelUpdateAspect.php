@@ -12,20 +12,50 @@ declare(strict_types=1);
 
 namespace App\Aspect;
 
+use App\Base\BaseModel;
+use App\Base\BaseRequest;
+use Hyperf\Context\Context;
 use Hyperf\Di\Annotation\Aspect;
 use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
+use Hyperf\Di\Exception\Exception;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use function Hyperf\Config\config;
 
 #[Aspect]
 class ModelUpdateAspect extends AbstractAspect
 {
+    public array $classes = [
+        'App\Base\BaseModel::save',
+    ];
+
     public function __construct(protected ContainerInterface $container)
     {
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws Exception
+     * @throws NotFoundExceptionInterface
+     */
     public function process(ProceedingJoinPoint $proceedingJoinPoint)
     {
+        $instance = $proceedingJoinPoint->getInstance();
+        // 更新更改人
+        if ($instance instanceof BaseModel
+            && in_array('updated_by', $instance->getFillable())
+            && config('base-common.data_scope_enabled')
+            && Context::has(ServerRequestInterface::class)
+            && di()->get(BaseRequest::class)->getHeaderLine('authorization')
+        ) {
+            try {
+                $instance->updated_by = user()->getId();
+            } catch (\Throwable $e) {
+            }
+        }
         return $proceedingJoinPoint->process();
     }
 }

@@ -40,8 +40,6 @@ class currentUser
 
     /**
      * 验证token.
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
      */
     public function check(?string $token = null, string $scene = 'default'): bool
     {

@@ -12,18 +12,19 @@ declare(strict_types=1);
 
 namespace App\Aspect;
 
-use App\Model\Model;
+use App\Base\BaseModel;
 use Hyperf\Di\Annotation\Aspect;
 use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
 use Hyperf\Di\Exception\Exception;
 use Psr\Container\ContainerInterface;
+use function Hyperf\Config\config;
 
 #[Aspect]
 class ModelSaveAspect extends AbstractAspect
 {
     public array $classes = [
-        'App\Model\Model::save',
+        'App\Base\BaseModel::save',
     ];
 
     public function __construct(protected ContainerInterface $container)
@@ -37,21 +38,22 @@ class ModelSaveAspect extends AbstractAspect
     {
         $instance = $proceedingJoinPoint->getInstance();
 
-        // 获取当前登录用户信息
-        // 设置创建人
-        if ($instance instanceof Model && in_array($instance->getDataScopeField(), $instance->getFillable()) && is_null($instance[$instance->getDataScopeField()])) {
-            $user = user();
-            $user->check();
-            $instance[$instance->getDataScopeField()] = $user->getId();
-        }
+        if (config('base-common.data_scope_enabled')){
+            // 获取当前登录用户信息
+            // 设置创建人
+            if ($instance instanceof BaseModel && in_array($instance->getDataScopeField(), $instance->getFillable()) && is_null($instance[$instance->getDataScopeField()])) {
+                $user = user();
+                $user->check();
+                $instance[$instance->getDataScopeField()] = $user->getId();
+            }
 
-        // 设置更新人
-        if ($instance instanceof Model && in_array('updated_by', $instance->getFillable())) {
-            $user = user();
-            $user->check();
-            $instance->updated_by = $user->getId();
+            // 设置更新人
+            if ($instance instanceof BaseModel && in_array('updated_by', $instance->getFillable())) {
+                $user = user();
+                $user->check();
+                $instance->updated_by = $user->getId();
+            }
         }
-
         return $proceedingJoinPoint->process();
     }
 }

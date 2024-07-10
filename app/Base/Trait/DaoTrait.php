@@ -15,6 +15,9 @@ namespace App\Base\Trait;
 use App\Base\BaseModel;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
+use Hyperf\Tappable\HigherOrderTapProxy;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 trait DaoTrait
 {
@@ -50,6 +53,117 @@ trait DaoTrait
         $this->filterExecuteAttributes($data, $this->getModel()->incrementing);
         $model = $this->model::create($data);
         return $model->{$model->getKeyName()};
+    }
+
+    /**
+     * 读取一条数据.
+     */
+    public function find(mixed $id, array $column = ['*']): ?BaseModel
+    {
+        return ($model = $this->model::find($id, $column)) ? $model : null;
+    }
+
+    /**
+     * 按条件读取一行数据.
+     * @return mixed
+     */
+    public function first(array $condition, array $column = ['*']): ?BaseModel
+    {
+        return ($model = $this->model::where($condition)->first($column)) ? $model : null;
+    }
+
+    /**
+     * 获取单个值
+     * @return null|HigherOrderTapProxy|mixed|void
+     */
+    public function value(array $condition, string $columns = 'id')
+    {
+        return ($model = $this->model::where($condition)->value($columns)) ? $model : null;
+    }
+
+    /**
+     * 获取单列值
+     */
+    public function pluck(array $condition, string $columns = 'id', ?string $key = null): array
+    {
+        return $this->model::where($condition)->pluck($columns, $key)->toArray();
+    }
+
+    /**
+     * 从回收站读取一条数据.
+     * @noinspection PhpUnused
+     */
+    public function readByRecycle(mixed $id): ?BaseModel
+    {
+        return ($model = $this->model::withTrashed()->find($id)) ? $model : null;
+    }
+
+    /**
+     * 单个或批量软删除数据.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function delete(array $ids): bool
+    {
+        $this->model::destroy($ids);
+        return true;
+    }
+
+    /**
+     * 更新一条数据.
+     */
+    public function update(mixed $id, array $data): bool
+    {
+        $this->filterExecuteAttributes($data, true);
+        return $this->model::find($id)->update($data) > 0;
+    }
+
+    /**
+     * 按条件更新数据.
+     */
+    public function updateByCondition(array $condition, array $data): bool
+    {
+        $this->filterExecuteAttributes($data, true);
+        return $this->model::query()->where($condition)->update($data) > 0;
+    }
+
+    /**
+     * 单个或批量真实删除数据.
+     */
+    public function realDelete(array $ids): bool
+    {
+        foreach ($ids as $id) {
+            $model = $this->model::withTrashed()->find($id);
+            $model && $model->forceDelete();
+        }
+        return true;
+    }
+
+    /**
+     * 单个或批量从回收站恢复数据.
+     */
+    public function recovery(array $ids): bool
+    {
+        $this->model::withTrashed()->whereIn((new $this->model())->getKeyName(), $ids)->restore();
+        return true;
+    }
+
+    /**
+     * 单个或批量禁用数据.
+     */
+    public function disable(array $ids, string $field = 'status'): bool
+    {
+        $this->model::query()->whereIn((new $this->model())->getKeyName(), $ids)->update([$field => $this->model::DISABLE]);
+        return true;
+    }
+
+    /**
+     * 单个或批量启用数据.
+     */
+    public function enable(array $ids, string $field = 'status'): bool
+    {
+        $this->model::query()->whereIn((new $this->model())->getKeyName(), $ids)->update([$field => $this->model::ENABLE]);
+        return true;
     }
 
     public function getModel(): BaseModel
@@ -93,6 +207,7 @@ trait DaoTrait
             ],
         ];
     }
+
     /**
      * 返回模型查询构造器.
      */

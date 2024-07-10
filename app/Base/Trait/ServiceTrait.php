@@ -14,16 +14,8 @@ namespace App\Base\Trait;
 
 use App\Base\BaseDao;
 use App\Base\BaseModel;
-use App\Constants\ErrorCode;
-use App\Exception\BusinessException;
-use App\Service\Trait\ContainerExceptionInterface;
-use App\Service\Trait\Exception;
-use App\Service\Trait\MineCollection;
-use App\Service\Trait\NotFoundExceptionInterface;
-use Closure;
 use Hyperf\DbConnection\Db;
 use Hyperf\Tappable\HigherOrderTapProxy;
-use Psr\Http\Message\ResponseInterface;
 
 trait ServiceTrait
 {
@@ -227,37 +219,5 @@ trait ServiceTrait
     public function numberOperation(mixed $id, string $field, int $value): bool
     {
         return $this->dao->numberOperation($id, $field, $value);
-    }
-
-    /**
-     * 导出数据.
-     * @throws Exception
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function export(array $params, ?string $dto, ?string $filename = null, ?Closure $callbackData = null): ResponseInterface
-    {
-        if (empty($dto)) {
-            throw new BusinessException(ErrorCode::EXPORT_DTO_NOT_SPECIFIED);
-        }
-
-        if (empty($filename)) {
-            $filename = $this->dao->getModel()->getTable();
-        }
-
-        return (new MineCollection())->export($dto, $filename, $this->dao->getList($params), $callbackData);
-    }
-
-    /**
-     * 数据导入.
-     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function import(string $dto, ?Closure $closure = null): bool
-    {
-        return Db::transaction(function () use ($dto, $closure) {
-            return $this->mapper->import($dto, $closure);
-        });
     }
 }

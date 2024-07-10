@@ -16,26 +16,26 @@ use Carbon\Carbon;
 use Hyperf\Database\Model\Relations\Pivot;
 
 /**
- * @property int $user_id
- * @property int $department_id
+ * @property int $role_id
+ * @property int $menu_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
  */
-class DepartmentUser extends Pivot
+class MenuRole extends Pivot
 {
     /**
      * The table associated with the model.
      */
-    protected ?string $table = 'department_user';
+    protected ?string $table = 'menu_role';
 
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['user_id', 'department_id', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['role_id', 'menu_id', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['user_id' => 'integer', 'department_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['role_id' => 'integer', 'menu_id' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 }

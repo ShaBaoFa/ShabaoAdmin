@@ -10,20 +10,19 @@ declare(strict_types=1);
  * @contact  mail@wlfpanda1012.com
  */
 
-namespace App\Dao;
+namespace App\Events;
 
-use App\Base\BaseDao;
-use App\Model\LoginLog;
-
-class LoginLogDao extends BaseDao
+class Operation
 {
-    /**
-     * @var LoginLog
-     */
-    public $model;
+    protected array $requestInfo;
 
-    public function assignModel(): void
+    public function __construct(array $requestInfo)
     {
-        $this->model = LoginLog::class;
+        $this->requestInfo = $requestInfo;
+    }
+
+    public function getRequestInfo(): array
+    {
+        return $this->requestInfo;
     }
 }

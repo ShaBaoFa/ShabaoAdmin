@@ -23,8 +23,11 @@ use Hyperf\Redis\Redis;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use RedisException;
 use Xmo\JWTAuth\JWT;
+
 use function Hyperf\Config\config;
+use function Hyperf\Support\env;
 
 class UserService extends BaseService
 {
@@ -41,7 +44,8 @@ class UserService extends BaseService
         if ($this->dao->existsByUsername($data['username'])) {
             throw new BusinessException(ErrorCode::USER_NOT_EXIST);
         }
-        return $this->dao->save($this->handleData($data));
+//        return $this->dao->save($this->handleData($data));
+        return $this->dao->save($data);
     }
 
     /**
@@ -75,7 +79,7 @@ class UserService extends BaseService
      * @throws ContainerExceptionInterface
      * @throws InvalidArgumentException
      * @throws NotFoundExceptionInterface
-     * @throws \RedisException
+     * @throws RedisException
      */
     public function getOnlineUserPageList(array $params = []): array
     {
@@ -105,7 +109,7 @@ class UserService extends BaseService
      * @throws ContainerExceptionInterface
      * @throws InvalidArgumentException
      * @throws NotFoundExceptionInterface
-     * @throws \RedisException
+     * @throws RedisException
      */
     public function kickUser(string $id): bool
     {
@@ -129,11 +133,78 @@ class UserService extends BaseService
     }
 
     /**
+     * 删除用户.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function delete(array $ids): bool
+    {
+        if (! empty($ids)) {
+            if (($key = array_search(env('SUPER_ADMIN'), $ids)) !== false) {
+                unset($ids[$key]);
+            }
+            return $this->dao->delete($ids);
+        }
+
+        return false;
+    }
+
+    /**
+     * 真实删除用户.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function realDelete(array $ids): bool
+    {
+        if (! empty($ids)) {
+            if (($key = array_search(env('SUPER_ADMIN'), $ids)) !== false) {
+                unset($ids[$key]);
+            }
+            return $this->dao->realDelete($ids);
+        }
+
+        return false;
+    }
+
+    /**
+     * 初始化用户密码
+     */
+    public function initUserPassword(int $id, string $password = '123456'): bool
+    {
+        return $this->dao->initUserPassword($id, $password);
+    }
+
+    /**
+     * 用户修改密码
+     */
+    public function modifyPassword(array $params): bool
+    {
+        return $this->dao->initUserPassword(user()->getId(), $params['newPassword']);
+    }
+
+    /**
+     * 用户更新个人资料.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[CacheEvict(prefix: 'loginInfo', value: 'userId_#{id}')]
+    public function updateInfo(int $id, array $params): bool
+    {
+        if (! $id) {
+            return false;
+        }
+        # 用户更新个人资料
+        unset($params['id'], $params['username'], $params['password'],$params['status'],$params['user_type']);
+        return $this->dao->update($id, $params);
+    }
+
+    /**
      * 获取缓存用户信息.
      */
     #[Cacheable(prefix: 'loginInfo', value: 'userId_#{id}', ttl: 0)]
     protected function getCacheInfo(int $id): array
     {
+        /** @var User $user */
         $user = $this->dao->getModel()->find($id);
         $user->addHidden('deleted_at', 'password');
         $data['user'] = $user->toArray();
@@ -141,17 +212,17 @@ class UserService extends BaseService
         /**
          * @todo 获取用户角色、部门、岗位信息
          */
-        //        if (user()->isSuperAdmin()) {
-        //            $data['roles'] = ['superAdmin'];
-        //            $data['routers'] = $this->sysMenuService->mapper->getSuperAdminRouters();
-        //            $data['codes'] = ['*'];
-        //        } else {
-        //            $roles = $this->sysRoleService->mapper->getMenuIdsByRoleIds($user->roles()->pluck('id')->toArray());
-        //            $ids = $this->filterMenuIds($roles);
-        //            $data['roles'] = $user->roles()->pluck('code')->toArray();
-        //            $data['routers'] = $this->sysMenuService->mapper->getRoutersByIds($ids);
-        //            $data['codes'] = $this->sysMenuService->mapper->getMenuCode($ids);
-        //        }
+        if (user()->isSuperAdmin()) {
+            $data['roles'] = ['superAdmin'];
+            //                    $data['routers'] = $this->sysMenuService->mapper->getSuperAdminRouters();
+            $data['codes'] = ['*'];
+        } else {
+            //                    $roles = $this->sysRoleService->mapper->getMenuIdsByRoleIds($user->roles()->pluck('id')->toArray());
+            //                    $ids = $this->filterMenuIds($roles);
+            $data['roles'] = $user->roles()->pluck('code')->toArray();
+            //                    $data['routers'] = $this->sysMenuService->mapper->getRoutersByIds($ids);
+            //                    $data['codes'] = $this->sysMenuService->mapper->getMenuCode($ids);
+        }
         return $data;
     }
 
@@ -189,9 +260,9 @@ class UserService extends BaseService
         $scenes = array_keys(config('jwt.scene'));
         $jti = $jwt->getParserData($token)['jti'];
         if (in_array($scene, $scenes) && $jwt->setScene($scene)->blackList->hasTokenBlack(
-                $jwt->getParserData($token),
-                $jwt->getSceneConfig($scene)
-            )) {
+            $jwt->getParserData($token),
+            $jwt->getSceneConfig($scene)
+        )) {
             return true;
         }
         return false;

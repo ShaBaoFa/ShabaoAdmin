@@ -27,8 +27,8 @@ use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 use RedisException;
-
 use Xmo\JWTAuth\JWT;
+
 use function Hyperf\Config\config;
 
 #[Listener]
