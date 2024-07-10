@@ -44,8 +44,8 @@ return [
             'gen:model' => [
                 'path' => 'app/Model',
                 'force_casts' => false,
-                'inheritance' => 'Model',
-                'uses' => '',
+                'inheritance' => 'BaseModel',
+                'uses' => 'App\Base\BaseModel',
                 'refresh_fillable' => true,
                 'table_mapping' => [],
             ],

@@ -10,20 +10,17 @@ declare(strict_types=1);
  * @contact  mail@wlfpanda1012.com
  */
 
-namespace App\Dao;
+namespace App\Service;
 
-use App\Base\BaseDao;
-use App\Model\LoginLog;
+use App\Base\BaseService;
+use App\Dao\OperationLogDao;
 
-class LoginLogDao extends BaseDao
+class OperationLogService extends BaseService
 {
-    /**
-     * @var LoginLog
-     */
-    public $model;
+    public $dao;
 
-    public function assignModel(): void
+    public function __construct(OperationLogDao $dao)
     {
-        $this->model = LoginLog::class;
+        $this->dao = $dao;
     }
 }

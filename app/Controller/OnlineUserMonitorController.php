@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 /**
- * This file is part of MineAdmin.
+ * This file is part of web-api.
  *
- * @link     https://www.mineadmin.com
- * @document https://doc.mineadmin.com
- * @contact  root@imoi.cn
- * @license  https://github.com/mineadmin/MineAdmin/blob/master/LICENSE
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
  */
 
 namespace App\Controller;
 
-use App\Annotation\Auth;
+use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Service\UserService;
 use Hyperf\Di\Annotation\Inject;
@@ -23,12 +23,13 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use RedisException;
 
 /**
  * 在线用户监控
  * Class OnlineUserMonitorController.
  */
-#[Controller(prefix: 'api/v1/monitor/online_users')]
+#[Controller(prefix: 'api/v1/monitor/onlineUsers')]
 class OnlineUserMonitorController extends BaseController
 {
     #[Inject]
@@ -40,7 +41,7 @@ class OnlineUserMonitorController extends BaseController
      * @throws NotFoundExceptionInterface
      * @throws InvalidArgumentException
      */
-    #[GetMapping('index'),Auth]
+    #[GetMapping('index'),Permission('monitor:onlineUser, monitor:onlineUser:index')]
     public function getPageList(): ResponseInterface
     {
         return $this->response->success($this->service->getOnlineUserPageList($this->request->all()));
@@ -51,9 +52,9 @@ class OnlineUserMonitorController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws InvalidArgumentException
-     * @throws \RedisException
+     * @throws RedisException
      */
-    #[PostMapping('kick'),Auth]
+    #[PostMapping('kick'),Permission('monitor:onlineUser:kick')]
     public function kickUser(): ResponseInterface
     {
         return $this->service->kickUser((string) $this->request->input('id')) ?

@@ -14,13 +14,14 @@ namespace App\Model;
 
 use App\Base\BaseModel;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
  * @property int $id
  * @property string $username
- * @property string $password
  * @property int $status
+ * @property string $phone
  * @property string $login_ip
  * @property Carbon $login_time
  * @property int $created_by
@@ -29,6 +30,9 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon $deleted_at
+ * @property string $user_type
+ * @property null|Collection|Role[] $roles
+ * @property mixed $password
  */
 class User extends BaseModel
 {
@@ -41,15 +45,17 @@ class User extends BaseModel
      */
     protected ?string $table = 'users';
 
+    protected array $hidden = ['password', 'deleted_at'];
+
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'username', 'password', 'status', 'login_ip', 'login_time', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'username', 'password', 'status', 'phone', 'login_ip', 'login_time', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'user_type'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'username' => 'string', 'password' => 'string', 'dept_id' => 'integer', 'status' => 'integer', 'login_ip' => 'string', 'login_time' => 'datetime', 'created_by' => 'integer', 'updated_by' => 'integer', 'remark' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'deleted_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'username' => 'string', 'password' => 'string', 'status' => 'integer', 'login_ip' => 'string', 'login_time' => 'datetime', 'created_by' => 'integer', 'updated_by' => 'integer', 'remark' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'deleted_at' => 'datetime'];
 
     /**
      * 通过中间表关联角色.
@@ -57,6 +63,14 @@ class User extends BaseModel
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
+    }
+
+    /**
+     * 通过中间表关联部门.
+     */
+    public function depts(): BelongsToMany
+    {
+        return $this->belongsToMany(Department::class, 'department_user', 'user_id', 'dept_id');
     }
 
     public function getId(): int

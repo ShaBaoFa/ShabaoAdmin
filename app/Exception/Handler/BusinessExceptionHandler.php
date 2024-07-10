@@ -16,6 +16,7 @@ use App\Base\BaseResponse;
 use App\Constants\ErrorCode;
 use App\Exception\AuthException;
 use App\Exception\BusinessException;
+use App\Exception\NoPermissionException;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\Di\Exception\CircularDependencyException;
 use Hyperf\ExceptionHandler\ExceptionHandler;
@@ -60,6 +61,9 @@ class BusinessExceptionHandler extends ExceptionHandler
             case $throwable instanceof CircularDependencyException:
                 $this->logger->error($throwable->getMessage());
                 return $this->response->fail(ErrorCode::SERVER_ERROR->value, $throwable->getMessage());
+            case $this instanceof NoPermissionException:
+                $this->logger->warning(format_throwable($throwable));
+                return $this->response->fail($throwable->getCode(), $throwable->getMessage())->withStatus(ErrorCode::FORBIDDEN->value);
         }
 
         $this->logger->error(format_throwable($throwable));

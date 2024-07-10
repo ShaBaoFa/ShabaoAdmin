@@ -25,6 +25,7 @@ class CreateUsersTable extends Migration
             $table->string('username', 20)->unique()->comment('账号');
             $table->string('password', 100)->comment('密码');
             $table->addColumn('smallInteger', 'status', ['default' => 1, 'comment' => '状态 (1正常 2停用)'])->index()->nullable();
+            $table->addColumn('string', 'phone', ['length' => 11, 'comment' => '手机'])->nullable();
             $table->addColumn('ipAddress', 'login_ip', ['comment' => '最后登陆IP'])->nullable();
             $table->datetime('login_time')->nullable()->comment('最后登陆时间');
             $table->addColumn('bigInteger', 'created_by', ['comment' => '创建者'])->nullable()->index();

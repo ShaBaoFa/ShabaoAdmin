@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Base;
 
 use App\Base\Trait\ModelMacroTrait;
+use Hyperf\Database\Model\SoftDeletes;
 use Hyperf\DbConnection\Model\Model;
 use Hyperf\ModelCache\Cacheable;
 
@@ -20,6 +21,7 @@ class BaseModel extends Model
 {
     use Cacheable;
     use ModelMacroTrait;
+    use SoftDeletes;
 
     /**
      * 状态
@@ -40,7 +42,6 @@ class BaseModel extends Model
     protected array $hidden = ['deleted_at'];
 
     protected string $dataScopeField = 'created_by';
-
 
     public function __construct(array $attributes = [])
     {

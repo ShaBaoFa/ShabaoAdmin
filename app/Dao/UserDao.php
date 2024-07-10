@@ -13,13 +13,19 @@ declare(strict_types=1);
 namespace App\Dao;
 
 use App\Base\BaseDao;
+use App\Base\BaseModel;
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
 use App\Model\User;
+use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
+use function Hyperf\Support\env;
 
 class UserDao extends BaseDao
 {
+    /**
+     * @var User
+     */
     public $model;
 
     public function assignModel(): void
@@ -27,13 +33,25 @@ class UserDao extends BaseDao
         $this->model = User::class;
     }
 
-    public function first(int $id, bool $throw = false): ?User
+    /**
+     * 检查用户密码
+     */
+    public function checkPass(string $password, string $hash): bool
     {
-        $model = User::findFromCache($id);
-        if (! $model && $throw) {
-            throw new BusinessException(ErrorCode::USER_NOT_EXIST);
+        return $this->model::passwordVerify($password, $hash);
+    }
+
+    /**
+     * 初始化用户密码
+     */
+    public function initUserPassword(int $id, string $password): bool
+    {
+        $model = $this->model::find($id);
+        if ($model) {
+            $model->password = $password;
+            return $model->save();
         }
-        return $model;
+        return false;
     }
 
     #[Transactional]
@@ -67,19 +85,136 @@ class UserDao extends BaseDao
     #[Transactional]
     public function update(mixed $id, array $data): bool
     {
-        $role_ids = $data['role_ids'] ?? [];
-        $post_ids = $data['post_ids'] ?? [];
-        $dept_ids = $data['dept_ids'] ?? [];
+        //        $role_ids = $data['role_ids'] ?? [];
+        //        $post_ids = $data['post_ids'] ?? [];
+        //        $dept_ids = $data['dept_ids'] ?? [];
         $this->filterExecuteAttributes($data, true);
 
         $result = parent::update($id, $data);
         $user = $this->model::find($id);
         if ($user && $result) {
-            ! empty($role_ids) && $user->roles()->sync($role_ids);
-            ! empty($dept_ids) && $user->depts()->sync($dept_ids);
-            $user->posts()->sync($post_ids);
+            //            ! empty($role_ids) && $user->roles()->sync($role_ids);
+            //            ! empty($dept_ids) && $user->depts()->sync($dept_ids);
+            //            $user->posts()->sync($post_ids);
             return true;
         }
         return false;
     }
+
+    /**
+     * 真实批量删除用户.
+     */
+    #[Transactional]
+    public function realDelete(array $ids): bool
+    {
+        foreach ($ids as $id) {
+            $user = $this->model::withTrashed()->find($id);
+            if ($user) {
+//                $user->roles()->detach();
+//                $user->posts()->detach();
+//                $user->depts()->detach();
+                $user->forceDelete();
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 获取用户信息.
+     */
+    public function find(mixed $id, array $column = ['*']): ?BaseModel
+    {
+        $user = $this->model::find($id);
+        if ($user) {
+//            $user->setAttribute('roleList', $user->roles()->get(['id', 'name']) ?: []);
+//            $user->setAttribute('postList', $user->posts()->get(['id', 'name']) ?: []);
+//            $user->setAttribute('deptList', $user->depts()->get(['id', 'name']) ?: []);
+        }
+        return $user;
+    }
+
+    /**
+     * 根据用户ID列表获取用户基础信息.
+     */
+    public function getUserInfoByIds(array $ids, ?array $select = null): array
+    {
+        if (! $select) {
+            $select = ['id', 'username', 'phone', 'created_at'];
+        }
+        return $this->model::query()->whereIn('id', $ids)->select($select)->get()->toArray();
+    }
+
+    /**
+     * 搜索处理器.
+     */
+    public function handleSearch(Builder $query, array $params): Builder
+    {
+//        if (isset($params['dept_id']) && filled($params['dept_id']) && is_string($params['dept_id'])) {
+//            $deptIds = SystemDept::query()
+//                ->where(function ($query) use ($params) {
+//                    $query->where('id', '=', $params['dept_id'])
+//                        ->orWhere('level', 'like', $params['dept_id'] . ',%')
+//                        ->orWhere('level', 'like', '%,' . $params['dept_id'])
+//                        ->orWhere('level', 'like', '%,' . $params['dept_id'] . ',%');
+//                })
+//                ->pluck('id')
+//                ->toArray();
+//            $query->whereHas('depts', fn ($query) => $query->whereIn('id', $deptIds));
+//        }
+        if (isset($params['username']) && filled($params['username'])) {
+            $query->where('username', 'like', '%' . $params['username'] . '%');
+        }
+        if (isset($params['phone']) && filled($params['phone'])) {
+            $query->where('phone', '=', $params['phone']);
+        }
+        if (isset($params['status']) && filled($params['status'])) {
+            $query->where('status', $params['status']);
+        }
+
+        if (isset($params['filterSuperAdmin']) && filled($params['filterSuperAdmin'])) {
+            $query->whereNotIn('id', [env('SUPER_ADMIN')]);
+        }
+
+        if (isset($params['created_at']) && filled($params['created_at']) && is_array($params['created_at']) && count($params['created_at']) == 2) {
+            $query->whereBetween(
+                'created_at',
+                [$params['created_at'][0] . ' 00:00:00', $params['created_at'][1] . ' 23:59:59']
+            );
+        }
+
+        if (isset($params['userIds']) && filled($params['userIds'])) {
+            $query->whereIn('id', $params['userIds']);
+        }
+
+//        if (isset($params['showDept']) && filled($params['showDept'])) {
+//            $isAll = $params['showDeptAll'] ?? false;
+//
+//            $query->with(['depts' => function ($query) use ($isAll) {
+//                /*
+//                 *  @var Builder $query
+//                 */
+//                $query->where('status', SystemDept::ENABLE);
+//                return $isAll ? $query->select(['*']) : $query->select(['id', 'name']);
+//            }]);
+//        }
+//
+//        if (isset($params['role_id']) && filled($params['role_id'])) {
+//            $tablePrefix = env('DB_PREFIX');
+//            $query->whereRaw(
+//                "id IN ( SELECT user_id FROM {$tablePrefix}system_user_role WHERE role_id = ? )",
+//                [$params['role_id']]
+//            );
+//        }
+//
+//        if (isset($params['post_id']) && filled($params['post_id'])) {
+//            $tablePrefix = env('DB_PREFIX');
+//            $query->whereRaw(
+//                "id IN ( SELECT user_id FROM {$tablePrefix}system_user_post WHERE post_id = ? )",
+//                [$params['post_id']]
+//            );
+//        }
+
+        return $query;
+    }
+
 }

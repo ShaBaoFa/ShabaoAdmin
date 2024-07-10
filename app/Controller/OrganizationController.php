@@ -13,9 +13,11 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Base\BaseController;
+use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 
+#[Controller(prefix: 'api/v1/organizations')]
 class OrganizationController extends BaseController
 {
     public function index(RequestInterface $request, ResponseInterface $response)

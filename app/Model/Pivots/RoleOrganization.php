@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace App\Model\Pivots;
 
-use App\Model\Model;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Relations\Pivot;
 

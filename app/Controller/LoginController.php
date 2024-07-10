@@ -17,12 +17,10 @@ use App\Base\BaseController;
 use App\Helper\currentUser;
 use App\Request\AuthRequest;
 use App\Service\AuthService;
-use App\Service\UserService;
 use App\Vo\UserServiceVo;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
-use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\PostMapping;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -35,12 +33,10 @@ class LoginController extends BaseController
     #[Inject]
     protected AuthService $authService;
 
-    #[Inject]
-    protected UserService $userService;
-
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws InvalidArgumentException
      */
     #[PostMapping('login')]
     public function login(AuthRequest $request): ResponseInterface
@@ -62,16 +58,6 @@ class LoginController extends BaseController
     {
         $this->authService->logout();
         return $this->response->success();
-    }
-
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    #[GetMapping('self'),Auth]
-    public function self(): ResponseInterface
-    {
-        return $this->response->success($this->userService->info());
     }
 
     /**

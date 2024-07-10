@@ -14,6 +14,8 @@ namespace App\Model;
 
 use App\Base\BaseModel;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Collection;
+use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
  * @property int $id
@@ -28,6 +30,8 @@ use Carbon\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * @property null|Collection|Menu[] $menus
+ * @property null|Collection|User[] $users
  */
 class Role extends BaseModel
 {
@@ -45,6 +49,16 @@ class Role extends BaseModel
 
     // 本人
     public const SELF_SCOPE = 5;
+
+    // 平台方
+    public const PLATFORM_SCOPE = 6;
+
+    // 主办方
+    public const ORGANIZER_SCOPE = 7;
+
+    // 参展商
+    public const EXHIBITOR_SCOPE = 8;
+
     /**
      * The table associated with the model.
      */
@@ -59,4 +73,25 @@ class Role extends BaseModel
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'int', 'type' => 'integer', 'data_scope' => 'integer', 'status' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    /**
+     * 通过中间表获取菜单.
+     */
+    public function menus(): BelongsToMany
+    {
+        return $this->belongsToMany(Menu::class, 'system_role_menu', 'role_id', 'menu_id');
+    }
+
+    /**
+     * 通过中间表获取用户.
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'role_user', 'role_id', 'user_id');
+    }
+
+    public function depts(): BelongsToMany
+    {
+        return $this->belongsToMany(Department::class, 'department_role', 'role_id', 'dept_id');
+    }
 }

@@ -33,8 +33,14 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('USER_BAN')]
     case USER_BAN = 10003;
 
+    #[Message('NO_LOGIN_USER')]
+    case NO_LOGIN_USER = 10004;
+
     #[Message('UNAUTHORIZED')]
     case UNAUTHORIZED = 401;
+
+    #[Message('FORBIDDEN')]
+    case FORBIDDEN = 403;
 
     # 导出数据失败
     #[Message('EXPORT_DATA_FAILED')]
@@ -51,6 +57,12 @@ enum ErrorCode: int implements ErrorCodeInterface
     # DTO注解信息为空（dto annotation info is empty）
     #[Message('DTO_ANNOTATION_INFO_EMPTY')]
     case DTO_ANNOTATION_INFO_EMPTY = 20004;
+
+    #[Message('ROLE_CODE_NOT_EXIST')]
+    case ROLE_CODE_NOT_EXIST = 30001;
+
+    #[Message('MENU_CODE_NOT_EXIST')]
+    case MENU_CODE_NOT_EXIST = 40001;
 
     #[Message('INVALID_PARAMS')]
     case INVALID_PARAMS = 422;
