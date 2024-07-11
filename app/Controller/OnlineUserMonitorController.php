@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Annotation\Auth;
 use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Service\UserService;
@@ -29,7 +30,7 @@ use RedisException;
  * 在线用户监控
  * Class OnlineUserMonitorController.
  */
-#[Controller(prefix: 'api/v1/monitor/onlineUsers')]
+#[Controller(prefix: 'api/v1/monitor/onlineUsers'),Auth]
 class OnlineUserMonitorController extends BaseController
 {
     #[Inject]

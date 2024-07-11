@@ -72,7 +72,7 @@ class MenuService extends BaseService
         $id = $this->dao->save($this->handleData($data));
 
         // 生成RESTFUL按钮菜单
-        if ($data['type'] == Menu::MENUS_LIST && config('base-common.restful_menu_enabled')) {
+        if ($data['type'] == Menu::MENUS_LIST && $data['gen_btn'] === Menu::GEN_BTN) {
             $model = $this->dao->model::find($id, ['id', 'name', 'code']);
             $this->genButtonMenu($model);
         }
@@ -91,7 +91,7 @@ class MenuService extends BaseService
             ['name' => $model->name . '保存', 'code' => $model->code . ':save'],
             ['name' => $model->name . '更新', 'code' => $model->code . ':update'],
             ['name' => $model->name . '删除', 'code' => $model->code . ':delete'],
-            ['name' => $model->name . '读取', 'code' => $model->code . ':read'],
+            ['name' => $model->name . '信息', 'code' => $model->code . ':info'],
             ['name' => $model->name . '恢复', 'code' => $model->code . ':recovery'],
             ['name' => $model->name . '真实删除', 'code' => $model->code . ':realDelete'],
             ['name' => $model->name . '导入', 'code' => $model->code . ':import'],

@@ -28,7 +28,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/users')]
+#[Controller(prefix: 'api/v1/users'),Auth]
 class UserController extends BaseController
 {
     #[Inject]
