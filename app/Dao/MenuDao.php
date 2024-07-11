@@ -17,10 +17,8 @@ use App\Model\Menu;
 use App\Model\User;
 use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Database\Model\Builder;
-use Hyperf\Database\Model\Model;
 use Hyperf\DbConnection\Annotation\Transactional;
 use RedisException;
-use function Hyperf\Config\config;
 
 class MenuDao extends BaseDao
 {
@@ -86,7 +84,7 @@ class MenuDao extends BaseDao
         $query = $this->model::query()->select(['id', 'parent_id', 'id AS value', 'name AS label'])
             ->where('status', $this->model::ENABLE)->orderBy('sort', 'desc');
 
-        if (($data['scope'] ?? false) && ! user()->isSuperAdmin()) {
+        if (! user()->isSuperAdmin()) {
             $roleData = di()->get(RoleDao::class)->getMenuIdsByRoleIds(
                 User::find(user()->getId(), ['id'])->roles()->pluck('id')->toArray()
             );
@@ -168,9 +166,7 @@ class MenuDao extends BaseDao
     }
 
     /**
-     * 批量更新菜单
-     * @param array $update
-     * @return bool
+     * 批量更新菜单.
      */
     #[CacheEvict(prefix: 'loginInfo', all: true),Transactional]
     public function batchUpdate(array $update): bool
@@ -222,8 +218,6 @@ class MenuDao extends BaseDao
         if (isset($params['status']) && filled($params['status'])) {
             $query->where('status', $params['status']);
         }
-
-
 
         if (isset($params['name']) && filled($params['name'])) {
             $query->where('name', 'like', '%' . $params['name'] . '%');

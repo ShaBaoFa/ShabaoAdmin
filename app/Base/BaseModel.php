@@ -63,6 +63,16 @@ class BaseModel extends Model
         return parent::update($attributes, $options);
     }
 
+    public function setPrimaryKeyValue($value): void
+    {
+        $this->{$this->primaryKey} = $value;
+    }
+
+    public function getPrimaryKeyType(): string
+    {
+        return $this->keyType;
+    }
+
     public function getDataScopeField(): string
     {
         return $this->dataScopeField;
@@ -72,5 +82,15 @@ class BaseModel extends Model
     {
         $this->dataScopeField = $name;
         return $this;
+    }
+
+    /**
+     * Create a new Model Collection instance.
+     *
+     * @return BaseCollection
+     */
+    public function newCollection(array $models = []): BaseCollection
+    {
+        return new BaseCollection($models);
     }
 }

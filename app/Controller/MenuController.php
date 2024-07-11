@@ -17,7 +17,7 @@ use App\Annotation\OperationLog;
 use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Request\MenuRequest;
-use App\Service\RoleService;
+use App\Service\menuservice;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
@@ -28,109 +28,66 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/roles'),Auth]
-class RoleController extends BaseController
+#[Controller(prefix: 'api/v1/menus'),Auth]
+class MenuController extends BaseController
 {
     #[Inject]
-    protected RoleService $service;
+    protected menuservice $service;
 
     /**
-     * 角色分页列表.
+     * 菜单树状列表.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('index'), Permission('roles, roles:index')]
+    #[GetMapping('index'), Permission('menus, menus:index')]
     public function index(): ResponseInterface
     {
-        return $this->response->success($this->service->getPageList($this->request->all()));
+        return $this->response->success($this->service->getTreeList($this->request->all()));
     }
 
     /**
-     * 回收站角色分页列表.
+     * 回收站菜单树状列表.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('recycle'), Permission('roles:recycle')]
+    #[GetMapping('recycle'), Permission('menus:recycle')]
     public function recycle(): ResponseInterface
     {
-        return $this->response->success($this->service->getPageListByRecycle($this->request->all()));
+        return $this->response->success($this->service->getTreeListByRecycle($this->request->all()));
     }
 
     /**
-     * 通过角色获取菜单.
+     * 前端选择树（不需要权限）.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('getMenuByRole/{id}')]
-    public function getMenuByRole(int $id): ResponseInterface
+    #[GetMapping('tree')]
+    public function tree(): ResponseInterface
     {
-        return $this->response->success($this->service->getMenuByRole($id));
+        return $this->response->success($this->service->getSelectTree($this->request->all()));
     }
 
+
     /**
-     * 通过角色获取部门.
+     * 新增菜单.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('getDeptByRole/{id}')]
-    public function getDeptByRole(int $id): ResponseInterface
-    {
-        return $this->response->success($this->service->getDeptByRole($id));
-    }
-
-    /**
-     * 获取角色列表 (不验证权限).
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    #[GetMapping('list')]
-    public function list(): ResponseInterface
-    {
-        return $this->response->success($this->service->getList());
-    }
-
-    /**
-     * 新增角色.
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    #[PostMapping('save'), Permission('roles:save'), OperationLog]
+    #[PostMapping('save'), Permission('menus:save'), OperationLog]
     public function save(MenuRequest $request): ResponseInterface
     {
         return $this->response->success(['id' => $this->service->save($request->all())]);
     }
 
     /**
-     * 更新角色.
+     * 更新菜单.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('update/{id:\d+}'), Permission('roles:update'), OperationLog]
+    #[PutMapping('update/{id:\d+}'), Permission('menus:update'), OperationLog]
     public function update(int $id, MenuRequest $request): ResponseInterface
     {
         return $this->service->update($id, $request->all()) ? $this->response->success() : $this->response->fail();
-    }
-
-    /**
-     * 更新用户菜单权限.
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    #[PutMapping('{id:\d+}/menuPermission'), Permission('roles:menuPermission'), OperationLog]
-    public function menuPermission(int $id): ResponseInterface
-    {
-        return $this->service->update($id, $this->request->all()) ? $this->response->success() : $this->response->fail();
-    }
-
-    /**
-     * 更新用户数据权限.
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    #[PutMapping('{id:\d+}/dataPermission'), Permission('roles:dataPermission'), OperationLog]
-    public function dataPermission(int $id): ResponseInterface
-    {
-        return $this->service->update($id, $this->request->all()) ? $this->response->success() : $this->response->fail();
     }
 
     /**
@@ -138,7 +95,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('delete'), Permission('roles:delete')]
+    #[DeleteMapping('delete'), Permission('menus:delete')]
     public function delete(MenuRequest $request): ResponseInterface
     {
         return $this->service->delete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -149,7 +106,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('realDelete'), Permission('roles:realDelete'), OperationLog]
+    #[DeleteMapping('realDelete'), Permission('menus:realDelete'), OperationLog]
     public function realDelete(MenuRequest $request): ResponseInterface
     {
         return $this->service->realDelete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -160,18 +117,18 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('recovery'), Permission('roles:recovery')]
+    #[PutMapping('recovery'), Permission('menus:recovery')]
     public function recovery(): ResponseInterface
     {
         return $this->service->recovery((array) $this->request->input('ids', [])) ? $this->response->success() : $this->response->fail();
     }
 
     /**
-     * 更改角色状态
+     * 更改菜单状态
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('changeStatus'), Permission('roles:changeStatus'), OperationLog]
+    #[PutMapping('changeStatus'), Permission('menus:changeStatus'), OperationLog]
     public function changeStatus(MenuRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
@@ -183,7 +140,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('numberOperation'), Permission('roles:update'), OperationLog]
+    #[PutMapping('numberOperation'), Permission('menus:update'), OperationLog]
     public function numberOperation(): ResponseInterface
     {
         return $this->service->numberOperation(

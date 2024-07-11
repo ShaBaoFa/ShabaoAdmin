@@ -209,6 +209,22 @@ trait DaoTrait
     }
 
     /**
+     * 获取树列表.
+     */
+    public function getTreeList(
+        ?array $params = null,
+        bool $isScope = true,
+        string $id = 'id',
+        string $parentField = 'parent_id',
+        string $children = 'children'
+    ): array {
+        $params['_tree'] = true;
+        $params['_tree_pid'] = $parentField;
+        $data = $this->listQuerySetting($params, $isScope)->get();
+        return $data->toTree([], $data[0]->{$parentField} ?? 0, $id, $parentField, $children);
+    }
+
+    /**
      * 返回模型查询构造器.
      */
     public function listQuerySetting(?array $params, bool $isScope): Builder
@@ -223,8 +239,6 @@ trait DaoTrait
 
         $isScope && $query->userDataScope();
 
-        ! $isScope && $query->exhibitionRoleDataScope();
-
         return $this->handleSearch($query, $params);
     }
 
@@ -233,6 +247,10 @@ trait DaoTrait
      */
     public function handleOrder(Builder $query, ?array &$params = null): Builder
     {
+        // 对树型数据加个排序
+        if (isset($params['_tree'])) {
+            $query->orderBy($params['_tree_pid']);
+        }
         if ($params['orderBy'] ?? false) {
             if (is_array($params['orderBy'])) {
                 foreach ($params['orderBy'] as $key => $order) {
