@@ -13,25 +13,29 @@ declare(strict_types=1);
 namespace App\Model;
 
 use App\Base\BaseModel;
+use App\Model\Pivots\DepartmentRole;
+use App\Model\Pivots\MenuRole;
+use App\Model\Pivots\RoleUser;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $code
- * @property int $type
- * @property int $data_scope
- * @property int $status
- * @property int $created_by
- * @property int $updated_by
- * @property string $remark
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property string $deleted_at
- * @property null|Collection|Menu[] $menus
- * @property null|Collection|User[] $users
+ * @property int $id 
+ * @property string $name 
+ * @property string $code 
+ * @property int $type 
+ * @property int $data_scope 
+ * @property int $status 
+ * @property int $created_by 
+ * @property int $updated_by 
+ * @property string $remark 
+ * @property Carbon $created_at 
+ * @property Carbon $updated_at 
+ * @property string $deleted_at 
+ * @property-read null|Collection|Department[] $depts 
+ * @property-read null|Collection|Menu[] $menus 
+ * @property-read null|Collection|User[] $users 
  */
 class Role extends BaseModel
 {
@@ -79,7 +83,7 @@ class Role extends BaseModel
      */
     public function menus(): BelongsToMany
     {
-        return $this->belongsToMany(Menu::class, 'system_role_menu', 'role_id', 'menu_id');
+        return $this->belongsToMany(Menu::class, 'menu_role', 'role_id', 'menu_id');
     }
 
     /**
@@ -92,6 +96,6 @@ class Role extends BaseModel
 
     public function depts(): BelongsToMany
     {
-        return $this->belongsToMany(Department::class, 'department_role', 'role_id', 'dept_id');
+        return $this->belongsToMany(Department::class, 'department_role', 'role_id', 'department_id');
     }
 }

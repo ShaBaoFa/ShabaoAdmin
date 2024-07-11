@@ -25,8 +25,6 @@ class CreatePostUserTable extends Migration
             $table->addColumn('bigInteger', 'user_id', ['unsigned' => true, 'comment' => '用户主键']);
             $table->addColumn('bigInteger', 'post_id', ['unsigned' => true, 'comment' => '岗位主键']);
             $table->primary(['user_id', 'post_id']);
-            $table->datetimes();
-            $table->softDeletes();
         });
     }
 

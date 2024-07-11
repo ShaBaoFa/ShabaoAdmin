@@ -25,8 +25,6 @@ class CreateMenuRoleTable extends Migration
             $table->addColumn('bigInteger', 'role_id', ['unsigned' => true, 'comment' => '角色主键']);
             $table->addColumn('bigInteger', 'menu_id', ['unsigned' => true, 'comment' => '菜单主键']);
             $table->primary(['role_id', 'menu_id']);
-            $table->datetimes();
-            $table->softDeletes();
         });
     }
 

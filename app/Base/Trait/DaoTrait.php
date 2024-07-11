@@ -223,6 +223,8 @@ trait DaoTrait
 
         $isScope && $query->userDataScope();
 
+        ! $isScope && $query->exhibitionRoleDataScope();
+
         return $this->handleSearch($query, $params);
     }
 

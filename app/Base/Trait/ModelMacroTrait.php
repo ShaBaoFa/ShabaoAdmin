@@ -28,6 +28,12 @@ trait ModelMacroTrait
     /**
      * 注册自定义方法.
      */
+    private function registerExhibitionRoleDataScope(): void
+    {
+        // 因为展会数据出现互通
+        $model = $this;
+
+    }
     private function registerUserDataScope(): void
     {
         // 数据权限方法
@@ -136,6 +142,11 @@ trait ModelMacroTrait
                             case Role::SELF_SCOPE:
                                 $this->userIds[] = $this->userid;
                                 break;
+                            case Role::PLATFORM_SCOPE:
+                                break;
+                            case Role::ORGANIZER_SCOPE:
+                                break;
+                            case Role::EXHIBITOR_SCOPE:
                             default:
                                 break;
                         }

@@ -25,8 +25,6 @@ class CreateDepartmentOrganizationTable extends Migration
             $table->addColumn('bigInteger', 'department_id', ['unsigned' => true, 'comment' => '部门主键']);
             $table->addColumn('bigInteger', 'organization_id', ['unsigned' => true, 'comment' => '组织主键']);
             $table->primary(['department_id', 'organization_id']);
-            $table->datetimes();
-            $table->softDeletes();
         });
     }
 

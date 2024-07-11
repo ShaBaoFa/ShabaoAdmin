@@ -38,7 +38,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('index'), Permission('system:role, system:role:index')]
+    #[GetMapping('index'), Permission('roles, roles:index')]
     public function index(): ResponseInterface
     {
         return $this->response->success($this->service->getPageList($this->request->all()));
@@ -49,7 +49,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('recycle'), Permission('system:role:recycle')]
+    #[GetMapping('recycle'), Permission('roles:recycle')]
     public function recycle(): ResponseInterface
     {
         return $this->response->success($this->service->getPageListByRecycle($this->request->all()));
@@ -93,7 +93,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PostMapping('save'), Permission('system:role:save'), OperationLog]
+    #[PostMapping('save'), Permission('roles:save'), OperationLog]
     public function save(RoleRequest $request): ResponseInterface
     {
         return $this->response->success(['id' => $this->service->save($request->all())]);
@@ -104,7 +104,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('update/{id}'), Permission('system:role:update'), OperationLog]
+    #[PutMapping('update/{id:\d+}'), Permission('roles:update'), OperationLog]
     public function update(int $id, RoleRequest $request): ResponseInterface
     {
         return $this->service->update($id, $request->all()) ? $this->response->success() : $this->response->fail();
@@ -115,7 +115,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('menuPermission/{id}'), Permission('system:role:menuPermission'), OperationLog]
+    #[PutMapping('{id:\d+}/menuPermission'), Permission('roles:menuPermission'), OperationLog]
     public function menuPermission(int $id): ResponseInterface
     {
         return $this->service->update($id, $this->request->all()) ? $this->response->success() : $this->response->fail();
@@ -126,7 +126,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('dataPermission/{id}'), Permission('system:role:dataPermission'), OperationLog]
+    #[PutMapping('{id:\d+}/dataPermission'), Permission('roles:dataPermission'), OperationLog]
     public function dataPermission(int $id): ResponseInterface
     {
         return $this->service->update($id, $this->request->all()) ? $this->response->success() : $this->response->fail();
@@ -137,10 +137,10 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('delete'), Permission('system:role:delete')]
-    public function delete(): ResponseInterface
+    #[DeleteMapping('delete'), Permission('roles:delete')]
+    public function delete(RoleRequest $request): ResponseInterface
     {
-        return $this->service->delete((array) $this->request->input('ids', [])) ? $this->response->success() : $this->response->fail();
+        return $this->service->delete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
     }
 
     /**
@@ -148,10 +148,10 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('realDelete'), Permission('system:role:realDelete'), OperationLog]
-    public function realDelete(): ResponseInterface
+    #[DeleteMapping('realDelete'), Permission('roles:realDelete'), OperationLog]
+    public function realDelete(RoleRequest $request): ResponseInterface
     {
-        return $this->service->realDelete((array) $this->request->input('ids', [])) ? $this->response->success() : $this->response->fail();
+        return $this->service->realDelete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
     }
 
     /**
@@ -159,7 +159,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('recovery'), Permission('system:role:recovery')]
+    #[PutMapping('recovery'), Permission('roles:recovery')]
     public function recovery(): ResponseInterface
     {
         return $this->service->recovery((array) $this->request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -170,7 +170,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('changeStatus'), Permission('system:role:changeStatus'), OperationLog]
+    #[PutMapping('changeStatus'), Permission('roles:changeStatus'), OperationLog]
     public function changeStatus(RoleRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
@@ -182,7 +182,7 @@ class RoleController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('numberOperation'), Permission('system:role:update'), OperationLog]
+    #[PutMapping('numberOperation'), Permission('roles:update'), OperationLog]
     public function numberOperation(): ResponseInterface
     {
         return $this->service->numberOperation(
