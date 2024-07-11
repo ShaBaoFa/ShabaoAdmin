@@ -25,8 +25,6 @@ class CreateRoleOrganizationTable extends Migration
             $table->addColumn('bigInteger', 'organization_id', ['unsigned' => true, 'comment' => '组织主键']);
             $table->addColumn('bigInteger', 'role_id', ['unsigned' => true, 'comment' => '角色主键']);
             $table->primary(['organization_id', 'role_id']);
-            $table->datetimes();
-            $table->softDeletes();
         });
     }
 

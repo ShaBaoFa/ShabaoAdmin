@@ -25,8 +25,6 @@ class CreateDepartmentUserTable extends Migration
             $table->addColumn('bigInteger', 'user_id', ['unsigned' => true, 'comment' => '用户主键']);
             $table->addColumn('bigInteger', 'department_id', ['unsigned' => true, 'comment' => '部门主键']);
             $table->primary(['user_id', 'department_id']);
-            $table->datetimes();
-            $table->softDeletes();
         });
     }
 

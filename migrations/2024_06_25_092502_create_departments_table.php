@@ -28,6 +28,7 @@ class CreateDepartmentsTable extends Migration
             $table->addColumn('string', 'leader', ['length' => 20, 'comment' => '负责人'])->nullable();
             $table->addColumn('string', 'phone', ['length' => 11, 'comment' => '联系电话'])->nullable();
             $table->addColumn('smallInteger', 'status', ['default' => 1, 'comment' => '状态 (1正常 2停用)'])->index()->nullable();
+            $table->addColumn('smallInteger', 'sort', ['unsigned' => true, 'default' => 0, 'comment' => '排序'])->nullable();
             $table->addColumn('bigInteger', 'created_by', ['comment' => '创建者'])->index()->nullable();
             $table->addColumn('bigInteger', 'updated_by', ['comment' => '更新者'])->index()->nullable();
             $table->addColumn('string', 'remark', ['length' => 255, 'comment' => '备注'])->nullable();

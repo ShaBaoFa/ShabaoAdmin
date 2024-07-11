@@ -15,16 +15,16 @@ namespace App\Model;
 use App\Base\BaseModel;
 
 /**
- * @property int $id
- * @property string $username
- * @property string $ip
- * @property string $ip_location
- * @property string $os
- * @property string $browser
- * @property int $status
- * @property string $message
- * @property string $login_time
- * @property string $remark
+ * @property int $id 
+ * @property string $username 
+ * @property string $ip 
+ * @property string $ip_location 
+ * @property string $os 
+ * @property string $browser 
+ * @property int $status 
+ * @property string $message 
+ * @property string $login_time 
+ * @property string $remark 
  */
 class LoginLog extends BaseModel
 {

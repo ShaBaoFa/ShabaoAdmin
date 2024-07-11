@@ -25,8 +25,6 @@ class CreateRoleUserTable extends Migration
             $table->addColumn('bigInteger', 'user_id', ['unsigned' => true, 'comment' => '用户主键']);
             $table->addColumn('bigInteger', 'role_id', ['unsigned' => true, 'comment' => '角色主键']);
             $table->primary(['user_id', 'role_id']);
-            $table->datetimes();
-            $table->softDeletes();
         });
     }
 

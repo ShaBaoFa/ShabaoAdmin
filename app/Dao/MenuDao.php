@@ -223,6 +223,8 @@ class MenuDao extends BaseDao
             $query->where('status', $params['status']);
         }
 
+
+
         if (isset($params['name']) && filled($params['name'])) {
             $query->where('name', 'like', '%' . $params['name'] . '%');
         }

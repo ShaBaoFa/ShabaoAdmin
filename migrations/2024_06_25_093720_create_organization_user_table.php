@@ -25,8 +25,6 @@ class CreateOrganizationUserTable extends Migration
             $table->addColumn('bigInteger', 'user_id', ['unsigned' => true, 'comment' => '用户主键']);
             $table->addColumn('bigInteger', 'organization_id', ['unsigned' => true, 'comment' => '组织主键']);
             $table->primary(['user_id', 'organization_id']);
-            $table->datetimes();
-            $table->softDeletes();
         });
     }
 
