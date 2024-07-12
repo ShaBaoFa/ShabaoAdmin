@@ -26,6 +26,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 use RedisException;
 use Xmo\JWTAuth\JWT;
 
+use function App\Helper\user;
 use function Hyperf\Config\config;
 use function Hyperf\Support\env;
 
@@ -44,7 +45,7 @@ class UserService extends BaseService
         if ($this->dao->existsByUsername($data['username'])) {
             throw new BusinessException(ErrorCode::USER_NOT_EXIST);
         }
-//        return $this->dao->save($this->handleData($data));
+        //        return $this->dao->save($this->handleData($data));
         return $this->dao->save($data);
     }
 

@@ -102,7 +102,7 @@ class RoleRequest extends BaseFormRequest
             'status' => '角色状态',
             'menu_ids.*' => '菜单ID',
             'depts_ids.*' => '部门ID',
-            'ids.*' => '角色ID'
+            'ids.*' => '角色ID',
         ];
     }
 }

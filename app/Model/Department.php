@@ -16,20 +16,20 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 
 /**
- * @property int $id 
- * @property int $parent_id 
- * @property string $level 
- * @property string $name 
- * @property string $leader 
- * @property string $phone 
- * @property int $status 
- * @property int $sort 
- * @property int $created_by 
- * @property int $updated_by 
- * @property string $remark 
- * @property Carbon $created_at 
- * @property Carbon $updated_at 
- * @property string $deleted_at 
+ * @property int $id
+ * @property int $parent_id
+ * @property string $level
+ * @property string $name
+ * @property string $leader
+ * @property string $phone
+ * @property int $status
+ * @property int $sort
+ * @property int $created_by
+ * @property int $updated_by
+ * @property string $remark
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property string $deleted_at
  */
 class Department extends BaseModel
 {

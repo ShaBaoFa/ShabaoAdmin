@@ -23,6 +23,9 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Throwable;
+
+use function App\Helper\user;
 use function Hyperf\Config\config;
 
 #[Aspect]
@@ -53,7 +56,7 @@ class ModelUpdateAspect extends AbstractAspect
         ) {
             try {
                 $instance->updated_by = user()->getId();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
             }
         }
         return $proceedingJoinPoint->process();

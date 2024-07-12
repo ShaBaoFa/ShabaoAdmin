@@ -17,7 +17,8 @@ use App\Constants\ErrorCode;
 use App\Dao\MenuDao;
 use App\Exception\BusinessException;
 use App\Model\Menu;
-use function Hyperf\Config\config;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class MenuService extends BaseService
 {
@@ -64,6 +65,7 @@ class MenuService extends BaseService
         $name = $this->dao->findNameByCode($code);
         return $name ?? throw new BusinessException(ErrorCode::MENU_CODE_NOT_EXIST);
     }
+
     /**
      * 新增菜单.
      */
@@ -109,6 +111,7 @@ class MenuService extends BaseService
 
         return true;
     }
+
     /**
      * 更新菜单.
      */
@@ -177,11 +180,7 @@ class MenuService extends BaseService
     }
 
     /**
-     * 处理子孙menu
-     * @param string $descendantLevel
-     * @param string $handleDataLevel
-     * @param int $id
-     * @return string
+     * 处理子孙menu.
      */
     protected function handleDescendantMenuLevels(string $descendantLevel, string $handleDataLevel, int $id): string
     {

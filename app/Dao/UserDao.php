@@ -16,9 +16,12 @@ use App\Base\BaseDao;
 use App\Base\BaseModel;
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
+use App\Model\Department;
 use App\Model\User;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
+
+use function App\Helper\filled;
 use function Hyperf\Support\env;
 
 class UserDao extends BaseDao
@@ -57,8 +60,14 @@ class UserDao extends BaseDao
     #[Transactional]
     public function save(array $data): int
     {
+        $role_ids = $data['role_ids'] ?? [];
+        $post_ids = $data['post_ids'] ?? [];
+        $dept_ids = $data['dept_ids'] ?? [];
         $this->filterExecuteAttributes($data, true);
         $user = $this->model::create($data);
+        $user->roles()->sync($role_ids, false);
+//        $user->posts()->sync($post_ids, false);
+//        $user->depts()->sync($dept_ids, false);
         return $user->getKey();
     }
 
@@ -85,7 +94,7 @@ class UserDao extends BaseDao
     #[Transactional]
     public function update(mixed $id, array $data): bool
     {
-        //        $role_ids = $data['role_ids'] ?? [];
+        $role_ids = $data['role_ids'] ?? [];
         //        $post_ids = $data['post_ids'] ?? [];
         //        $dept_ids = $data['dept_ids'] ?? [];
         $this->filterExecuteAttributes($data, true);
@@ -93,7 +102,7 @@ class UserDao extends BaseDao
         $result = parent::update($id, $data);
         $user = $this->model::find($id);
         if ($user && $result) {
-            //            ! empty($role_ids) && $user->roles()->sync($role_ids);
+            ! empty($role_ids) && $user->roles()->sync($role_ids);
             //            ! empty($dept_ids) && $user->depts()->sync($dept_ids);
             //            $user->posts()->sync($post_ids);
             return true;
@@ -110,9 +119,9 @@ class UserDao extends BaseDao
         foreach ($ids as $id) {
             $user = $this->model::withTrashed()->find($id);
             if ($user) {
-//                $user->roles()->detach();
-//                $user->posts()->detach();
-//                $user->depts()->detach();
+                $user->roles()->detach();
+                //                $user->posts()->detach();
+                //                $user->depts()->detach();
                 $user->forceDelete();
             }
         }
@@ -126,9 +135,9 @@ class UserDao extends BaseDao
     {
         $user = $this->model::find($id);
         if ($user) {
-//            $user->setAttribute('roleList', $user->roles()->get(['id', 'name']) ?: []);
-//            $user->setAttribute('postList', $user->posts()->get(['id', 'name']) ?: []);
-//            $user->setAttribute('deptList', $user->depts()->get(['id', 'name']) ?: []);
+            $user->setAttribute('roleList', $user->roles()->get(['id', 'name']) ?: []);
+            //            $user->setAttribute('postList', $user->posts()->get(['id', 'name']) ?: []);
+            //            $user->setAttribute('deptList', $user->depts()->get(['id', 'name']) ?: []);
         }
         return $user;
     }
@@ -149,18 +158,18 @@ class UserDao extends BaseDao
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-//        if (isset($params['dept_id']) && filled($params['dept_id']) && is_string($params['dept_id'])) {
-//            $deptIds = SystemDept::query()
-//                ->where(function ($query) use ($params) {
-//                    $query->where('id', '=', $params['dept_id'])
-//                        ->orWhere('level', 'like', $params['dept_id'] . ',%')
-//                        ->orWhere('level', 'like', '%,' . $params['dept_id'])
-//                        ->orWhere('level', 'like', '%,' . $params['dept_id'] . ',%');
-//                })
-//                ->pluck('id')
-//                ->toArray();
-//            $query->whereHas('depts', fn ($query) => $query->whereIn('id', $deptIds));
-//        }
+        if (isset($params['dept_id']) && filled($params['dept_id']) && is_string($params['dept_id'])) {
+            $deptIds = Department::query()
+                ->where(function ($query) use ($params) {
+                    $query->where('id', '=', $params['dept_id'])
+                        ->orWhere('level', 'like', $params['dept_id'] . ',%')
+                        ->orWhere('level', 'like', '%,' . $params['dept_id'])
+                        ->orWhere('level', 'like', '%,' . $params['dept_id'] . ',%');
+                })
+                ->pluck('id')
+                ->toArray();
+            $query->whereHas('depts', fn ($query) => $query->whereIn('id', $deptIds));
+        }
         if (isset($params['username']) && filled($params['username'])) {
             $query->where('username', 'like', '%' . $params['username'] . '%');
         }
@@ -186,35 +195,30 @@ class UserDao extends BaseDao
             $query->whereIn('id', $params['userIds']);
         }
 
-//        if (isset($params['showDept']) && filled($params['showDept'])) {
-//            $isAll = $params['showDeptAll'] ?? false;
-//
-//            $query->with(['depts' => function ($query) use ($isAll) {
-//                /*
-//                 *  @var Builder $query
-//                 */
-//                $query->where('status', SystemDept::ENABLE);
-//                return $isAll ? $query->select(['*']) : $query->select(['id', 'name']);
-//            }]);
-//        }
-//
-//        if (isset($params['role_id']) && filled($params['role_id'])) {
-//            $tablePrefix = env('DB_PREFIX');
-//            $query->whereRaw(
-//                "id IN ( SELECT user_id FROM {$tablePrefix}system_user_role WHERE role_id = ? )",
-//                [$params['role_id']]
-//            );
-//        }
-//
-//        if (isset($params['post_id']) && filled($params['post_id'])) {
-//            $tablePrefix = env('DB_PREFIX');
-//            $query->whereRaw(
-//                "id IN ( SELECT user_id FROM {$tablePrefix}system_user_post WHERE post_id = ? )",
-//                [$params['post_id']]
-//            );
-//        }
+        if (isset($params['showDept']) && filled($params['showDept'])) {
+            $isAll = $params['showDeptAll'] ?? false;
+
+            $query->with(['depts' => function ($query) use ($isAll) {
+                /**
+                 * @var Builder $query
+                 */
+                $query->where('status', Department::ENABLE);
+                return $isAll ? $query->select(['*']) : $query->select(['id', 'name']);
+            }]);
+        }
+
+        if (isset($params['role_ids']) && filled($params['role_ids'])) {
+            $query->whereHas('roles', fn ($query) => $query->whereIn('roles.id', $params['role_ids']));
+        }
+        //
+        //        if (isset($params['post_id']) && filled($params['post_id'])) {
+        //            $tablePrefix = env('DB_PREFIX');
+        //            $query->whereRaw(
+        //                "id IN ( SELECT user_id FROM {$tablePrefix}system_user_post WHERE post_id = ? )",
+        //                [$params['post_id']]
+        //            );
+        //        }
 
         return $query;
     }
-
 }

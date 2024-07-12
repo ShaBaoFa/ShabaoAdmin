@@ -20,6 +20,7 @@ use App\Model\User;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Db;
 
+use function App\Helper\user;
 use function Hyperf\Config\config;
 use function Hyperf\Support\env;
 
@@ -32,8 +33,8 @@ trait ModelMacroTrait
     {
         // 因为展会数据出现互通
         $model = $this;
-
     }
+
     private function registerUserDataScope(): void
     {
         // 数据权限方法

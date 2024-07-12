@@ -9,9 +9,13 @@ declare(strict_types=1);
  * @gitee    https://gitee.com/wlfpanda/web-api
  * @contact  mail@wlfpanda1012.com
  */
+
+namespace App\Helper;
+
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
-use App\Helper\currentUser;
+use Countable;
+use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -26,6 +30,29 @@ if (! function_exists('user')) {
         } catch (ContainerExceptionInterface|NotFoundExceptionInterface $e) {
             throw new BusinessException(ErrorCode::SERVER_ERROR);
         }
+    }
+}
+
+if (! function_exists('lang')) {
+    /**
+     * 获取当前语言
+     */
+    function lang(): string
+    {
+        $acceptLanguage = di()
+            ->get(RequestInterface::class)
+            ->getHeaderLine('accept-language');
+        return str_replace('-', '_', ! empty($acceptLanguage) ? explode(',', $acceptLanguage)[0] : 'zh_CN');
+    }
+}
+
+if (! function_exists('trans')) {
+    /**
+     * 翻译.
+     */
+    function trans(string $key, array $replace = []): string
+    {
+        return \Hyperf\Translation\trans($key, $replace, lang());
     }
 }
 

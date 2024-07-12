@@ -18,6 +18,8 @@ use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
 use Hyperf\Di\Exception\Exception;
 use Psr\Container\ContainerInterface;
+
+use function App\Helper\user;
 use function Hyperf\Config\config;
 
 #[Aspect]
@@ -38,7 +40,7 @@ class ModelSaveAspect extends AbstractAspect
     {
         $instance = $proceedingJoinPoint->getInstance();
 
-        if (config('base-common.data_scope_enabled')){
+        if (config('base-common.data_scope_enabled')) {
             // 获取当前登录用户信息
             // 设置创建人
             if ($instance instanceof BaseModel && in_array($instance->getDataScopeField(), $instance->getFillable()) && is_null($instance[$instance->getDataScopeField()])) {

@@ -21,51 +21,51 @@ enum ErrorCode: int implements ErrorCodeInterface
 {
     use EnumConstantsTrait;
 
-    #[Message('Server Error')]
-    case SERVER_ERROR = 500;
-
-    #[Message('USER_NOT_EXIST')]
-    case USER_NOT_EXIST = 10001;
-
-    #[Message('USER_PASSWORD_ERROR')]
-    case USER_PASSWORD_ERROR = 10002;
-
-    #[Message('USER_BAN')]
-    case USER_BAN = 10003;
-
-    #[Message('NO_LOGIN_USER')]
-    case NO_LOGIN_USER = 10004;
-
-    #[Message('UNAUTHORIZED')]
+    #[Message('common.unauthorized')]
     case UNAUTHORIZED = 401;
 
-    #[Message('FORBIDDEN')]
+    #[Message('common.forbidden')]
     case FORBIDDEN = 403;
 
+    #[Message('common.invalid_params')]
+    case INVALID_PARAMS = 422;
+
+    #[Message('common.server_error')]
+    case SERVER_ERROR = 500;
+
+    #[Message('common.user_not_found')]
+    case USER_NOT_EXIST = 10001;
+
+    #[Message('common.user_login_failed')]
+    case USER_PASSWORD_ERROR = 10002;
+
+    #[Message('common.user_ban')]
+    case USER_BAN = 10003;
+
+    #[Message('common.user_not_login')]
+    case NO_LOGIN_USER = 10004;
+
     # 导出数据失败
-    #[Message('EXPORT_DATA_FAILED')]
+    #[Message('common.export_data_failed')]
     case EXPORT_DATA_FAILED = 20002;
 
     # 导出未指定DTO
-    #[Message('EXPORT_DTO_NOT_SPECIFIED')]
+    #[Message('common.export_dto_not_specified')]
     case EXPORT_DTO_NOT_SPECIFIED = 20001;
 
     # DTO不符合规范
-    #[Message('DTO_NOT_IMPLEMENT_MODEL_EXCEL')]
+    #[Message('common.dto_not_implement_model_excel')]
     case DTO_NOT_IMPLEMENT_MODEL_EXCEL = 20003;
 
     # DTO注解信息为空（dto annotation info is empty）
-    #[Message('DTO_ANNOTATION_INFO_EMPTY')]
+    #[Message('common.dto_annotation_info_is_empty')]
     case DTO_ANNOTATION_INFO_EMPTY = 20004;
 
-    #[Message('ROLE_CODE_NOT_EXIST')]
+    #[Message('common.role_not_found')]
     case ROLE_CODE_NOT_EXIST = 30001;
 
-    #[Message('MENU_CODE_NOT_EXIST')]
+    #[Message('common.menu_not_found')]
     case MENU_CODE_NOT_EXIST = 40001;
-
-    #[Message('INVALID_PARAMS')]
-    case INVALID_PARAMS = 422;
 
     public function getMessage(?array $translate = null): string
     {
