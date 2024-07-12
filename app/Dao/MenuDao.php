@@ -18,7 +18,12 @@ use App\Model\User;
 use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use RedisException;
+
+use function App\Helper\filled;
+use function App\Helper\user;
 
 class MenuDao extends BaseDao
 {

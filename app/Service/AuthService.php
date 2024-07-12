@@ -24,7 +24,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 
-use function user;
+use function App\Helper\user;
 
 class AuthService extends BaseService
 {

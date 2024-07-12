@@ -18,6 +18,7 @@ use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
 
+use function App\Helper\filled;
 use function Hyperf\Support\env;
 
 class RoleDao extends BaseDao

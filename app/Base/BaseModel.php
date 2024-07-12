@@ -86,8 +86,6 @@ class BaseModel extends Model
 
     /**
      * Create a new Model Collection instance.
-     *
-     * @return BaseCollection
      */
     public function newCollection(array $models = []): BaseCollection
     {

@@ -65,6 +65,48 @@ class InstallProjectCommand extends HyperfCommand
         }
     }
 
+    protected function initSuperAdminData()
+    {
+        // 清理数据
+        Db::table('users')->truncate();
+        Db::table('roles')->truncate();
+        Db::table('role_user')->truncate();
+
+        // 创建超级管理员
+        $superAdminId = Db::table('users')->insertGetId([
+            'username' => 'superAdmin',
+            'password' => password_hash('admin123', PASSWORD_DEFAULT),
+            'user_type' => '100',
+            'phone' => '15911112222',
+            'created_by' => 0,
+            'updated_by' => 0,
+            'status' => User::STATUS_NORMAL,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+        ]);
+        // 创建管理员角色
+        $superRoleId = Db::table('roles')->insertGetId([
+            'name' => '超级管理员（创始人）',
+            'code' => 'superAdmin',
+            'data_scope' => 0,
+            'created_by' => env('SUPER_ADMIN', 0),
+            'updated_by' => 0,
+            'status' => 1,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+            'remark' => '系统内置角色，不可删除',
+        ]);
+        Db::table('role_user')->insertGetId([
+            'user_id' => $superAdminId,
+            'role_id' => $superRoleId,
+        ]);
+        $envConfig = <<<ENV
+SUPER_ADMIN={$superAdminId}
+ADMIN_ROLE={$superAdminId}
+ENV;
+        file_put_contents(BASE_PATH . '/.env', $envConfig, FILE_APPEND);
+    }
+
     private function menu_data(): array
     {
         return [
@@ -3968,47 +4010,5 @@ class InstallProjectCommand extends HyperfCommand
                 'remark' => '',
             ],
         ];
-    }
-
-    protected function initSuperAdminData()
-    {
-        // 清理数据
-        Db::table('users')->truncate();
-        Db::table('roles')->truncate();
-        Db::table('role_user')->truncate();
-
-        // 创建超级管理员
-        $superAdminId = Db::table('users')->insertGetId([
-            'username' => 'superAdmin',
-            'password' => password_hash('admin123', PASSWORD_DEFAULT),
-            'user_type' => '100',
-            'phone' => '15911112222',
-            'created_by' => 0,
-            'updated_by' => 0,
-            'status' => User::STATUS_NORMAL,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-        ]);
-        // 创建管理员角色
-        $superRoleId = Db::table('roles')->insertGetId([
-            'name' => '超级管理员（创始人）',
-            'code' => 'superAdmin',
-            'data_scope' => 0,
-            'created_by' => env('SUPER_ADMIN', 0),
-            'updated_by' => 0,
-            'status' => 1,
-            'created_at' => date('Y-m-d H:i:s'),
-            'updated_at' => date('Y-m-d H:i:s'),
-            'remark' => '系统内置角色，不可删除',
-        ]);
-        Db::table('role_user')->insertGetId([
-            'user_id' => $superAdminId,
-            'role_id' => $superRoleId,
-        ]);
-        $envConfig = <<<ENV
-SUPER_ADMIN={$superAdminId}
-ADMIN_ROLE={$superAdminId}
-ENV;
-        file_put_contents(BASE_PATH . '/.env', $envConfig, FILE_APPEND);
     }
 }

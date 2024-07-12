@@ -28,6 +28,8 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
+use function App\Helper\user;
+
 #[Controller(prefix: 'api/v1/users'),Auth]
 class UserController extends BaseController
 {

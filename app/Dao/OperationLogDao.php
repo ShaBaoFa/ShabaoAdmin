@@ -16,6 +16,8 @@ use App\Base\BaseDao;
 use App\Model\OperationLog;
 use Hyperf\Database\Model\Builder;
 
+use function App\Helper\filled;
+
 class OperationLogDao extends BaseDao
 {
     /**

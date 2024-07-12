@@ -20,7 +20,7 @@ return [
      */
     'excel_drive' => 'auto',
     /**
-     * 生成RESTFUL按钮菜单
+     * 生成RESTFUL按钮菜单.
      */
     'restful_menu_enabled' => \Hyperf\Support\env('RESTFUL_MENU_ENABLED', false),
 ];

@@ -18,6 +18,8 @@ use App\Model\User;
 use App\Request\Rules\PasswordRule;
 use App\Service\UserService;
 
+use function App\Helper\user;
+
 class UserRequest extends BaseFormRequest
 {
     /**
@@ -26,7 +28,11 @@ class UserRequest extends BaseFormRequest
     public function commonRules(): array
     {
         return [
-            'id' => ['required', 'integer', 'exists:users,id'],
+            'role_ids' => ['nullable', 'array'],
+            'role_ids.*' => ['required_with:role_ids', 'integer', 'exists:roles,id'],
+            'dept_ids' => ['nullable', 'array'],
+            'dept_ids.*' => ['required_with:dept_ids', 'integer', 'exists:depts,id'],
+            'status' => ['nullable', 'integer', 'in:1,2'],
         ];
     }
 
@@ -40,8 +46,8 @@ class UserRequest extends BaseFormRequest
             'username' => ['required', 'max:20', 'unique:users'],
             'password' => ['required', 'min:6', new PasswordRule()],
             'phone' => ['telephone_number'],
-            //            'dept_ids' => ['required'],
-            //            'role_ids' => ['required'],
+//            'dept_ids' => ['required'],
+            'role_ids' => ['required'],
             'remark' => ['max:255'],
         ];
     }
@@ -55,7 +61,7 @@ class UserRequest extends BaseFormRequest
         return [
             'username' => ['required', 'max:20'],
             'phone' => ['telephone_number'],
-            'dept_ids' => ['required'],
+//            'dept_ids' => ['required'],
             'role_ids' => ['required'],
             'remark' => ['max:255'],
         ];
@@ -179,7 +185,9 @@ class UserRequest extends BaseFormRequest
             'newPassword_confirmation' => '确认密码',
             'status' => '用户状态',
             'dept_ids' => '部门ID',
+            'dept_ids.*' => '部门ID',
             'role_ids' => '角色列表',
+            'role_ids.*' => '角色列表',
             'phone' => '手机',
             'email' => '邮箱',
             'remark' => '备注',

@@ -21,6 +21,8 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
+use function App\Helper\user;
+
 #[Aspect]
 class AuthAspect extends AbstractAspect
 {
@@ -52,7 +54,6 @@ class AuthAspect extends AbstractAspect
             $scene = $auth->scene ?? 'default';
         }
         $currentUser = user($scene);
-
         $currentUser->check(scene: $scene);
 
         return $proceedingJoinPoint->process();

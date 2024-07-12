@@ -67,7 +67,6 @@ class MenuController extends BaseController
         return $this->response->success($this->service->getSelectTree($this->request->all()));
     }
 
-
     /**
      * 新增菜单.
      * @throws ContainerExceptionInterface
