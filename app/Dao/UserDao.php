@@ -66,8 +66,8 @@ class UserDao extends BaseDao
         $this->filterExecuteAttributes($data, true);
         $user = $this->model::create($data);
         $user->roles()->sync($role_ids, false);
-//        $user->posts()->sync($post_ids, false);
-//        $user->depts()->sync($dept_ids, false);
+        //        $user->posts()->sync($post_ids, false);
+        //        $user->depts()->sync($dept_ids, false);
         return $user->getKey();
     }
 
