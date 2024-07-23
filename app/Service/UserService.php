@@ -14,6 +14,8 @@ namespace App\Service;
 
 use App\Base\BaseService;
 use App\Constants\ErrorCode;
+use App\Dao\MenuDao;
+use App\Dao\RoleDao;
 use App\Dao\UserDao;
 use App\Exception\BusinessException;
 use App\Model\User;
@@ -213,18 +215,38 @@ class UserService extends BaseService
         /**
          * @todo 获取用户角色、部门、岗位信息
          */
+        /**
+         * @var MenuDao $menuDao
+         */
+        $menuDao = di()->get(MenuDao::class);
         if (user()->isSuperAdmin()) {
             $data['roles'] = ['superAdmin'];
-            //                    $data['routers'] = $this->sysMenuService->mapper->getSuperAdminRouters();
+            $data['routers'] = $menuDao->getSuperAdminRouters();
             $data['codes'] = ['*'];
         } else {
-            //                    $roles = $this->sysRoleService->mapper->getMenuIdsByRoleIds($user->roles()->pluck('id')->toArray());
-            //                    $ids = $this->filterMenuIds($roles);
+            $roleDao = di()->get(RoleDao::class);
+            $roles = $roleDao->getMenuIdsByRoleIds($user->roles()->pluck('id')->toArray());
+            $ids = $this->filterMenuIds($roles);
             $data['roles'] = $user->roles()->pluck('code')->toArray();
-            //                    $data['routers'] = $this->sysMenuService->mapper->getRoutersByIds($ids);
-            //                    $data['codes'] = $this->sysMenuService->mapper->getMenuCode($ids);
+            $data['routers'] = $menuDao->getRoutersByIds($ids);
+            $data['codes'] = $menuDao->getMenuCode($ids);
         }
         return $data;
+    }
+
+    /**
+     * 过滤通过角色查询出来的菜单id列表，并去重.
+     */
+    protected function filterMenuIds(array &$roleData): array
+    {
+        $ids = [];
+        foreach ($roleData as $val) {
+            foreach ($val['menus'] as $menu) {
+                $ids[] = $menu['id'];
+            }
+        }
+        unset($roleData);
+        return array_unique($ids);
     }
 
     /**

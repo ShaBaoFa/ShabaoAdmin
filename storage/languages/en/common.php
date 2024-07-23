@@ -10,6 +10,9 @@ declare(strict_types=1);
  * @contact  mail@wlfpanda1012.com
  */
 return [
+    // base
+    'normal' => 'normal',
+    'abnormal' => 'abnormal',
     // server
     'unauthorized' => 'unauthorized',
     'forbidden' => 'forbidden',
@@ -33,4 +36,8 @@ return [
 
     // menu
     'menu_not_found' => 'menu_not_found',
+
+    // dept
+    'dept_parent_not_valid' => 'dept_parent_not_valid',
+    'dept_exists_children' => 'dept_exists_children',
 ];

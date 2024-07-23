@@ -16,17 +16,17 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 
 /**
- * @property int $id
- * @property int $parent_id
- * @property string $level
- * @property string $name
- * @property string $leader
- * @property string $phone
- * @property int $status
- * @property int $sort
- * @property int $created_by
- * @property int $updated_by
- * @property string $remark
+ * @property int $id 主键ID
+ * @property int $parent_id 父级ID
+ * @property string $level 层级
+ * @property string $name 名称
+ * @property string $leader 负责人
+ * @property string $phone 电话
+ * @property int $status 状态 (1正常 2停用)
+ * @property int $sort 排序
+ * @property int $created_by 创建者
+ * @property int $updated_by 更新者
+ * @property string $remark 备注
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at

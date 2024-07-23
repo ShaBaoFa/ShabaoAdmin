@@ -10,3 +10,15 @@ namespace PHPSTORM_META {
 
     override(\di(0), map(['' => '@']));
 }
+
+namespace Hyperf\Database\Model {
+    class Builder {
+        /**
+         * @param int|null $userid
+         * @return Builder
+         */
+        public function userDataScope(?int $userid = null)
+        {
+        }
+    }
+}

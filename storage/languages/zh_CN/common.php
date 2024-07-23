@@ -10,6 +10,10 @@ declare(strict_types=1);
  * @contact  mail@wlfpanda1012.com
  */
 return [
+    // base
+    'normal' => '正常',
+    'ban' => '禁用',
+    // server
     'unauthorized' => '未经授权',
     'forbidden' => '禁止访问',
     'invalid_params' => '无效参数',
@@ -32,4 +36,8 @@ return [
 
     // menu
     'menu_not_found' => '菜单不存在',
+
+    // dept
+    'dept_parent_not_valid' => '上级部门不合法',
+    'dept_exists_children' => '部门存在子部门',
 ];

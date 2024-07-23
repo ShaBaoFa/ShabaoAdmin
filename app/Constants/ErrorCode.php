@@ -67,6 +67,12 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.menu_not_found')]
     case MENU_CODE_NOT_EXIST = 40001;
 
+    #[Message('common.dept_parent_not_valid')]
+    case DEPT_PARENT_NOT_VALID = 50001;
+
+    #[Message('common.dept_exists_children')]
+    case DEPT_EXISTS_CHILDREN = 50002;
+
     public function getMessage(?array $translate = null): string
     {
         $arguments = [];

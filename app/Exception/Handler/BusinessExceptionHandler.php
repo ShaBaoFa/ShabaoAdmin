@@ -61,7 +61,7 @@ class BusinessExceptionHandler extends ExceptionHandler
             case $throwable instanceof CircularDependencyException:
                 $this->logger->error($throwable->getMessage());
                 return $this->response->fail(ErrorCode::SERVER_ERROR->value, $throwable->getMessage());
-            case $this instanceof NoPermissionException:
+            case $throwable instanceof NoPermissionException:
                 $this->logger->warning(format_throwable($throwable));
                 return $this->response->fail($throwable->getCode(), $throwable->getMessage())->withStatus(ErrorCode::FORBIDDEN->value);
         }
