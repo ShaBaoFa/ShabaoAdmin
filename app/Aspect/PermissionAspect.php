@@ -89,8 +89,9 @@ class PermissionAspect extends AbstractAspect
                 if (in_array(trim($code), $codes)) {
                     return true;
                 }
+                $service = di()->get(MenuService::class);
+                throw new NoPermissionException(ErrorCode::FORBIDDEN, $service->findNameByCode($code) . ErrorCode::FORBIDDEN->getMessage());
             }
-            throw new NoPermissionException(ErrorCode::FORBIDDEN, $this->request->getPathInfo() . ErrorCode::FORBIDDEN->getMessage());
         }
 
         if ($where === 'AND') {

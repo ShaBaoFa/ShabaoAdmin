@@ -105,22 +105,22 @@ trait ModelMacroTrait
                                 $deptIds = $role->depts()->pluck('id')->toArray();
                                 $this->userIds = array_merge(
                                     $this->userIds,
-                                    Db::table('system_user_dept')->whereIn('dept_id', $deptIds)->pluck('user_id')->toArray()
+                                    Db::table('department_user')->whereIn('department_id', $deptIds)->pluck('user_id')->toArray()
                                 );
                                 $this->userIds[] = $this->userid;
                                 break;
                             case Role::SELF_DEPT_SCOPE:
                                 // 本部门数据权限
-                                $deptIds = Db::table('system_user_dept')->where('user_id', $userModel->id)->pluck('dept_id')->toArray();
+                                $deptIds = Db::table('department_user')->where('user_id', $userModel->id)->pluck('department_id')->toArray();
                                 $this->userIds = array_merge(
                                     $this->userIds,
-                                    Db::table('system_user_dept')->whereIn('dept_id', $deptIds)->pluck('user_id')->toArray()
+                                    Db::table('department_user')->whereIn('department_id', $deptIds)->pluck('user_id')->toArray()
                                 );
                                 $this->userIds[] = $this->userid;
                                 break;
                             case Role::DEPT_BELOW_SCOPE:
                                 // 本部门及子部门数据权限
-                                $parentDepts = Db::table('system_user_dept')->where('user_id', $userModel->id)->pluck('dept_id')->toArray();
+                                $parentDepts = Db::table('department_user')->where('user_id', $userModel->id)->pluck('department_id')->toArray();
                                 $ids = [];
                                 foreach ($parentDepts as $deptId) {
                                     $ids[] = Department::query()
@@ -136,18 +136,13 @@ trait ModelMacroTrait
                                 $deptIds = array_merge($parentDepts, ...$ids);
                                 $this->userIds = array_merge(
                                     $this->userIds,
-                                    Db::table('system_user_dept')->whereIn('dept_id', $deptIds)->pluck('user_id')->toArray()
+                                    Db::table('department_user')->whereIn('department_id', $deptIds)->pluck('user_id')->toArray()
                                 );
                                 $this->userIds[] = $this->userid;
                                 break;
                             case Role::SELF_SCOPE:
                                 $this->userIds[] = $this->userid;
                                 break;
-                            case Role::PLATFORM_SCOPE:
-                                break;
-                            case Role::ORGANIZER_SCOPE:
-                                break;
-                            case Role::EXHIBITOR_SCOPE:
                             default:
                                 break;
                         }

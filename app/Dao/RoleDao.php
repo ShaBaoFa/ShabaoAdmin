@@ -41,6 +41,7 @@ class RoleDao extends BaseDao
         return $this->model::query()->where('code', $code)->value('name');
     }
 
+
     /**
      * 检查角色code是否已存在.
      */
