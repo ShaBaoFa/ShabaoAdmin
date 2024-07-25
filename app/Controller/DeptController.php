@@ -29,7 +29,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/departments'),Auth]
+#[Controller(prefix: 'api/v1/depts'),Auth]
 class DeptController extends BaseController
 {
     #[Inject]
@@ -39,7 +39,7 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('index'), Permission('departments, departments:index')]
+    #[GetMapping('index'), Permission('depts, depts:index')]
     public function index(): ResponseInterface
     {
         return $this->response->success($this->service->getTreeList($this->request->all()));
@@ -50,7 +50,7 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('recycle'), Permission('departments:recycle')]
+    #[GetMapping('recycle'), Permission('depts:recycle')]
     public function recycleTree(): ResponseInterface
     {
         return $this->response->success($this->service->getTreeListByRecycle($this->request->all()));
@@ -72,7 +72,7 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PostMapping('save'), Permission('departments:save'), OperationLog]
+    #[PostMapping('save'), Permission('depts:save'), OperationLog]
     public function save(DepartmentRequest $request): ResponseInterface
     {
         return $this->response->success(['id' => $this->service->save($request->all())]);
@@ -82,7 +82,7 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('update/{id}'), Permission('departments:update'), OperationLog]
+    #[PutMapping('update/{id}'), Permission('depts:update'), OperationLog]
     public function update(int $id, DepartmentRequest $request): ResponseInterface
     {
         return $this->service->update($id, $request->all()) ? $this->response->success() : $this->response->fail();
@@ -93,10 +93,10 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('delete'), Permission('departments:delete')]
-    public function delete(): ResponseInterface
+    #[DeleteMapping('delete'), Permission('depts:delete')]
+    public function delete(DepartmentRequest $request): ResponseInterface
     {
-        return $this->service->delete((array) $this->request->input('ids', [])) ? $this->response->success() : $this->response->fail();
+        return $this->service->delete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
     }
 
     /**
@@ -104,13 +104,13 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('realDelete'), Permission('departments:realDelete'), OperationLog]
-    public function realDelete(): ResponseInterface
+    #[DeleteMapping('realDelete'), Permission('depts:realDelete'), OperationLog]
+    public function realDelete(DepartmentRequest $request): ResponseInterface
     {
-        $data = $this->service->realDel((array) $this->request->input('ids', []));
+        $data = $this->service->realDel((array) $request->input('ids', []));
         return is_null($data) ?
             $this->response->success() :
-            $this->response->fail(ErrorCode::DEPT_EXISTS_CHILDREN);
+            $this->response->fail(code:ErrorCode::DEPT_EXISTS_CHILDREN,message: ErrorCode::DEPT_EXISTS_CHILDREN->getMessage(),data: $data);
     }
 
     /**
@@ -118,10 +118,10 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('recovery'), Permission('departments:recovery')]
-    public function recovery(): ResponseInterface
+    #[PutMapping('recovery'), Permission('depts:recovery')]
+    public function recovery(DepartmentRequest $request): ResponseInterface
     {
-        return $this->service->recovery((array) $this->request->input('ids', [])) ? $this->response->success() : $this->response->fail();
+        return $this->service->recovery((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
     }
 
     /**
@@ -129,7 +129,7 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('changeStatus'), Permission('departments:changeStatus'), OperationLog]
+    #[PutMapping('changeStatus'), Permission('depts:changeStatus'), OperationLog]
     public function changeStatus(DepartmentRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
@@ -141,7 +141,7 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('numberOperation'), Permission('departments:update'), OperationLog]
+    #[PutMapping('numberOperation'), Permission('depts:update'), OperationLog]
     public function numberOperation(): ResponseInterface
     {
         return $this->service->numberOperation(

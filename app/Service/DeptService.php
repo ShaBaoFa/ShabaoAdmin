@@ -114,12 +114,10 @@ class DeptService extends BaseService
      */
     protected function handleData(array $data): array
     {
-        $pid = $data['parent_id'] ?? 0;
-
+        $pid = (int)$data['parent_id'] ?? 0;
         if (isset($data['id']) && $data['id'] == $pid) {
             throw new BusinessException(ErrorCode::DEPT_PARENT_NOT_VALID);
         }
-
         if ($pid === 0) {
             $data['level'] = $data['parent_id'] = '0';
         } else {
