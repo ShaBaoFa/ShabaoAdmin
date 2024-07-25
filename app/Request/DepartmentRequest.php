@@ -1,6 +1,14 @@
 <?php
 
 declare(strict_types=1);
+/**
+ * This file is part of web-api.
+ *
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
+ */
 
 namespace App\Request;
 
@@ -25,7 +33,7 @@ class DepartmentRequest extends BaseFormRequest
         return [
             'name' => 'required|max:30',
             'leader' => 'nullable|string|max:30',
-            'phone' => ['nullable','string','telephone_number'],
+            'phone' => ['nullable', 'string', 'telephone_number'],
         ];
     }
 
@@ -38,7 +46,7 @@ class DepartmentRequest extends BaseFormRequest
         return [
             'name' => 'required|max:30',
             'leader' => 'nullable|string|max:30',
-            'phone' => ['nullable','string','telephone_number'],
+            'phone' => ['nullable', 'string', 'telephone_number'],
             'parent_id' => 'nullable|integer|exists:departments,id',
         ];
     }
@@ -50,8 +58,8 @@ class DepartmentRequest extends BaseFormRequest
     public function changeStatusRules(): array
     {
         return [
-            'id' => ['required','integer','exists:departments,id'],
-            'status' => ['required','integer','in:1,2'],
+            'id' => ['required', 'integer', 'exists:departments,id'],
+            'status' => ['required', 'integer', 'in:1,2'],
         ];
     }
 

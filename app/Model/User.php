@@ -74,6 +74,14 @@ class User extends BaseModel
         return $this->belongsToMany(Department::class, 'department_user', 'user_id', 'department_id');
     }
 
+    /**
+     * 通过中间表关联组织.
+     */
+    public function organizations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class, 'organization_user', 'user_id', 'organization_id');
+    }
+
     public function getId(): int
     {
         return self::getKey();

@@ -14,19 +14,20 @@ namespace App\Model;
 
 use App\Base\BaseModel;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
- * @property int $id 主键ID
- * @property int $parent_id 父级ID
- * @property string $level 层级
- * @property string $name 名称
- * @property string $leader 负责人
- * @property string $phone 电话
- * @property int $status 状态 (1正常 2停用)
- * @property int $sort 排序
- * @property int $created_by 创建者
- * @property int $updated_by 更新者
- * @property string $remark 备注
+ * @property int $id
+ * @property int $parent_id
+ * @property string $level
+ * @property string $name
+ * @property string $leader
+ * @property string $phone
+ * @property int $status
+ * @property int $sort
+ * @property int $created_by
+ * @property int $updated_by
+ * @property string $remark
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
@@ -47,4 +48,28 @@ class Department extends BaseModel
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'int', 'parent_id' => 'integer', 'status' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'sort' => 'integer'];
+
+    /**
+     * 通过中间表关联用户.
+     */
+    public function users(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'department_user', 'department_id', 'user_id');
+    }
+
+    /**
+     * 通过中间表获取角色.
+     */
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class, 'department_role', 'department_id', 'role_id');
+    }
+
+    /**
+     * 通过中间表获取组织.
+     */
+    public function organizations(): BelongsToMany
+    {
+        return $this->belongsToMany(Organization::class, 'department_organization', 'department_id', 'organization_id');
+    }
 }
