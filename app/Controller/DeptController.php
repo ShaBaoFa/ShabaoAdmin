@@ -57,7 +57,7 @@ class DeptController extends BaseController
     }
 
     /**
-     * 前端选择树（不需要权限）
+     * 前端选择树（不需要权限）.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
@@ -77,6 +77,7 @@ class DeptController extends BaseController
     {
         return $this->response->success(['id' => $this->service->save($request->all())]);
     }
+
     /**
      * 更新部门.
      * @throws ContainerExceptionInterface
@@ -110,7 +111,7 @@ class DeptController extends BaseController
         $data = $this->service->realDel((array) $request->input('ids', []));
         return is_null($data) ?
             $this->response->success() :
-            $this->response->fail(code:ErrorCode::DEPT_EXISTS_CHILDREN,message: ErrorCode::DEPT_EXISTS_CHILDREN->getMessage(),data: $data);
+            $this->response->fail(code: ErrorCode::DEPT_EXISTS_CHILDREN, message: ErrorCode::DEPT_EXISTS_CHILDREN->getMessage(), data: $data);
     }
 
     /**

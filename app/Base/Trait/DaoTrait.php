@@ -292,6 +292,7 @@ trait DaoTrait
         $model = null;
         return (count($fields) < 1) ? ['*'] : $fields;
     }
+
     /**
      * 数字更新操作.
      */
