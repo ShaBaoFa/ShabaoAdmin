@@ -292,4 +292,11 @@ trait DaoTrait
         $model = null;
         return (count($fields) < 1) ? ['*'] : $fields;
     }
+    /**
+     * 数字更新操作.
+     */
+    public function numberOperation(mixed $id, string $field, int $value): bool
+    {
+        return $this->find($id)->increment($field, $value) > 0;
+    }
 }
