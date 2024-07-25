@@ -54,7 +54,7 @@ class BaseResponse extends Response
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function fail(mixed $code = self::ERROR, ?string $message = null, array $data = []): ResponseInterface
+    public function fail(mixed $code = ErrorCode::SERVER_ERROR, ?string $message = null, array $data = []): ResponseInterface
     {
         $format = [
             /**

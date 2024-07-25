@@ -24,6 +24,8 @@ class DepartmentRequest extends BaseFormRequest
     {
         return [
             'name' => 'required|max:30',
+            'leader' => 'nullable|string|max:30',
+            'phone' => ['nullable','string','telephone_number'],
         ];
     }
 
@@ -35,6 +37,9 @@ class DepartmentRequest extends BaseFormRequest
     {
         return [
             'name' => 'required|max:30',
+            'leader' => 'nullable|string|max:30',
+            'phone' => ['nullable','string','telephone_number'],
+            'parent_id' => 'nullable|integer|exists:departments,id',
         ];
     }
 
@@ -54,7 +59,7 @@ class DepartmentRequest extends BaseFormRequest
     {
         return [
             'ids' => ['required', 'array'],
-            'ids.*' => ['required', 'integer', 'exists:menus,id'],
+            'ids.*' => ['required', 'integer', 'exists:departments,id'],
         ];
     }
 
@@ -62,7 +67,7 @@ class DepartmentRequest extends BaseFormRequest
     {
         return [
             'ids' => ['required', 'array'],
-            'ids.*' => ['required', 'integer', 'exists:menus,id'],
+            'ids.*' => ['required', 'integer', 'exists:departments,id'],
         ];
     }
 
@@ -70,7 +75,7 @@ class DepartmentRequest extends BaseFormRequest
     {
         return [
             'ids' => ['required', 'array'],
-            'ids.*' => ['required', 'integer', 'exists:menus,id'],
+            'ids.*' => ['required', 'integer', 'exists:departments,id'],
         ];
     }
 
@@ -87,6 +92,7 @@ class DepartmentRequest extends BaseFormRequest
             'status' => '部门状态',
             'leader' => '部门负责人',
             'phone' => '部门电话',
+            'parent_id' => '上级部门',
         ];
     }
 }
