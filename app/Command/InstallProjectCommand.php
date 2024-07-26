@@ -43,15 +43,24 @@ class InstallProjectCommand extends HyperfCommand
 
     protected function installProject(): void
     {
+        $this->cleanData();
         $this->initSuperAdminData();
         $this->initMenuData();
     }
 
-    protected function initMenuData()
+    protected function cleanData(): void
     {
+        // 清理数据
+        Db::table('users')->truncate();
+        Db::table('roles')->truncate();
+        Db::table('role_user')->truncate();
         // 清理数据
         Db::table('menus')->truncate();
         Db::table('menu_role')->truncate();
+    }
+
+    protected function initMenuData()
+    {
         if (env('DB_DRIVER') === 'odbc-sql-server') {
             Db::unprepared('SET IDENTITY_INSERT [' . Menu::getModel()->getTable() . '] ON;');
         }
@@ -67,11 +76,6 @@ class InstallProjectCommand extends HyperfCommand
 
     protected function initSuperAdminData()
     {
-        // 清理数据
-        Db::table('users')->truncate();
-        Db::table('roles')->truncate();
-        Db::table('role_user')->truncate();
-
         // 创建超级管理员
         $superAdminId = Db::table('users')->insertGetId([
             'username' => 'superAdmin',
@@ -100,11 +104,104 @@ class InstallProjectCommand extends HyperfCommand
             'user_id' => $superAdminId,
             'role_id' => $superRoleId,
         ]);
+        // 创建组织管理员角色
+        $orgSuperRoleId = Db::table('roles')->insertGetId([
+            'name' => '组织超级管理员（组织最高权限）',
+            'code' => 'orgSuperAdmin',
+            'data_scope' => 0,
+            'created_by' => env('SUPER_ADMIN', 0),
+            'updated_by' => 0,
+            'status' => 1,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
+            'remark' => '系统内置角色，不可删除',
+        ]);
+        $ids = $this->org_admin_menu_ids();
+        foreach ($ids as $id) {
+            Db::table('menu_role')->insert([
+                'role_id' => $orgSuperRoleId,
+                'menu_id' => $id,
+            ]);
+        }
+
         $envConfig = <<<ENV
+
 SUPER_ADMIN={$superAdminId}
 ADMIN_ROLE={$superAdminId}
+ORG_SUPER_ROLE={$orgSuperRoleId}
 ENV;
         file_put_contents(BASE_PATH . '/.env', $envConfig, FILE_APPEND);
+    }
+
+    private function org_admin_menu_ids(): array
+    {
+        return [
+            1000,
+            1100,
+            1101,
+            1102,
+            1103,
+            1104,
+            1105,
+            1106,
+            1107,
+            1108,
+            1109,
+            1110,
+            1111,
+            1112,
+            1113,
+            1114,
+            1200,
+            1201,
+            1202,
+            1203,
+            1204,
+            1205,
+            1206,
+            1207,
+            1208,
+            1209,
+            1210,
+            1300,
+            1301,
+            1302,
+            1303,
+            1304,
+            1305,
+            1306,
+            1307,
+            1308,
+            1309,
+            1310,
+            1311,
+            1400,
+            1401,
+            1402,
+            1403,
+            1404,
+            1405,
+            1406,
+            1407,
+            1408,
+            1409,
+            1410,
+            1411,
+            1412,
+            1413,
+            1500,
+            1501,
+            1502,
+            1503,
+            1504,
+            1505,
+            1506,
+            1507,
+            1508,
+            1509,
+            1510,
+            1511,
+        ];
     }
 
     private function menu_data(): array

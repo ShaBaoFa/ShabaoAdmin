@@ -66,7 +66,7 @@ class UserController extends BaseController
     #[GetMapping('{id:\d+}'), Permission('users:info')]
     public function info(int $id): ResponseInterface
     {
-        return $this->response->success($this->service->info($id));
+        return $this->response->success($this->service->find($id));
     }
 
     /**

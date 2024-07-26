@@ -33,6 +33,7 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property string $user_type
  * @property null|Collection|Role[] $roles
  * @property null|Collection|Department[] $depts
+ * @property null|Collection|Organization[] $organizations
  * @property mixed $password
  */
 class User extends BaseModel
@@ -96,7 +97,7 @@ class User extends BaseModel
      * password 加密.
      * @param mixed $value
      */
-    public function setPasswordAttribute($value): void
+    public function setPasswordAttribute(string $value): void
     {
         $this->attributes['password'] = password_hash($value, PASSWORD_DEFAULT);
     }

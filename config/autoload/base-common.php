@@ -23,4 +23,12 @@ return [
      * 生成RESTFUL按钮菜单.
      */
     'restful_menu_enabled' => \Hyperf\Support\env('RESTFUL_MENU_ENABLED', false),
+    /**
+     * 组织超级管理员角色ID.
+     */
+    'org_super_role_id' => \Hyperf\Support\env('ORG_SUPER_ROLE', 2),
+    /**
+     * 默认密码
+     */
+    'default_password' => \Hyperf\Support\env('DEFAULT_PASSWORD', 'Admin@2024!'),
 ];

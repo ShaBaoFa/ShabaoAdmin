@@ -14,18 +14,23 @@ namespace App\Service;
 
 use App\Base\BaseService;
 use App\Constants\ErrorCode;
-use App\Dao\DeptDao;
+use App\Dao\OrganizationDao;
+use App\Dao\UserDao;
 use App\Exception\BusinessException;
 use App\Model\Department;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
-class DeptService extends BaseService
+use function Hyperf\Support\env;
+
+class OrganizationService extends BaseService
 {
     /**
-     * @var DeptDao
+     * @var OrganizationDao
      */
     public $dao;
 
-    public function __construct(DeptDao $dao)
+    public function __construct(OrganizationDao $dao)
     {
         $this->dao = $dao;
     }
@@ -43,15 +48,27 @@ class DeptService extends BaseService
     }
 
     /**
-     * 获取前端选择树.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function getSelectTree(): array
+    public function getAllStaff(int $id): array
     {
-        return $this->dao->getSelectTree();
+        $userDao = di()->get(UserDao::class);
+        return $userDao->belongThisOrg($id) ? $this->dao->getAllStaff($id) : [];
     }
 
     /**
-     * 新增部门.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getAllDept(int $id): array
+    {
+        $userDao = di()->get(UserDao::class);
+        return $userDao->belongThisOrg($id) ? $this->dao->getAllDept($id) : [];
+    }
+
+    /**
+     * 新增组织.
      */
     public function save(array $data): mixed
     {
@@ -59,7 +76,7 @@ class DeptService extends BaseService
     }
 
     /**
-     * 更新部门.
+     * 更新组织.
      */
     public function update(mixed $id, array $data): bool
     {
@@ -71,12 +88,12 @@ class DeptService extends BaseService
             'id' => $id,
             'data' => $handleData,
         ];
-        $descendants = $this->dao->getDescendantsDepts((int) $id);
+        $descendants = $this->dao->getDescendantsOrgs((int) $id);
         foreach ($descendants as $descendant) {
-            $handleDescendantDeptLevelData = $this->handleDescendantDeptLevels($descendant['level'], $handleData['level'], $id);
+            $handleDescendantOrganizationLevelData = $this->handleDescendantOrganizationLevels($descendant['level'], $handleData['level'], $id);
             $update[] = [
                 'id' => $descendant['id'],
-                'data' => ['level' => $handleDescendantDeptLevelData],
+                'data' => ['level' => $handleDescendantOrganizationLevelData],
             ];
         }
         return $this->dao->batchUpdate($update);
@@ -87,7 +104,7 @@ class DeptService extends BaseService
      */
     public function realDel(array $ids): ?array
     {
-        // 跳过的部门
+        // 跳过的组织
         $ctuIds = [];
         if (count($ids)) {
             foreach ($ids as $id) {
@@ -98,11 +115,11 @@ class DeptService extends BaseService
                 }
             }
         }
-        return count($ctuIds) ? $this->dao->getDeptName($ctuIds) : null;
+        return count($ctuIds) ? $this->dao->getOrgName($ctuIds) : null;
     }
 
     /**
-     * 检查子部门是否存在.
+     * 检查子组织是否存在.
      */
     public function checkChildrenExists(int $id): bool
     {
@@ -114,9 +131,12 @@ class DeptService extends BaseService
      */
     protected function handleData(array $data): array
     {
-        $pid = (int) $data['parent_id'] ?? 0;
+        if (isset($data['role_ids']) && ($key = array_search(env('ADMIN_ROLE'), $data['role_ids'])) !== false) {
+            unset($data['role_ids'][$key]);
+        }
+        $pid = (int) isset($data['parent_id']) ?? 0;
         if (isset($data['id']) && $data['id'] == $pid) {
-            throw new BusinessException(ErrorCode::DEPT_PARENT_NOT_VALID);
+            throw new BusinessException(ErrorCode::ORG_PARENT_NOT_VALID);
         }
         if ($pid === 0) {
             $data['level'] = $data['parent_id'] = '0';
@@ -134,7 +154,7 @@ class DeptService extends BaseService
     /**
      * 处理下级部门.
      */
-    protected function handleDescendantDeptLevels(string $descendantLevel, string $handleDataLevel, int $id): string
+    protected function handleDescendantOrganizationLevels(string $descendantLevel, string $handleDataLevel, int $id): string
     {
         $descendantLevelArr = explode(',', $descendantLevel);
         $handleDataLevelArr = explode(',', $handleDataLevel);

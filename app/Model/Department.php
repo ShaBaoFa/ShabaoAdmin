@@ -14,6 +14,7 @@ namespace App\Model;
 
 use App\Base\BaseModel;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
@@ -31,6 +32,9 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * @property null|Collection|User[] $users
+ * @property null|Collection|Role[] $roles
+ * @property null|Collection|Organization[] $organizations
  */
 class Department extends BaseModel
 {

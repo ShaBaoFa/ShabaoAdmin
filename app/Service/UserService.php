@@ -47,8 +47,7 @@ class UserService extends BaseService
         if ($this->dao->existsByUsername($data['username'])) {
             throw new BusinessException(ErrorCode::USER_NOT_EXIST);
         }
-        //        return $this->dao->save($this->handleData($data));
-        return $this->dao->save($data);
+        return $this->dao->save($this->handleData($data));
     }
 
     /**
@@ -197,7 +196,7 @@ class UserService extends BaseService
             return false;
         }
         # 用户更新个人资料
-        unset($params['id'], $params['username'], $params['password'],$params['status'],$params['user_type']);
+        unset($params['id'], $params['username'], $params['password'], $params['status'], $params['user_type']);
         return $this->dao->update($id, $params);
     }
 
@@ -227,6 +226,7 @@ class UserService extends BaseService
             $roleDao = di()->get(RoleDao::class);
             $roles = $roleDao->getMenuIdsByRoleIds($user->roles()->pluck('id')->toArray());
             $ids = $this->filterMenuIds($roles);
+            $data['organization'] = $user->organizations()->first(['id', 'name']);
             $data['roles'] = $user->roles()->pluck('code')->toArray();
             $data['routers'] = $menuDao->getRoutersByIds($ids);
             $data['codes'] = $menuDao->getMenuCode($ids);

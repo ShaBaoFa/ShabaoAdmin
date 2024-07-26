@@ -70,8 +70,14 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.dept_parent_not_valid')]
     case DEPT_PARENT_NOT_VALID = 50001;
 
-    #[Message('common.dept_exists_children')]
-    case DEPT_EXISTS_CHILDREN = 50002;
+    #[Message('common.dept_can_not_delete')]
+    case DEPT_CAN_NOT_DELETE = 50002;
+
+    #[Message('common.org_parent_not_valid')]
+    case ORG_PARENT_NOT_VALID = 60001;
+
+    #[Message('common.org_can_not_delete')]
+    case ORG_CAN_NOT_DELETE = 60002;
 
     public function getMessage(?array $translate = null): string
     {

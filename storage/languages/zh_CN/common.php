@@ -39,5 +39,9 @@ return [
 
     // dept
     'dept_parent_not_valid' => '上级部门不合法',
-    'dept_exists_children' => '部门存在子部门',
+    'dept_can_not_delete' => '部门不可被删除',
+
+    // org
+    'org_parent_not_valid' => '上级组织不合法',
+    'org_can_not_delete' => '组织不可被删除',
 ];

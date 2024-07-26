@@ -111,7 +111,7 @@ class DeptController extends BaseController
         $data = $this->service->realDel((array) $request->input('ids', []));
         return is_null($data) ?
             $this->response->success() :
-            $this->response->fail(code: ErrorCode::DEPT_EXISTS_CHILDREN, message: ErrorCode::DEPT_EXISTS_CHILDREN->getMessage(), data: $data);
+            $this->response->fail(code: ErrorCode::DEPT_CAN_NOT_DELETE, message: ErrorCode::DEPT_CAN_NOT_DELETE->getMessage(), data: $data);
     }
 
     /**
