@@ -62,6 +62,7 @@ class MenuService extends BaseService
         if (strlen($code) < 1) {
             throw new BusinessException(ErrorCode::MENU_CODE_NOT_EXIST);
         }
+        var_dump($code);
         $name = $this->dao->findNameByCode($code);
         return $name ?? throw new BusinessException(ErrorCode::MENU_CODE_NOT_EXIST);
     }

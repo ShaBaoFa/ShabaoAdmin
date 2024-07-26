@@ -22,6 +22,7 @@ use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
 
 use function App\Helper\filled;
+use function App\Helper\user;
 use function Hyperf\Support\env;
 
 class UserDao extends BaseDao
@@ -45,6 +46,17 @@ class UserDao extends BaseDao
     }
 
     /**
+     * 判断是否归属该组织.
+     */
+    public function belongThisOrg(int $id): bool
+    {
+        if (user()->isSuperAdmin()) {
+            return true;
+        }
+        return $this->model->find(user()->getId())->organizations()->first()->value($this->model->getKeyName()) == $id;
+    }
+
+    /**
      * 初始化用户密码
      */
     public function initUserPassword(int $id, string $password): bool
@@ -61,13 +73,15 @@ class UserDao extends BaseDao
     public function save(array $data): int
     {
         $role_ids = $data['role_ids'] ?? [];
-        $post_ids = $data['post_ids'] ?? [];
+        //        $post_ids = $data['post_ids'] ?? [];
         $dept_ids = $data['dept_ids'] ?? [];
+        $org_id = $data['org_id'] ?? 0;
         $this->filterExecuteAttributes($data, true);
         $user = $this->model::create($data);
         $user->roles()->sync($role_ids, false);
+        $user->organizations()->sync($org_id, false);
         //        $user->posts()->sync($post_ids, false);
-        //        $user->depts()->sync($dept_ids, false);
+        $user->depts()->sync($dept_ids, false);
         return $user->getKey();
     }
 
@@ -94,16 +108,16 @@ class UserDao extends BaseDao
     #[Transactional]
     public function update(mixed $id, array $data): bool
     {
-        $role_ids = $data['role_ids'] ?? [];
         //        $post_ids = $data['post_ids'] ?? [];
-        //        $dept_ids = $data['dept_ids'] ?? [];
+        $role_ids = $data['role_ids'] ?? [];
+        $dept_ids = $data['dept_ids'] ?? [];
         $this->filterExecuteAttributes($data, true);
 
         $result = parent::update($id, $data);
         $user = $this->model::find($id);
         if ($user && $result) {
             ! empty($role_ids) && $user->roles()->sync($role_ids);
-            //            ! empty($dept_ids) && $user->depts()->sync($dept_ids);
+            ! empty($dept_ids) && $user->depts()->sync($dept_ids);
             //            $user->posts()->sync($post_ids);
             return true;
         }
@@ -120,8 +134,9 @@ class UserDao extends BaseDao
             $user = $this->model::withTrashed()->find($id);
             if ($user) {
                 $user->roles()->detach();
+                $user->organizations()->detach();
                 //                $user->posts()->detach();
-                //                $user->depts()->detach();
+                $user->depts()->detach();
                 $user->forceDelete();
             }
         }
@@ -136,8 +151,9 @@ class UserDao extends BaseDao
         $user = $this->model::find($id);
         if ($user) {
             $user->setAttribute('roleList', $user->roles()->get(['id', 'name']) ?: []);
+            $user->setAttribute('organization', $user->organizations()->first(['id', 'name']) ?: null);
             //            $user->setAttribute('postList', $user->posts()->get(['id', 'name']) ?: []);
-            //            $user->setAttribute('deptList', $user->depts()->get(['id', 'name']) ?: []);
+            $user->setAttribute('deptList', $user->depts()->get(['id', 'name']) ?: []);
         }
         return $user;
     }
@@ -209,6 +225,9 @@ class UserDao extends BaseDao
 
         if (isset($params['role_ids']) && filled($params['role_ids'])) {
             $query->whereHas('roles', fn ($query) => $query->whereIn('roles.id', $params['role_ids']));
+        }
+        if (isset($params['org_id']) && filled($params['org_id'])) {
+            $query->whereHas('organizations', fn ($query) => $query->whereIn('organizations.id', $params['org_id']));
         }
         //
         //        if (isset($params['post_id']) && filled($params['post_id'])) {

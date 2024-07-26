@@ -39,5 +39,9 @@ return [
 
     // dept
     'dept_parent_not_valid' => 'dept_parent_not_valid',
-    'dept_exists_children' => 'dept_exists_children',
+    'dept_can_not_delete' => 'dept_can_not_delete',
+
+    // org
+    'org_parent_not_valid' => 'org_parent_not_valid',
+    'org_can_not_delete' => 'org_can_not_delete',
 ];

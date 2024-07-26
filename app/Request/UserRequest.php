@@ -46,7 +46,9 @@ class UserRequest extends BaseFormRequest
             'username' => ['required', 'max:20', 'unique:users'],
             'password' => ['required', 'min:6', new PasswordRule()],
             'phone' => ['telephone_number'],
-            //            'dept_ids' => ['required'],
+            'dept_ids' => ['nullable', 'array'],
+            'dept_ids.*' => ['required_with:dept_ids', 'integer', 'exists:depts,id'],
+            'organization_id' => ['required', 'integer', 'exists:organizations,id'],
             'role_ids' => ['required'],
             'remark' => ['max:255'],
         ];
@@ -61,7 +63,9 @@ class UserRequest extends BaseFormRequest
         return [
             'username' => ['required', 'max:20'],
             'phone' => ['telephone_number'],
-            //            'dept_ids' => ['required'],
+            'dept_ids' => ['nullable', 'array'],
+            'dept_ids.*' => ['required_with:dept_ids', 'integer', 'exists:depts,id'],
+            'org_id' => ['required', 'integer', 'exists:organizations,id'],
             'role_ids' => ['required'],
             'remark' => ['max:255'],
         ];
