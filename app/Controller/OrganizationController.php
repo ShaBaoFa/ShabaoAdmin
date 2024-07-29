@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Annotation\Auth;
 use App\Annotation\OperationLog;
 use App\Annotation\Permission;
 use App\Base\BaseController;
@@ -28,7 +29,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/organizations')]
+#[Controller(prefix: 'api/v1/organizations'),Auth]
 class OrganizationController extends BaseController
 {
     #[Inject]
@@ -50,7 +51,7 @@ class OrganizationController extends BaseController
      * @throws NotFoundExceptionInterface
      */
     #[GetMapping('recycle'), Permission('organizations:recycle')]
-    public function recycleTree(): ResponseInterface
+    public function recycle(): ResponseInterface
     {
         return $this->response->success($this->service->getListByRecycle($this->request->all()));
     }
