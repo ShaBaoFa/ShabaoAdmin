@@ -1,6 +1,7 @@
 <?php
 
 declare(strict_types=1);
+
 /**
  * This file is part of web-api.
  *
@@ -9,18 +10,20 @@ declare(strict_types=1);
  * @gitee    https://gitee.com/wlfpanda/web-api
  * @contact  mail@wlfpanda1012.com
  */
-use App\Kernel\Log\AppendRequestIdProcessor;
+
+use App\Log\Processor\UuidRequestIdProcessor;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 
 return [
     'default' => [
         'handler' => [
-            'class' => StreamHandler::class,
+            'class' => RotatingFileHandler::class,
             'constructor' => [
-                'stream' => 'php://stdout',
-                //                'stream' => BASE_PATH . '/runtime/logs/hyperf.log',
+//                'stream' => 'php://stdout',
+                'filename' => BASE_PATH . '/runtime/logs/hyperf.log',
                 'level' => Level::Info,
             ],
         ],
@@ -34,8 +37,28 @@ return [
         ],
         'processors' => [
             [
-                'class' => AppendRequestIdProcessor::class,
+                'class' => UuidRequestIdProcessor::class,
             ],
+        ],
+    ],
+    'sql' => [
+        'handler' => [
+            'class' => RotatingFileHandler::class,
+            'constructor' => [
+                'filename' => BASE_PATH . '/runtime/logs/sql/sql.log',
+                'level' => Level::Info,
+            ],
+        ],
+        'formatter' => [
+            'class' => LineFormatter::class,
+            'constructor' => [
+                'format' => null,
+                'dateFormat' => 'Y-m-d H:i:s',
+                'allowInlineLineBreaks' => true,
+            ],
+        ],
+        'processor' => [
+            'class' => UuidRequestIdProcessor::class,
         ],
     ],
 ];
