@@ -11,6 +11,10 @@ declare(strict_types=1);
  */
 return [
     /**
+     * 是否打印sql
+     */
+    'sql_log_enabled' => \Hyperf\Support\env('SQL_LOG_ENABLED', false),
+    /**
      * 是否启用数据权限.
      */
     'data_scope_enabled' => \Hyperf\Support\env('DATA_SCOPE_ENABLED', true),
@@ -31,4 +35,8 @@ return [
      * 默认密码
      */
     'default_password' => \Hyperf\Support\env('DEFAULT_PASSWORD', 'Admin@2024!'),
+    /**
+     * 上传地址
+     */
+    'update_path' => \Hyperf\Support\env('UPDATE_PATH', 'uploadFile'),
 ];

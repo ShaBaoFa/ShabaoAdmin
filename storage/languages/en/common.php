@@ -44,4 +44,10 @@ return [
     // org
     'org_parent_not_valid' => 'org_parent_not_valid',
     'org_can_not_delete' => 'org_can_not_delete',
+
+    // upload
+    'upload_verification_failed' => 'upload_verification_failed',
+    'upload_failed' => 'upload_failed',
+    'hash_verification_failed' => 'hash_verification_failed',
+    'file_not_exist' => 'file_not_exist',
 ];

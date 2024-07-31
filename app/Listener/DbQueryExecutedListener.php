@@ -20,6 +20,7 @@ use Hyperf\Logger\LoggerFactory;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 
+use function Hyperf\Config\config;
 use function Hyperf\Support\env;
 
 #[Listener]
@@ -29,7 +30,7 @@ class DbQueryExecutedListener implements ListenerInterface
 
     public function __construct(ContainerInterface $container)
     {
-        $this->logger = $container->get(LoggerFactory::class)->get('sql');
+        $this->logger = $container->get(LoggerFactory::class)->get(env('APP_NAME'), 'sql');
     }
 
     public function listen(): array
@@ -58,7 +59,7 @@ class DbQueryExecutedListener implements ListenerInterface
                     $position += strlen($value);
                 }
             }
-            if (env('PRINT_SQL_LOG')) {
+            if (config('base-common.sql_log_enabled')) {
                 $this->logger->info(sprintf('[%s:%s] %s', $event->connectionName, $event->time, $sql));
             }
         }

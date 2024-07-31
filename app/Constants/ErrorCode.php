@@ -79,6 +79,18 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.org_can_not_delete')]
     case ORG_CAN_NOT_DELETE = 60002;
 
+    #[Message('common.upload_verification_failed')]
+    case UPLOAD_VERIFICATION_FAILED = 70001;
+
+    #[Message('common.upload_failed')]
+    case UPLOAD_FAILED = 70002;
+
+    #[Message('common.hash_verification_failed')]
+    case HASH_VERIFICATION_FAILED = 70003;
+
+    #[Message('common.file_not_exist')]
+    case FILE_NOT_EXIST = 70004;
+
     public function getMessage(?array $translate = null): string
     {
         $arguments = [];
