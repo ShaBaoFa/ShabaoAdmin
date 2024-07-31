@@ -44,4 +44,10 @@ return [
     // org
     'org_parent_not_valid' => '上级组织不合法',
     'org_can_not_delete' => '组织不可被删除',
+
+    // upload
+    'upload_verification_failed' => '文件验证失败',
+    'upload_failed' => '文件上传失败',
+    'hash_verification_failed' => '文件哈希验证失败',
+    'file_not_exist' => '文件不存在',
 ];

@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Base;
 
 use App\Constants\ErrorCode;
+use App\Log\RequestIdHolder;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\HttpServer\Response;
 use Psr\Container\ContainerExceptionInterface;
@@ -35,10 +36,7 @@ class BaseResponse extends Response
     public function success(array|object $data = []): ResponseInterface
     {
         $format = [
-            /**
-             * 'requestId' => RequestIdHolder？,
-             * 请求ID（有需求）.
-             */
+            'request_id' => di()->get(RequestIdHolder::class)->getId(),
             'path' => di()->get(BaseRequest::class)->getUri()->getPath(),
             'success' => true,
             'code' => self::OK,
@@ -57,10 +55,7 @@ class BaseResponse extends Response
     public function fail(mixed $code = ErrorCode::SERVER_ERROR, ?string $message = null, array $data = []): ResponseInterface
     {
         $format = [
-            /**
-             * 'requestId' => RequestIdHolder？,
-             * 请求ID（有需求）.
-             */
+            'request_id' => di()->get(RequestIdHolder::class)->getId(),
             'path' => di()->get(BaseRequest::class)->getUri()->getPath(),
             'success' => false,
             'code' => $code,
@@ -95,7 +90,7 @@ class BaseResponse extends Response
     private function handleHeader(ResponsePlusInterface $response): ResponseInterface
     {
         $headers = config('base-common.http.headers', [
-            'Server' => 'web-api',
+            'My-Server' => 'web-api',
         ]);
         foreach ($headers as $key => $value) {
             $response = $response->withHeader($key, $value);
