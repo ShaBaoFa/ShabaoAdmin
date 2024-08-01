@@ -36,7 +36,7 @@ class BaseResponse extends Response
     public function success(array|object $data = []): ResponseInterface
     {
         $format = [
-            'request_id' => di()->get(RequestIdHolder::class)->getId(),
+            'requestId' => di()->get(RequestIdHolder::class)->getId(),
             'path' => di()->get(BaseRequest::class)->getUri()->getPath(),
             'success' => true,
             'code' => self::OK,
@@ -55,7 +55,7 @@ class BaseResponse extends Response
     public function fail(mixed $code = ErrorCode::SERVER_ERROR, ?string $message = null, array $data = []): ResponseInterface
     {
         $format = [
-            'request_id' => di()->get(RequestIdHolder::class)->getId(),
+            'requestId' => di()->get(RequestIdHolder::class)->getId(),
             'path' => di()->get(BaseRequest::class)->getUri()->getPath(),
             'success' => false,
             'code' => $code,

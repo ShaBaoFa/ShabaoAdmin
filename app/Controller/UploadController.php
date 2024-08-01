@@ -18,11 +18,13 @@ use App\Request\UploadRequest;
 use App\Service\FileSystemService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\PostMapping;
 use League\Flysystem\FilesystemException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
+use RedisException;
 
 #[Controller(prefix: 'api/v1/upload')]
 class UploadController extends BaseController
@@ -59,5 +61,17 @@ class UploadController extends BaseController
             return empty($data) ? $this->response->fail() : $this->response->success($data);
         }
         return $this->response->fail();
+    }
+
+    /**
+     * 通过HASH值获取文件.
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws ContainerExceptionInterface
+     */
+    #[GetMapping('getFileByHash')]
+    public function getFilesByHash(UploadRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->getFileByHash($request->input('hash', null)) ?? []);
     }
 }

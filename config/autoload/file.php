@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  * This file is part of web-api.
  *
@@ -10,7 +9,6 @@ declare(strict_types=1);
  * @gitee    https://gitee.com/wlfpanda/web-api
  * @contact  mail@wlfpanda1012.com
  */
-
 use Hyperf\Filesystem\Adapter\AliyunOssAdapterFactory;
 use Hyperf\Filesystem\Adapter\CosAdapterFactory;
 use Hyperf\Filesystem\Adapter\FtpAdapterFactory;
