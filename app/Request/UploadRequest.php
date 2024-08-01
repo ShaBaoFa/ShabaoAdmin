@@ -57,6 +57,13 @@ class UploadRequest extends BaseFormRequest
         ];
     }
 
+    public function getFilesByHashRules(): array
+    {
+        return [
+            'hash' => 'required|string|min:32|max:32|exists:upload_files,hash',
+        ];
+    }
+
     /**
      * 字段映射名称
      * return array.

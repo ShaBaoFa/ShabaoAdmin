@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace App\Dao;
 
 use App\Base\BaseDao;
-use App\Constants\FileSystem;
 use App\Constants\FileSystemCode;
 use App\Events\RealDeleteUploadFile;
 use App\Model\UploadFile;
@@ -94,7 +93,7 @@ class UploadFileDao extends BaseDao
                 /**
                  * @var UploadFile $model
                  */
-                $storageMode = Str::lower(FileSystemCode::tryFrom($model->storage_mode)->name ?? FileSystem::LOCAL->name);
+                $storageMode = Str::lower(FileSystemCode::tryFrom($model->storage_mode)->name ?? FileSystemCode::LOCAL->name);
                 $event = new RealDeleteUploadFile(
                     $model,
                     $this->container->get(FilesystemFactory::class)->get($storageMode)

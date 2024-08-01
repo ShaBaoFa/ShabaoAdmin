@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 /**
- * This file is part of MineAdmin.
+ * This file is part of web-api.
  *
- * @link     https://www.mineadmin.com
- * @document https://doc.mineadmin.com
- * @contact  root@imoi.cn
- * @license  https://github.com/mineadmin/MineAdmin/blob/master/LICENSE
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
  */
 
 namespace App\Log\Processor;
 
-use Hyperf\Coroutine\Coroutine;
 use App\Log\RequestIdHolder;
+use Hyperf\Coroutine\Coroutine;
 use Monolog\LogRecord;
 use Monolog\Processor\ProcessorInterface;
 

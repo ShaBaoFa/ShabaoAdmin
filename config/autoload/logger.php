@@ -1,7 +1,6 @@
 <?php
 
 declare(strict_types=1);
-
 /**
  * This file is part of web-api.
  *
@@ -10,21 +9,45 @@ declare(strict_types=1);
  * @gitee    https://gitee.com/wlfpanda/web-api
  * @contact  mail@wlfpanda1012.com
  */
-
 use App\Log\Processor\UuidRequestIdProcessor;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
-use Monolog\Handler\StreamHandler;
 use Monolog\Level;
 
 return [
     'default' => [
-        'handler' => [
-            'class' => RotatingFileHandler::class,
-            'constructor' => [
-//                'stream' => 'php://stdout',
-                'filename' => BASE_PATH . '/runtime/logs/hyperf.log',
-                'level' => Level::Info,
+        'handlers' => [
+            [
+                'class' => RotatingFileHandler::class,
+                'constructor' => [
+                    //                'stream' => 'php://stdout',
+                    'filename' => BASE_PATH . '/runtime/logs/hyperf-info.log',
+                    'level' => Level::Info,
+                ],
+            ],
+            [
+                'class' => RotatingFileHandler::class,
+                'constructor' => [
+                    //                'stream' => 'php://stdout',
+                    'filename' => BASE_PATH . '/runtime/logs/hyperf-debug.log',
+                    'level' => Level::Debug,
+                ],
+            ],
+            [
+                'class' => RotatingFileHandler::class,
+                'constructor' => [
+                    //                'stream' => 'php://stdout',
+                    'filename' => BASE_PATH . '/runtime/logs/hyperf-warning.log',
+                    'level' => Level::Warning,
+                ],
+            ],
+            [
+                'class' => RotatingFileHandler::class,
+                'constructor' => [
+                    //                'stream' => 'php://stdout',
+                    'filename' => BASE_PATH . '/runtime/logs/hyperf-error.log',
+                    'level' => Level::Error,
+                ],
             ],
         ],
         'formatter' => [
