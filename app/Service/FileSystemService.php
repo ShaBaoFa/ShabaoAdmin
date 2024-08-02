@@ -25,10 +25,12 @@ use Hyperf\Di\Annotation\Inject;
 use Hyperf\Filesystem\FilesystemFactory;
 use Hyperf\HttpMessage\Upload\UploadedFile;
 use Hyperf\Stringable\Str;
+use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RedisException;
+use Swoole\Coroutine\System;
 
 class FileSystemService extends BaseService
 {
@@ -81,17 +83,19 @@ class FileSystemService extends BaseService
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
-    public function getFileByHash(string $hash, array $columns = ['*']): array
+    public function getFileByHash(string $hash, array $columns = ['*'], bool $returnFs = false): array
     {
-        $data = $this->dao->getFileInfoByHash($hash, $columns);
-        if (empty($data)) {
-            return [];
+        $file = $this->dao->getFileInfoByHash($hash, $columns);
+        if (empty($file)) {
+            throw new BusinessException(ErrorCode::FILE_NOT_EXIST);
         }
-        match ($data['storage_mode']) {
-            FileSystemCode::OSS->value => $data['url'] = $this->generateSignature($data),
-            default => null
+        $storageMode = Str::lower(FileSystemCode::tryFrom($file['storage_mode'])->name ?? FileSystemCode::LOCAL->name);
+        $filesystem = di()->get(FilesystemFactory::class)->get($storageMode);
+        match ($file['storage_mode']) {
+            FileSystemCode::OSS->value => $file['signature'] = $this->generateSignature($filesystem, $file),
+            default => $file['signature'] = null
         };
-        return $data;
+        return $returnFs ? [$filesystem, $file] : $file;
     }
 
     /**
@@ -99,13 +103,44 @@ class FileSystemService extends BaseService
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
-    private function generateSignature(array $data): string
+    private function generateSignature(Filesystem $filesystem, array $data): string
     {
-        $storageMode = Str::lower(FileSystemCode::tryFrom($data['storage_mode'])->name ?? FileSystemCode::LOCAL->name);
-        $filesystem = di()->get(FilesystemFactory::class)->get($storageMode);
         return match ($data['storage_mode']) {
             FileSystemCode::OSS->value => $filesystem->temporaryUrl($data['url'], Carbon::now()->addHour()),
             default => $data['url']
         };
+    }
+
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws ContainerExceptionInterface
+     * @throws FilesystemException
+     */
+    public function responseFileByHash(string $hash): array
+    {
+        [$filesystem, $file] = $this->getFileByHash($hash, returnFs: true);
+        if ($file['storage_mode'] != FileSystemCode::LOCAL->value && $file['size_byte'] > 4 * 1024 * 1024) {
+            throw new BusinessException(ErrorCode::FILE_TOO_LARGE_TO_READ);
+        }
+        /**
+         * @var Filesystem $filesystem
+         */
+        $context = $filesystem->read($file['url']);
+        return [$file, $context];
+    }
+
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws ContainerExceptionInterface
+     * @throws FilesystemException
+     */
+    public function downloadFileByHash(string $hash): array
+    {
+        [$file, $context] = $this->responseFileByHash($hash);
+        $tempPath = tempnam(sys_get_temp_dir(), 'tmp') . '.' . $file['suffix'];
+        System::writeFile($tempPath, $context);
+        return [$tempPath, $file];
     }
 }

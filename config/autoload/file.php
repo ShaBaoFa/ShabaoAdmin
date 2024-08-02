@@ -24,7 +24,7 @@ return [
     'storage' => [
         'local' => [
             'driver' => LocalAdapterFactory::class,
-            'root' => __DIR__ . '/../../runtime',
+            'root' => __DIR__ . '/../../public/',
         ],
         'ftp' => [
             'driver' => FtpAdapterFactory::class,

@@ -73,15 +73,21 @@ class BaseResponse extends Response
     }
 
     /**
-     * 向浏览器输出图片.
+     * 向浏览器输出文件(默认图片).
      */
-    public function responseImage(string $image, string $type = 'image/png'): ResponseInterface
+    public function responseFile(string $image, string $type = 'image/png'): ResponseInterface
     {
         return $this->handleHeader($this->getResponse())
             ->withAddedHeader('content-type', $type)
             ->withBody(new SwooleStream($image));
     }
-
+    /**
+     * 下载文件.
+     */
+    public function _download(string $filePath, string $name = ''): ResponseInterface
+    {
+        return $this->download($filePath, $name);
+    }
     public function getResponse(): ResponsePlusInterface
     {
         return parent::getResponse();
