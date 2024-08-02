@@ -12,42 +12,30 @@ declare(strict_types=1);
 use App\Log\Processor\UuidRequestIdProcessor;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Level;
+
+if (\Hyperf\Support\env('APP_ENV') === 'testing') {
+    $handler = [
+        'class' => StreamHandler::class,
+        'constructor' => [
+            'stream' => 'php://output',
+            'level' => Level::Info,
+        ],
+    ];
+}
 
 return [
     'default' => [
-        'handlers' => [
-            [
-                'class' => RotatingFileHandler::class,
-                'constructor' => [
-                    //                'stream' => 'php://stdout',
-                    'filename' => BASE_PATH . '/runtime/logs/hyperf-info.log',
-                    'level' => Level::Info,
-                ],
-            ],
-            [
-                'class' => RotatingFileHandler::class,
-                'constructor' => [
-                    //                'stream' => 'php://stdout',
-                    'filename' => BASE_PATH . '/runtime/logs/hyperf-debug.log',
-                    'level' => Level::Debug,
-                ],
-            ],
-            [
-                'class' => RotatingFileHandler::class,
-                'constructor' => [
-                    //                'stream' => 'php://stdout',
-                    'filename' => BASE_PATH . '/runtime/logs/hyperf-warning.log',
-                    'level' => Level::Warning,
-                ],
-            ],
-            [
-                'class' => RotatingFileHandler::class,
-                'constructor' => [
-                    //                'stream' => 'php://stdout',
-                    'filename' => BASE_PATH . '/runtime/logs/hyperf-error.log',
-                    'level' => Level::Error,
-                ],
+        'handlers' => ['biz'],
+    ],
+    'biz' => [
+        'handler' => $handler ?? [
+            'class' => RotatingFileHandler::class,
+            'constructor' => [
+                //                'stream' => 'php://stdout',
+                'filename' => BASE_PATH . '/runtime/logs/hyperf-error.log',
+                'level' => Level::Error,
             ],
         ],
         'formatter' => [
@@ -65,7 +53,7 @@ return [
         ],
     ],
     'sql' => [
-        'handler' => [
+        'handler' => $handler ?? [
             'class' => RotatingFileHandler::class,
             'constructor' => [
                 'filename' => BASE_PATH . '/runtime/logs/sql/sql.log',
