@@ -54,7 +54,8 @@ class BusinessExceptionHandler extends ExceptionHandler
                 $this->logger->warning(format_throwable($throwable));
                 return $this->response->fail(ErrorCode::UNAUTHORIZED->value, ErrorCode::UNAUTHORIZED->getMessage())->withStatus(ErrorCode::UNAUTHORIZED->value);
             case $throwable instanceof HttpException:
-                return $this->response->handleException($throwable);
+                $this->logger->error($throwable->getMessage());
+                return $this->response->fail($throwable->getCode(), $throwable->getMessage());
             case $throwable instanceof BusinessException:
                 $this->logger->warning(format_throwable($throwable));
                 return $this->response->fail($throwable->getCode(), $throwable->getMessage());

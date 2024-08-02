@@ -50,4 +50,5 @@ return [
     'upload_failed' => '文件上传失败',
     'hash_verification_failed' => '文件哈希验证失败',
     'file_not_exist' => '文件不存在',
+    'file_too_large_to_read' => '文件过大，请更换方式读取',
 ];

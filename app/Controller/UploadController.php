@@ -74,4 +74,30 @@ class UploadController extends BaseController
     {
         return $this->response->success($this->service->getFileByHash($request->input('hash', null)) ?? []);
     }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws FilesystemException
+     */
+    #[GetMapping('downloadByHash')]
+    public function downloadByHash(UploadRequest $request): ResponseInterface
+    {
+        [$path, $file] = $this->service->downloadFileByHash($request->input('hash'));
+        return $this->response->download($path,$file['origin_name']);
+    }
+
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws ContainerExceptionInterface
+     * @throws FilesystemException
+     */
+    #[GetMapping('showFileByHash/{hash}')]
+    public function showFileByHash(string $hash): ResponseInterface
+    {
+        [$file, $context] = $this->service->responseFileByHash($hash);
+        return $this->response->responseFile($context,$file['mime_type']);
+    }
 }

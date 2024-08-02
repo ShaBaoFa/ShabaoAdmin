@@ -35,6 +35,8 @@ return [
         ],
     ],
     'settings' => [
+        // 对外部可以直接访问的目录地址，建议使用nginx反向代理访问
+        Constant::OPTION_DOCUMENT_ROOT => BASE_PATH . '/public',
         Constant::OPTION_ENABLE_COROUTINE => true,
         Constant::OPTION_WORKER_NUM => swoole_cpu_num(),
         Constant::OPTION_PID_FILE => BASE_PATH . '/runtime/hyperf.pid',

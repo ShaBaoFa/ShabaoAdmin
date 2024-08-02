@@ -69,11 +69,6 @@ class BaseUpload
         return $this->filesystem;
     }
 
-    public function setFileSystem($mode): void
-    {
-        $this->filesystem = $this->factory->get($mode);
-    }
-
     /**
      * 上传文件.
      * @throws FileExistsException

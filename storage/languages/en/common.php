@@ -50,4 +50,5 @@ return [
     'upload_failed' => 'upload_failed',
     'hash_verification_failed' => 'hash_verification_failed',
     'file_not_exist' => 'file_not_exist',
+    'file_too_large_to_read' => 'file_too_large_to_read',
 ];
