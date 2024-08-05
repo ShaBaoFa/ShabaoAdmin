@@ -85,7 +85,7 @@ class UploadController extends BaseController
     public function downloadByHash(UploadRequest $request): ResponseInterface
     {
         [$path, $file] = $this->service->downloadFileByHash($request->input('hash'));
-        return $this->response->download($path,$file['origin_name']);
+        return $this->response->download($path, $file['origin_name']);
     }
 
     /**
@@ -98,6 +98,6 @@ class UploadController extends BaseController
     public function showFileByHash(string $hash): ResponseInterface
     {
         [$file, $context] = $this->service->responseFileByHash($hash);
-        return $this->response->responseFile($context,$file['mime_type']);
+        return $this->response->responseFile($context, $file['mime_type']);
     }
 }
