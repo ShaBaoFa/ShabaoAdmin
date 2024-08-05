@@ -81,6 +81,7 @@ class BaseResponse extends Response
             ->withAddedHeader('content-type', $type)
             ->withBody(new SwooleStream($image));
     }
+
     /**
      * 下载文件.
      */
@@ -88,6 +89,7 @@ class BaseResponse extends Response
     {
         return $this->download($filePath, $name);
     }
+
     public function getResponse(): ResponsePlusInterface
     {
         return parent::getResponse();

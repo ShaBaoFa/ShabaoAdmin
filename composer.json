@@ -59,7 +59,8 @@
         "phpoffice/phpspreadsheet": "^1.24",
         "ramsey/uuid": "^4.7",
         "xmo/jwt-auth": "^2.0",
-        "zoujingli/ip2region": "^2.0"
+        "zoujingli/ip2region": "^2.0",
+        "wlfpanda1012/aliyun-sts": "*"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",
@@ -91,6 +92,12 @@
         "sort-packages": true
     },
     "extra": [],
+    "repositories": {
+        "wlfpanda1012/aliyun-sts": {
+            "type": "path",
+            "url": "/Users/weilingfeng/Documents/GitHub/aliyun-sts"
+        }
+    },
     "scripts": {
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

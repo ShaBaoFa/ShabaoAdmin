@@ -18,7 +18,6 @@ use Countable;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Swoole\Coroutine\System;
 
 if (! function_exists('user')) {
     /**
@@ -106,14 +105,5 @@ if (! function_exists('format_size')) {
             $index = $i;
         }
         return round($size, 2) . $units[$index];
-    }
-}
-
-if (! function_exists('generate_temp_path')){
-    /**
-     * 生成临时文件路径
-     */
-    function generate_temp_path()
-    {
     }
 }

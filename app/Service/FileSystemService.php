@@ -99,19 +99,6 @@ class FileSystemService extends BaseService
     }
 
     /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws RedisException
-     */
-    private function generateSignature(Filesystem $filesystem, array $data): string
-    {
-        return match ($data['storage_mode']) {
-            FileSystemCode::OSS->value => $filesystem->temporaryUrl($data['url'], Carbon::now()->addHour()),
-            default => $data['url']
-        };
-    }
-
-    /**
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      * @throws ContainerExceptionInterface
@@ -142,5 +129,18 @@ class FileSystemService extends BaseService
         $tempPath = tempnam(sys_get_temp_dir(), 'tmp') . '.' . $file['suffix'];
         System::writeFile($tempPath, $context);
         return [$tempPath, $file];
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     */
+    private function generateSignature(Filesystem $filesystem, array $data): string
+    {
+        return match ($data['storage_mode']) {
+            FileSystemCode::OSS->value => $filesystem->temporaryUrl($data['url'], Carbon::now()->addHour()),
+            default => $data['url']
+        };
     }
 }
