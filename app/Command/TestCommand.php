@@ -12,14 +12,18 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Constants\FileSystemCode;
 use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
-use Hyperf\Filesystem\FilesystemFactory;
-use Hyperf\Stringable\Str;
+use Hyperf\Contract\ConfigInterface;
+use OSS\Core\OssException;
+use OSS\Http\RequestCore_Exception;
+use OSS\OssClient;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Wlfpanda1012\AliyunSts\Constants\OSSAction;
 use Wlfpanda1012\AliyunSts\Constants\OSSEffect;
+use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 use Wlfpanda1012\AliyunSts\StsService;
 
 #[Command]
@@ -36,19 +40,29 @@ class TestCommand extends HyperfCommand
         $this->setDescription('Hyperf Demo Command');
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws RequestCore_Exception
+     * @throws ContainerExceptionInterface
+     * @throws OssException
+     */
     public function handle(): void
     {
         // 示例
-        $service = di()->get(StsService::class);
-        $put = $service->generateStatement(OSSEffect::ALLOW->value, [OSSAction::PUT_OBJECT->value], ['acs:oss:*:*:wlf-upload-file/2024/02/16/*']);
-        $get = $service->generateStatement(OSSEffect::ALLOW->value, [OSSAction::GET_OBJECT->value], ['acs:oss:*:*:wlf-upload-file/2024/02/16/hgignore_global.txt']);
-        $policy = $service->generatePolicy([$put,$get]);
-        $request = $service->generateAssumeRoleRequest($policy);
-        $response = $service->assumeRole($request);
-        var_dump($response->body->credentials->accessKeyId);
-        var_dump($response->body->credentials->accessKeySecret);
-        var_dump($response->body->credentials->securityToken);
-        $filesystem = di()->get(FilesystemFactory::class)->get(FileSystemCode::OSS->value);
 
+        $config = di()->get(ConfigInterface::class)->get('sts');
+        $config['bucket'] = 'wlf-upload-file';
+        $service = new OssRamService($config);
+        $credentials = $service->allowPutObject('2024/02/16/tdddw3ww.txt');
+        var_dump($credentials);
+        $fileConfig = di()->get(ConfigInterface::class)->get('file');
+        $ossConfig = $fileConfig['storage']['oss'];
+        $client = new OssClient($credentials['AccessKeyId'], $credentials['AccessKeySecret'], $ossConfig['endpoint'], false, $credentials['SecurityToken']);
+        try {
+            $data = $client->putObject('wlf-upload-file', '2024/02/16/tdddw3ww.txt','123');
+//            $data = $client->getObject('wlf-upload-file', '2024/02/16/ceshice1231231shi111.txt');
+        } catch (OssException $e) {
+            var_dump($e->getMessage());
+        }
     }
 }
