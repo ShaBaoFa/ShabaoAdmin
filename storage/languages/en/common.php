@@ -51,4 +51,19 @@ return [
     'hash_verification_failed' => 'hash_verification_failed',
     'file_not_exist' => 'file_not_exist',
     'file_too_large_to_read' => 'file_too_large_to_read',
+    'sts_not_support' => 'sts_not_support',
+    'finished' => 'finished',
+    'unfinished' => 'unfinished',
+    'file_has_been_uploaded' => 'file_has_been_uploaded',
+    'get_sts_token_fail' => 'get_sts_token_fail',
+
+    // filesystem
+    'local' => 'local',
+    'oss' => 'oss',
+    'qiniu' => 'qiniu',
+    'cos' => 'cos',
+    'ftp' => 'ftp',
+    'memory' => 'memory',
+    's3' => 's3',
+    'minio' => 'minio',
 ];

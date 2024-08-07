@@ -51,4 +51,19 @@ return [
     'hash_verification_failed' => '文件哈希验证失败',
     'file_not_exist' => '文件不存在',
     'file_too_large_to_read' => '文件过大，请更换方式读取',
+    'sts_not_support' => 'STS不支持',
+    'finished' => '已完成',
+    'unfinished' => '未完成',
+    'file_has_been_uploaded' => '文件已上传',
+    'get_sts_token_fail' => '获取STS令牌失败',
+
+    // filesystem
+    'local' => '本地',
+    'oss' => '阿里云OSS',
+    'qiniu' => '七牛云',
+    'cos' => '腾讯云COS',
+    'ftp' => 'FTP',
+    'memory' => '内存',
+    's3' => 'S3',
+    'minio' => 'Minio',
 ];

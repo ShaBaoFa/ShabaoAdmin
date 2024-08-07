@@ -17,24 +17,13 @@ use Hyperf\Constants\Annotation\Message;
 use Hyperf\Constants\EnumConstantsTrait;
 
 #[Constants]
-enum FileSystemCode: int
+enum UploadStatusCode: int
 {
     use EnumConstantsTrait;
 
-    #[Message('common.local')]
-    case LOCAL = 1;
-    #[Message('common.oss')]
-    case OSS = 2;
-    #[Message('common.qiniu')]
-    case QINIU = 3;
-    #[Message('common.cos')]
-    case COS = 4;
-    #[Message('common.ftp')]
-    case FTP = 5;
-    #[Message('common.memory')]
-    case MEMORY = 6;
-    #[Message('common.s3')]
-    case S3 = 7;
-    #[Message('common.minio')]
-    case MINIO = 8;
+    #[Message('common.finished')]
+    case UPLOAD_FINISHED = 1;
+
+    #[Message('common.unfinished')]
+    case UPLOAD_UNFINISHED = 2;
 }

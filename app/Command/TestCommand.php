@@ -45,8 +45,12 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
+        var_dump(md5('helloworld',true));
+        $encode = base64_encode(md5('helloworld',true));
+        var_dump(base64_decode($encode));
+        var_dump(hex2bin(md5('helloworld')));
         // 示例
-
+        return;
         $config = di()->get(ConfigInterface::class)->get('sts');
         $config['bucket'] = 'wlf-upload-file';
         $service = new OssRamService($config);

@@ -71,7 +71,17 @@ class UploadController extends BaseController
     #[PostMapping('uploaderStsToken'),Auth]
     public function getUploaderStsToken(UploadRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->getUploaderStsToken($request->input('metadata'), $request->all()));
+        return $this->response->success($this->service->getUploaderStsToken($request->input('hash')));
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[PostMapping('uploaderPreparation'),Auth]
+    public function uploaderPreparation(UploadRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->uploaderPreparation($request->input('metadata'), $request->all()));
     }
 
     #[PostMapping('downloaderStsToken'),Auth]
