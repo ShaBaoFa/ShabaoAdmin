@@ -67,10 +67,18 @@ class UploadRequest extends BaseFormRequest
     public function getUploaderStsTokenRules(): array
     {
         return [
+            'hash' => 'required|string|min:32|max:32|exists:upload_files,hash',
+        ];
+    }
+
+    public function uploaderPreparationRules(): array
+    {
+        return [
             'metadata' => 'required|array',
             'metadata.origin_name' => 'required|string|max:255',
             'metadata.size_byte' => 'required|int',
             'metadata.mime_type' => 'required|string|max:255',
+            'path' => 'max:30',
         ];
     }
 

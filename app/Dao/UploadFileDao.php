@@ -14,6 +14,7 @@ namespace App\Dao;
 
 use App\Base\BaseDao;
 use App\Constants\FileSystemCode;
+use App\Constants\UploadStatusCode;
 use App\Events\RealDeleteUploadFile;
 use App\Model\UploadFile;
 use Hyperf\Database\Model\Builder;
@@ -53,6 +54,11 @@ class UploadFileDao extends BaseDao
         }
 
         return $model->toArray();
+    }
+
+    public function isUploaded(string $hash): bool
+    {
+        return $this->model::query()->where('hash', $hash)->where('status',UploadStatusCode::UPLOAD_UNFINISHED->value)->exists();
     }
 
     /**

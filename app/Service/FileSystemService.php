@@ -20,6 +20,7 @@ use App\Dao\UploadFileDao;
 use App\Exception\BusinessException;
 use Carbon\Carbon;
 use Exception;
+use Hyperf\Cache\Annotation\Cacheable;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Filesystem\FilesystemFactory;
@@ -31,6 +32,9 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RedisException;
 use Swoole\Coroutine\System;
+use Wlfpanda1012\AliyunSts\Oss\OssRamService;
+use function App\Helper\user;
+use function PHPUnit\Framework\throwException;
 
 class FileSystemService extends BaseService
 {
@@ -136,28 +140,20 @@ class FileSystemService extends BaseService
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
-    public function getUploaderStsToken(array $metadata, array $config): array
+    #[Cacheable(prefix: 'stsToken', value: 'fileHash_#{hash}', ttl: 3600)]
+    public function getUploaderStsToken(string $hash): array
     {
+        if ($this->dao->isUploaded($hash)) throw new BusinessException(ErrorCode::FILE_HAS_BEEN_UPLOADED);
+        $fileInfo = $this->dao->getFileInfoByHash($hash);
         try {
-            $hash = md5(json_encode($metadata));
-            if ($fileInfo = $this->dao->getFileInfoByHash($hash)) {
-                return ['fileInfo' => $fileInfo,'sts' => null];
-            }
-        } catch (Exception $e) {
-            throw new BusinessException(ErrorCode::HASH_VERIFICATION_FAILED);
+            $sts = $this->config->get('sts');
+            $ossRamService = new OssRamService($sts);
+            // todo::gen-callback
+            return $ossRamService->allowPutObject($fileInfo['url']);
+        }catch (Exception $e){
+            throw new BusinessException(ErrorCode::GET_STS_TOKEN_FAIL);
         }
-        if ($this->uploadTool->getStorageMode() != FileSystemCode::OSS->value) {
-            throw new BusinessException(ErrorCode::STS_NOT_SUPPORT);
-        }
-        try {
-            [$fileInfo, $credentials] = $this->uploadTool->handleStsUpload($metadata, $config);
-            if ($this->save($fileInfo)) {
-                return ['file_info' => $fileInfo,'sts' => $credentials];
-            }
-        } catch (Exception $e) {
-            throw new BusinessException(ErrorCode::UPLOAD_FAILED);
-        }
-        return [];
+
     }
 
     /**
@@ -171,5 +167,30 @@ class FileSystemService extends BaseService
             FileSystemCode::OSS->value => $filesystem->temporaryUrl($data['url'], Carbon::now()->addHour()),
             default => $data['url']
         };
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     */
+    public function uploaderPreparation(array $metadata, array $config): array
+    {
+        /**
+         * todo::根据当前upload-tool的storage-mode去获取sts-factory对应的sts适配器实例,获取失败则判断不支持sts.
+         */
+        if ($this->uploadTool->getStorageMode() != FileSystemCode::OSS->value) {
+            throw new BusinessException(ErrorCode::STS_NOT_SUPPORT);
+        }
+        try {
+            $hash = md5(json_encode($metadata));
+            $data = ['hash' => $hash, 'is_uploaded' => $this->dao->isUploaded($hash)];
+            if ($data['is_uploaded']) return $data;
+            $fileInfo = $this->uploadTool->handlePreparation($metadata, $config);
+                $this->save($fileInfo) ?? throw new BusinessException(ErrorCode::UPLOAD_FAILED);
+            return $data;
+        } catch (Exception $e) {
+            throw new BusinessException(ErrorCode::HASH_VERIFICATION_FAILED);
+        }
     }
 }
