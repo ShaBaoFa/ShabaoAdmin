@@ -28,6 +28,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RedisException;
+use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 
 use function App\Helper\format_size;
 use function Hyperf\Config\config;
@@ -56,12 +57,14 @@ class BaseUpload
         EventDispatcherInterface $eventDispatcher,
         BaseRequest $request,
         IdGeneratorInterface $idGenerator,
+        ConfigInterface $config
     ) {
         $this->factory = $factory;
         $this->eventDispatcher = $eventDispatcher;
         $this->request = $request;
         $this->filesystem = $factory->get($this->getMappingMode());
         $this->idGenerator = $idGenerator;
+        $this->config = $config;
     }
 
     public function getFileSystem(): Filesystem
@@ -108,6 +111,35 @@ class BaseUpload
     public function getStorageMode(): int|string
     {
         return FileSystemCode::OSS->value;
+    }
+
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws ContainerExceptionInterface
+     */
+    public function handleStsUpload(array $metadata, array $config): array
+    {
+        $segments = explode('.', $metadata['origin_name']);
+        $suffix = Str::lower((string) end($segments));
+        $path = $this->getPath($config['path'] ?? null, $this->getStorageMode() != FileSystemCode::LOCAL);
+        $filename = $this->getNewName() . '.' . $suffix;
+        $fileInfo = [
+            'storage_mode' => $this->getStorageMode(),
+            'origin_name' => $metadata['origin_name'],
+            'object_name' => $filename,
+            'mime_type' => $metadata['mime_type'],
+            'storage_path' => $path,
+            'hash' => md5(json_encode($metadata)),
+            'suffix' => $suffix,
+            'size_byte' => (int) $metadata['size_byte'],
+            'size_info' => format_size((int) $metadata['size_byte'] * 1024),
+            'url' => $this->assembleUrl($config['path'] ?? null, $filename),
+        ];
+        $sts = $this->config->get('sts');
+        $ossRamService = new OssRamService($sts);
+        $credentials = $ossRamService->allowPutObject($fileInfo['url']);
+        return [$fileInfo, $credentials];
     }
 
     /**

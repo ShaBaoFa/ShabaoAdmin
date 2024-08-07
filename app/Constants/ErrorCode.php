@@ -94,6 +94,9 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.file_too_large_to_read')]
     case FILE_TOO_LARGE_TO_READ = 70005;
 
+    #[Message('common.sts_not_support')]
+    case STS_NOT_SUPPORT = 70006;
+
     public function getMessage(?array $translate = null): string
     {
         $arguments = [];

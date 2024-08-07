@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 /**
- * This file is part of Hyperf.
+ * This file is part of web-api.
  *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
  */
 use function Hyperf\Support\env;
 
@@ -15,10 +15,10 @@ return [
     'access_key_id' => env('STS_ACCESS_KEY_ID', 'LTAI4---------44pg8'),
     'access_key_secret' => env('STS_ACCESS_KEY_SECRET', 'oibIsys6xl---------ETocTR'),
     'role_arn' => env('STS_ROLE_ARN', 'acs:ram::xxxxxxxxxxx:role/xxx'),
-    'role_session_name' => env('STS_ROLE_SESSION_NAME', 'role_session_name_demo'),
+    'role_session_name' => env('STS_ROLE_SESSION_NAME', 'xxxxxxxxxxx'),
     'endpoint' => env('STS_ENDPOINT', 'sts.cn-hangzhou.aliyuncs.com'),
     'duration_seconds' => env('STS_DURATION_SECONDS', 3000),
-    'external_id' => env('STS_EXTERNAL_ID', 'external_id_demo'),
+    'external_id' => env('STS_EXTERNAL_ID', 'external_id_test'),
     /**
      * 授予RAM用户使用OSS命令行工具访问目录mybucket/hangzhou/2014/和mybucket/hangzhou/2015/并列举目录中文件的权限.
      *
@@ -55,5 +55,13 @@ return [
                 ],
             ],
         ],
+    ],
+    /**
+     * OSS相关.
+     */
+    'oss' => [
+        'bucket' => env('OSS_BUCKET', '*'),
+        'account_uid' => env('OSS_ACCOUNT_UID', '*'),
+        'region_id' => env('OSS_REGION_ID', '*'),
     ],
 ];
