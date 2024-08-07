@@ -64,6 +64,22 @@ class UploadController extends BaseController
     }
 
     /**
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws ContainerExceptionInterface
+     */
+    #[PostMapping('uploaderStsToken'),Auth]
+    public function getUploaderStsToken(UploadRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->getUploaderStsToken($request->input('metadata'), $request->all()));
+    }
+
+    #[PostMapping('downloaderStsToken'),Auth]
+    public function getDownloaderStsToken(UploadRequest $request)
+    {
+    }
+
+    /**
      * 通过HASH值获取文件.
      * @throws NotFoundExceptionInterface
      * @throws RedisException

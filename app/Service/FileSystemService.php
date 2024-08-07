@@ -136,6 +136,35 @@ class FileSystemService extends BaseService
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
+    public function getUploaderStsToken(array $metadata, array $config): array
+    {
+        try {
+            $hash = md5(json_encode($metadata));
+            if ($fileInfo = $this->dao->getFileInfoByHash($hash)) {
+                return ['fileInfo' => $fileInfo,'sts' => null];
+            }
+        } catch (Exception $e) {
+            throw new BusinessException(ErrorCode::HASH_VERIFICATION_FAILED);
+        }
+        if ($this->uploadTool->getStorageMode() != FileSystemCode::OSS->value) {
+            throw new BusinessException(ErrorCode::STS_NOT_SUPPORT);
+        }
+        try {
+            [$fileInfo, $credentials] = $this->uploadTool->handleStsUpload($metadata, $config);
+            if ($this->save($fileInfo)) {
+                return ['file_info' => $fileInfo,'sts' => $credentials];
+            }
+        } catch (Exception $e) {
+            throw new BusinessException(ErrorCode::UPLOAD_FAILED);
+        }
+        return [];
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     */
     private function generateSignature(Filesystem $filesystem, array $data): string
     {
         return match ($data['storage_mode']) {
