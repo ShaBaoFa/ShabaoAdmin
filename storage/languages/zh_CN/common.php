@@ -55,6 +55,7 @@ return [
     'finished' => '已完成',
     'unfinished' => '未完成',
     'file_has_been_uploaded' => '文件已上传',
+    'file_has_not_been_uploaded' => '文件未上传',
     'get_sts_token_fail' => '获取STS令牌失败',
 
     // filesystem

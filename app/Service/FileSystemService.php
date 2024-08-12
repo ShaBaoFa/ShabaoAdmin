@@ -141,7 +141,7 @@ class FileSystemService extends BaseService
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
-    #[Cacheable(prefix: 'stsToken', value: 'fileHash_#{hash}', ttl: 900)]
+    #[Cacheable(prefix: 'uploaderStsToken', value: 'fileHash_#{hash}', ttl: 900)]
     public function getUploaderStsToken(string $hash): array
     {
         if ($this->dao->isUploaded($hash)) {
@@ -154,6 +154,21 @@ class FileSystemService extends BaseService
             $customParams = ['hash' => $hash];
             $this->generateOssCallback(['hash' => $hash]);
             return ['callback_custom_params' => $customParams, 'credentials' => $ossRamService->allowPutObject($fileInfo['url'])];
+        } catch (Exception $e) {
+            throw new BusinessException(ErrorCode::GET_STS_TOKEN_FAIL);
+        }
+    }
+
+    public function getDownloaderStsToken(string $hash): array
+    {
+        if (! $this->dao->isUploaded($hash)) {
+            throw new BusinessException(ErrorCode::FILE_HAS_NOT_BEEN_UPLOADED);
+        }
+        $fileInfo = $this->dao->getFileInfoByHash($hash);
+        try {
+            $sts = $this->config->get('sts');
+            $ossRamService = new OssRamService($sts);
+            return $ossRamService->allowGetObject($fileInfo['url']);
         } catch (Exception $e) {
             throw new BusinessException(ErrorCode::GET_STS_TOKEN_FAIL);
         }
@@ -178,7 +193,7 @@ class FileSystemService extends BaseService
         if ($data['is_uploaded']) {
             return $data;
         }
-        $fileInfo = $this->uploadTool->handlePreparation($metadata, array($config,['hash'=>$hash]));
+        $fileInfo = $this->uploadTool->handlePreparation($metadata, [$config, ['hash' => $hash]]);
         $this->save($fileInfo) ?? throw new BusinessException(ErrorCode::UPLOAD_FAILED);
         return $data;
     }
@@ -217,9 +232,7 @@ class FileSystemService extends BaseService
     }
 
     /**
-     * (不太用的上,前端的格式略微不同)
-     * @param array|null $customParams
-     * @return string
+     * (不太用的上,前端的格式略微不同).
      */
     private function generateOssCallbackBody(?array $customParams = null): string
     {
@@ -239,9 +252,7 @@ class FileSystemService extends BaseService
     }
 
     /**
-     * (不太用的上,前端的格式略微不同)
-     * @param $customParams
-     * @return bool|string
+     * (不太用的上,前端的格式略微不同).
      */
     private function generateOssCallbackVar($customParams): bool|string
     {

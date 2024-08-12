@@ -55,6 +55,7 @@ return [
     'finished' => 'finished',
     'unfinished' => 'unfinished',
     'file_has_been_uploaded' => 'file_has_been_uploaded',
+    'file_has_not_been_uploaded' => 'file_has_not_been_uploaded',
     'get_sts_token_fail' => 'get_sts_token_fail',
 
     // filesystem

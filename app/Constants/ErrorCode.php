@@ -103,6 +103,9 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.get_sts_token_fail')]
     case GET_STS_TOKEN_FAIL = 70008;
 
+    #[Message('common.file_has_not_been_uploaded')]
+    case FILE_HAS_NOT_BEEN_UPLOADED = 70009;
+
     public function getMessage(?array $translate = null): string
     {
         $arguments = [];
