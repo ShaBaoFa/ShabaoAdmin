@@ -54,9 +54,9 @@ class LoginListener implements ListenerInterface
     public function process(object $event): void
     {
         /** @var AfterLogin $event */
-        $request = di()->get(BaseRequest::class);
-        $service = di()->get(LoginLogService::class);
-        $ip2region = di()->get(Ip2region::class);
+        $request = $this->container->get(BaseRequest::class);
+        $service = $this->container->get(LoginLogService::class);
+        $ip2region = $this->container->get(Ip2region::class);
         $agent = $request->getHeader('user-agent')[0] ?? 'unknown';
         $ip = $request->ip();
         try {

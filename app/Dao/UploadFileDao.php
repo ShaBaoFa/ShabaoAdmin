@@ -63,7 +63,7 @@ class UploadFileDao extends BaseDao
 
     public function changeStatusByHash(string $hash): bool
     {
-        return $this->updateByCondition(['hash', $hash], ['status', UploadStatusCode::UPLOAD_FINISHED->value]);
+        return $this->updateByCondition(['hash' => $hash], ['status' => UploadStatusCode::UPLOAD_FINISHED->value]);
     }
 
     /**
