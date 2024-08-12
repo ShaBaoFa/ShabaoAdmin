@@ -14,6 +14,7 @@ namespace App\Controller;
 
 use App\Annotation\Auth;
 use App\Annotation\OperationLog;
+use App\Annotation\UploaderCallback;
 use App\Base\BaseController;
 use App\Request\UploadRequest;
 use App\Service\FileSystemService;
@@ -108,7 +109,7 @@ class UploadController extends BaseController
      * @throws RedisException
      * @throws ContainerExceptionInterface
      */
-    #[GetMapping('getFileByHash')]
+    #[GetMapping('getFileByHash'),Auth]
     public function getFilesByHash(UploadRequest $request): ResponseInterface
     {
         return $this->response->success($this->service->getFileByHash($request->input('hash', null)) ?? []);
@@ -120,7 +121,7 @@ class UploadController extends BaseController
      * @throws RedisException
      * @throws FilesystemException
      */
-    #[GetMapping('downloadByHash')]
+    #[GetMapping('downloadByHash'),Auth]
     public function downloadByHash(UploadRequest $request): ResponseInterface
     {
         [$path, $file] = $this->service->downloadFileByHash($request->input('hash'));
@@ -133,7 +134,7 @@ class UploadController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws FilesystemException
      */
-    #[GetMapping('showFileByHash/{hash}')]
+    #[GetMapping('showFileByHash/{hash}'),Auth]
     public function showFileByHash(string $hash): ResponseInterface
     {
         [$file, $context] = $this->service->responseFileByHash($hash);

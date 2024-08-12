@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Annotation\UploaderCallback;
+use App\Base\BaseRequest;
 use App\Base\BaseService;
 use App\Base\BaseUpload;
 use App\Constants\ErrorCode;
@@ -176,7 +178,7 @@ class FileSystemService extends BaseService
 
     public function uploaderCallback(string $hash): bool
     {
-        return $this->dao->isUploaded($hash) ?? $this->dao->changeStatusByHash($hash);
+        return $this->dao->isUploaded($hash) ? true : $this->dao->changeStatusByHash($hash);
     }
 
     /**
