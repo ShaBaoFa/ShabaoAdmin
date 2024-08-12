@@ -29,7 +29,6 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RedisException;
-use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 
 use function App\Helper\format_size;
 use function Hyperf\Config\config;
@@ -115,6 +114,32 @@ class BaseUpload
     }
 
     /**
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws ContainerExceptionInterface
+     */
+    public function handlePreparation(array $metadata, array $config): array
+    {
+        $segments = explode('.', $metadata['origin_name']);
+        $suffix = Str::lower((string) end($segments));
+        $path = $this->getPath($config['path'] ?? null, $this->getStorageMode() != FileSystemCode::LOCAL);
+        $filename = $this->getNewName() . '.' . $suffix;
+        return [
+            'storage_mode' => $this->getStorageMode(),
+            'origin_name' => $metadata['origin_name'],
+            'object_name' => $filename,
+            'mime_type' => $metadata['mime_type'],
+            'storage_path' => $path,
+            'status' => UploadStatusCode::UPLOAD_UNFINISHED->value,
+            'hash' => $config['hash'],
+            'suffix' => $suffix,
+            'size_byte' => (int) $metadata['size_byte'],
+            'size_info' => format_size((int) $metadata['size_byte'] * 1024),
+            'url' => $this->assembleUrl($config['path'] ?? null, $filename),
+        ];
+    }
+
+    /**
      * 处理上传.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -168,31 +193,5 @@ class BaseUpload
     protected function getMappingMode(): string
     {
         return Str::lower(FileSystemCode::tryFrom($this->getStorageMode())->name ?? FileSystemCode::LOCAL->name);
-    }
-
-    /**
-     * @throws NotFoundExceptionInterface
-     * @throws RedisException
-     * @throws ContainerExceptionInterface
-     */
-    public function handlePreparation(array $metadata, array $config): array
-    {
-        $segments = explode('.', $metadata['origin_name']);
-        $suffix = Str::lower((string) end($segments));
-        $path = $this->getPath($config['path'] ?? null, $this->getStorageMode() != FileSystemCode::LOCAL);
-        $filename = $this->getNewName() . '.' . $suffix;
-        return [
-            'storage_mode' => $this->getStorageMode(),
-            'origin_name' => $metadata['origin_name'],
-            'object_name' => $filename,
-            'mime_type' => $metadata['mime_type'],
-            'storage_path' => $path,
-            'status' => UploadStatusCode::UPLOAD_UNFINISHED->value,
-            'hash' => md5(json_encode($metadata)),
-            'suffix' => $suffix,
-            'size_byte' => (int) $metadata['size_byte'],
-            'size_info' => format_size((int) $metadata['size_byte'] * 1024),
-            'url' => $this->assembleUrl($config['path'] ?? null, $filename),
-        ];
     }
 }

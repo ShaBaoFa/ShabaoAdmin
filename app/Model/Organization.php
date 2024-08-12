@@ -19,24 +19,24 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
 use Hyperf\Database\Model\Relations\HasOne;
 
 /**
- * @property int $id
- * @property int $parent_id
- * @property int $super_admin_id
- * @property string $level
- * @property string $name
- * @property string $address
- * @property string $legal_person
- * @property string $phone
- * @property int $status
- * @property int $created_by
- * @property int $updated_by
- * @property string $remark
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property string $deleted_at
- * @property null|Collection|User[] $users
- * @property null|Collection|Department[] $depts
- * @property null|User $superAdmin
+ * @property int $id 
+ * @property int $parent_id 
+ * @property int $super_admin_id 
+ * @property string $level 
+ * @property string $name 
+ * @property string $address 
+ * @property string $legal_person 
+ * @property string $phone 
+ * @property int $status 
+ * @property int $created_by 
+ * @property int $updated_by 
+ * @property string $remark 
+ * @property Carbon $created_at 
+ * @property Carbon $updated_at 
+ * @property string $deleted_at 
+ * @property-read null|Collection|User[] $users 
+ * @property-read null|Collection|Department[] $depts 
+ * @property-read null|User $superAdmin 
  */
 class Organization extends BaseModel
 {
