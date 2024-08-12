@@ -86,10 +86,14 @@ class UploadController extends BaseController
         return $this->response->success($this->service->uploaderPreparation($request->input('metadata'), $request->all()));
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     #[PostMapping('uploaderCallback')]
     public function uploaderCallback(UploadRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->uploaderCallback($request->all()));
+        return $this->service->uploaderCallback($request->input('hash')) ? $this->response->success() : $this->response->fail();
     }
 
     #[GetMapping('getDownloaderStsToken'),Auth,OperationLog]
