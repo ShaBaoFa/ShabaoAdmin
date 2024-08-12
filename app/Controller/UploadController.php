@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Annotation\Auth;
+use App\Annotation\OperationLog;
 use App\Base\BaseController;
 use App\Request\UploadRequest;
 use App\Service\FileSystemService;
@@ -91,9 +92,10 @@ class UploadController extends BaseController
         return $this->response->success($this->service->uploaderCallback($request->all()));
     }
 
-    #[GetMapping('getDownloaderStsToken'),Auth]
-    public function getDownloaderStsToken(UploadRequest $request)
+    #[GetMapping('getDownloaderStsToken'),Auth,OperationLog]
+    public function getDownloaderStsToken(UploadRequest $request): ResponseInterface
     {
+        return $this->response->success($this->service->getDownloaderStsToken($request->input('hash')));
     }
 
     /**
