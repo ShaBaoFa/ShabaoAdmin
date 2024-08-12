@@ -18,26 +18,26 @@ use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
- * @property int $id 
- * @property int $parent_id 
- * @property string $level 
- * @property string $name 
- * @property string $code 
- * @property string $icon 
- * @property string $route 
- * @property string $component 
- * @property string $redirect 
- * @property int $is_hidden 
- * @property string $type 
- * @property int $status 
- * @property int $sort 
- * @property int $created_by 
- * @property int $updated_by 
- * @property Carbon $created_at 
- * @property Carbon $updated_at 
- * @property string $deleted_at 
- * @property string $remark 
- * @property-read null|Collection|Role[] $roles 
+ * @property int $id
+ * @property int $parent_id
+ * @property string $level
+ * @property string $name
+ * @property string $code
+ * @property string $icon
+ * @property string $route
+ * @property string $component
+ * @property string $redirect
+ * @property int $is_hidden
+ * @property string $type
+ * @property int $status
+ * @property int $sort
+ * @property int $created_by
+ * @property int $updated_by
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property string $deleted_at
+ * @property string $remark
+ * @property null|Collection|Role[] $roles
  */
 class Menu extends BaseModel
 {
