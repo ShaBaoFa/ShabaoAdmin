@@ -15,8 +15,8 @@ namespace App\Model;
 use App\Base\BaseModel;
 
 /**
- * @property int $user_id
- * @property int $post_id
+ * @property int $user_id 
+ * @property int $post_id 
  */
 class PostUser extends BaseModel
 {

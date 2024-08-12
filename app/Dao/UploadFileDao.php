@@ -58,7 +58,7 @@ class UploadFileDao extends BaseDao
 
     public function isUploaded(string $hash): bool
     {
-        return $this->model::query()->where('hash', $hash)->where('status',UploadStatusCode::UPLOAD_UNFINISHED->value)->exists();
+        return $this->model::query()->where('hash', $hash)->where('status', UploadStatusCode::UPLOAD_FINISHED->value)->exists();
     }
 
     /**

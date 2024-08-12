@@ -32,9 +32,10 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RedisException;
 use Swoole\Coroutine\System;
+use Wlfpanda1012\AliyunSts\Constants\OSSClientCode;
 use Wlfpanda1012\AliyunSts\Oss\OssRamService;
+
 use function App\Helper\user;
-use function PHPUnit\Framework\throwException;
 
 class FileSystemService extends BaseService
 {
@@ -140,33 +141,22 @@ class FileSystemService extends BaseService
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
-    #[Cacheable(prefix: 'stsToken', value: 'fileHash_#{hash}', ttl: 3600)]
+    #[Cacheable(prefix: 'stsToken', value: 'fileHash_#{hash}', ttl: 900)]
     public function getUploaderStsToken(string $hash): array
     {
-        if ($this->dao->isUploaded($hash)) throw new BusinessException(ErrorCode::FILE_HAS_BEEN_UPLOADED);
+        if ($this->dao->isUploaded($hash)) {
+            throw new BusinessException(ErrorCode::FILE_HAS_BEEN_UPLOADED);
+        }
         $fileInfo = $this->dao->getFileInfoByHash($hash);
         try {
             $sts = $this->config->get('sts');
             $ossRamService = new OssRamService($sts);
-            // todo::gen-callback
-            return $ossRamService->allowPutObject($fileInfo['url']);
-        }catch (Exception $e){
+            $customParams = ['hash' => $hash];
+            $this->generateOssCallback(['hash' => $hash]);
+            return ['callback_custom_params' => $customParams, 'credentials' => $ossRamService->allowPutObject($fileInfo['url'])];
+        } catch (Exception $e) {
             throw new BusinessException(ErrorCode::GET_STS_TOKEN_FAIL);
         }
-
-    }
-
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws RedisException
-     */
-    private function generateSignature(Filesystem $filesystem, array $data): string
-    {
-        return match ($data['storage_mode']) {
-            FileSystemCode::OSS->value => $filesystem->temporaryUrl($data['url'], Carbon::now()->addHour()),
-            default => $data['url']
-        };
     }
 
     /**
@@ -182,15 +172,84 @@ class FileSystemService extends BaseService
         if ($this->uploadTool->getStorageMode() != FileSystemCode::OSS->value) {
             throw new BusinessException(ErrorCode::STS_NOT_SUPPORT);
         }
-        try {
-            $hash = md5(json_encode($metadata));
-            $data = ['hash' => $hash, 'is_uploaded' => $this->dao->isUploaded($hash)];
-            if ($data['is_uploaded']) return $data;
-            $fileInfo = $this->uploadTool->handlePreparation($metadata, $config);
-                $this->save($fileInfo) ?? throw new BusinessException(ErrorCode::UPLOAD_FAILED);
+        $hash = md5($this->fitterMd5Resource($metadata));
+        ! $hash && throw new BusinessException(ErrorCode::HASH_VERIFICATION_FAILED);
+        $data = ['hash' => $hash, 'is_uploaded' => $this->dao->isUploaded($hash)];
+        if ($data['is_uploaded']) {
             return $data;
-        } catch (Exception $e) {
-            throw new BusinessException(ErrorCode::HASH_VERIFICATION_FAILED);
         }
+        $fileInfo = $this->uploadTool->handlePreparation($metadata, array($config,['hash'=>$hash]));
+        $this->save($fileInfo) ?? throw new BusinessException(ErrorCode::UPLOAD_FAILED);
+        return $data;
+    }
+
+    private function generateOssCallback(array $customParams = []): array
+    {
+        $sts = $this->config->get('sts');
+        $callback = $sts['oss']['callback'];
+        ! json_encode($callback) ?? throw new BusinessException(ErrorCode::SERVER_ERROR);
+        if (empty($customParams)) {
+            return [OSSClientCode::OSS_CALLBACK->value => json_encode($callback)];
+        }
+        $callback[OSSClientCode::OSS_CALLBACK_BODY->value] = $this->generateOssCallbackBody($customParams);
+        return [
+            OSSClientCode::OSS_CALLBACK->value => json_encode($callback),
+            OSSClientCode::OSS_CALLBACK_VAR->value => $this->generateOssCallbackVar($customParams),
+        ];
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     */
+    private function generateSignature(Filesystem $filesystem, array $data): string
+    {
+        return match ($data['storage_mode']) {
+            FileSystemCode::OSS->value => $filesystem->temporaryUrl($data['url'], Carbon::now()->addHour()),
+            default => $data['url']
+        };
+    }
+
+    private function fitterMd5Resource(array $metadata): bool|string
+    {
+        return json_encode(['user_id' => user()->getId(), 'size_byte' => $metadata['size_byte'], 'mime_type' => $metadata['mime_type'], 'last_modified' => $metadata['last_modified']]);
+    }
+
+    /**
+     * (不太用的上,前端的格式略微不同)
+     * @param array|null $customParams
+     * @return string
+     */
+    private function generateOssCallbackBody(?array $customParams = null): string
+    {
+        $sts = $this->config->get('sts');
+        $callback = $sts['oss']['callback'];
+        $baseParams = is_string($callback[OSSClientCode::OSS_CALLBACK_BODY->value]) ? explode(OSSClientCode::OSS_CALLBACK_SEPARATOR->value, $callback[OSSClientCode::OSS_CALLBACK_BODY->value]) : $callback[OSSClientCode::OSS_CALLBACK_BODY->value];
+        ! is_array($baseParams) && throw new BusinessException(ErrorCode::SERVER_ERROR);
+
+        // 遍历传入的数组，将其格式化为 'key=value' 的形式
+        foreach ($customParams as $key => $value) {
+            $variable = '${' . OSSClientCode::OSS_CALLBACK_CUSTOM_VAR_PREFIX->value . $key . '}';
+            $baseParams[] = "{$key}={$variable}";
+        }
+
+        // 将所有参数用 & 连接成一个字符串
+        return implode(OSSClientCode::OSS_CALLBACK_SEPARATOR->value, $baseParams);
+    }
+
+    /**
+     * (不太用的上,前端的格式略微不同)
+     * @param $customParams
+     * @return bool|string
+     */
+    private function generateOssCallbackVar($customParams): bool|string
+    {
+        // 设置发起回调请求的自定义参数，由Key和Value组成，Key必须以枚举指定的前缀开始。
+        $var = [];
+        foreach ($customParams as $key => $value) {
+            $var[OSSClientCode::OSS_CALLBACK_CUSTOM_VAR_PREFIX->value . $key] = $value;
+        }
+        return json_encode($var);
     }
 }

@@ -16,16 +16,16 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $code
- * @property int $status
- * @property int $created_by
- * @property int $updated_by
- * @property string $remark
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property string $deleted_at
+ * @property int $id 
+ * @property string $name 
+ * @property string $code 
+ * @property int $status 
+ * @property int $created_by 
+ * @property int $updated_by 
+ * @property string $remark 
+ * @property Carbon $created_at 
+ * @property Carbon $updated_at 
+ * @property string $deleted_at 
  */
 class Post extends BaseModel
 {

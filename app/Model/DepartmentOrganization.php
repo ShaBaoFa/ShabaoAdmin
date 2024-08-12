@@ -15,8 +15,8 @@ namespace App\Model;
 use App\Base\BaseModel;
 
 /**
- * @property int $department_id
- * @property int $organization_id
+ * @property int $department_id 
+ * @property int $organization_id 
  */
 class DepartmentOrganization extends BaseModel
 {

@@ -68,7 +68,7 @@ class UploadController extends BaseController
      * @throws RedisException
      * @throws ContainerExceptionInterface
      */
-    #[PostMapping('uploaderStsToken'),Auth]
+    #[GetMapping('getUploaderStsToken'),Auth]
     public function getUploaderStsToken(UploadRequest $request): ResponseInterface
     {
         return $this->response->success($this->service->getUploaderStsToken($request->input('hash')));
@@ -77,6 +77,7 @@ class UploadController extends BaseController
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws RedisException
      */
     #[PostMapping('uploaderPreparation'),Auth]
     public function uploaderPreparation(UploadRequest $request): ResponseInterface
@@ -84,7 +85,13 @@ class UploadController extends BaseController
         return $this->response->success($this->service->uploaderPreparation($request->input('metadata'), $request->all()));
     }
 
-    #[PostMapping('downloaderStsToken'),Auth]
+    #[PostMapping('uploaderCallback')]
+    public function uploaderCallback(UploadRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->uploaderCallback($request->all()));
+    }
+
+    #[GetMapping('getDownloaderStsToken'),Auth]
     public function getDownloaderStsToken(UploadRequest $request)
     {
     }
