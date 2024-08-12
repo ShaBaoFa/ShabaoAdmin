@@ -61,6 +61,11 @@ class UploadFileDao extends BaseDao
         return $this->model::query()->where('hash', $hash)->where('status', UploadStatusCode::UPLOAD_FINISHED->value)->exists();
     }
 
+    public function changeStatusByHash(string $hash): bool
+    {
+        return $this->updateByCondition(['hash', $hash], ['status', UploadStatusCode::UPLOAD_FINISHED->value]);
+    }
+
     /**
      * 搜索处理器.
      */

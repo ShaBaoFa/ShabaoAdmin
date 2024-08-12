@@ -174,6 +174,11 @@ class FileSystemService extends BaseService
         }
     }
 
+    public function uploaderCallback(string $hash): bool
+    {
+        return $this->dao->isUploaded($hash) ?? $this->dao->changeStatusByHash($hash);
+    }
+
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -253,6 +258,7 @@ class FileSystemService extends BaseService
 
     /**
      * (不太用的上,前端的格式略微不同).
+     * @param mixed $customParams
      */
     private function generateOssCallbackVar($customParams): bool|string
     {
