@@ -16,24 +16,24 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 
 /**
- * @property int $id 
- * @property int $storage_mode 
- * @property string $origin_name 
- * @property string $object_name 
- * @property string $hash 
- * @property string $mime_type 
- * @property string $storage_path 
- * @property string $suffix 
- * @property int $size_byte 
- * @property string $size_info 
- * @property string $url 
- * @property int $status 
- * @property int $created_by 
- * @property int $updated_by 
- * @property Carbon $created_at 
- * @property Carbon $updated_at 
- * @property string $deleted_at 
- * @property string $remark 
+ * @property int $id
+ * @property int $storage_mode
+ * @property string $origin_name
+ * @property string $object_name
+ * @property string $hash
+ * @property string $mime_type
+ * @property string $storage_path
+ * @property string $suffix
+ * @property int $size_byte
+ * @property string $size_info
+ * @property string $url
+ * @property int $status
+ * @property int $created_by
+ * @property int $updated_by
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property string $deleted_at
+ * @property string $remark
  */
 class UploadFile extends BaseModel
 {

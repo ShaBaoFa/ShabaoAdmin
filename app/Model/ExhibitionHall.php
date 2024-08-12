@@ -15,8 +15,8 @@ namespace App\Model;
 use App\Base\BaseModel;
 
 /**
- * @property int $exhibition_id 
- * @property int $hall_id 
+ * @property int $exhibition_id
+ * @property int $hall_id
  */
 class ExhibitionHall extends BaseModel
 {

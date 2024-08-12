@@ -15,8 +15,8 @@ namespace App\Model;
 use App\Base\BaseModel;
 
 /**
- * @property int $role_id 
- * @property int $menu_id 
+ * @property int $role_id
+ * @property int $menu_id
  */
 class MenuRole extends BaseModel
 {

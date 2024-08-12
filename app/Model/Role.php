@@ -18,21 +18,21 @@ use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
- * @property int $id 
- * @property string $name 
- * @property string $code 
- * @property int $type 
- * @property int $data_scope 
- * @property int $status 
- * @property int $created_by 
- * @property int $updated_by 
- * @property string $remark 
- * @property Carbon $created_at 
- * @property Carbon $updated_at 
- * @property string $deleted_at 
- * @property-read null|Collection|Department[] $depts 
- * @property-read null|Collection|Menu[] $menus 
- * @property-read null|Collection|User[] $users 
+ * @property int $id
+ * @property string $name
+ * @property string $code
+ * @property int $type
+ * @property int $data_scope
+ * @property int $status
+ * @property int $created_by
+ * @property int $updated_by
+ * @property string $remark
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property string $deleted_at
+ * @property null|Collection|Department[] $depts
+ * @property null|Collection|Menu[] $menus
+ * @property null|Collection|User[] $users
  */
 class Role extends BaseModel
 {

@@ -16,15 +16,15 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 
 /**
- * @property int $id 
- * @property int $status 
- * @property int $sort 
- * @property int $created_by 
- * @property int $updated_by 
- * @property Carbon $created_at 
- * @property Carbon $updated_at 
- * @property string $deleted_at 
- * @property string $remark 
+ * @property int $id
+ * @property int $status
+ * @property int $sort
+ * @property int $created_by
+ * @property int $updated_by
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property string $deleted_at
+ * @property string $remark
  */
 class Hall extends BaseModel
 {

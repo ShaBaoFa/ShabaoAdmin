@@ -49,17 +49,17 @@ class TestCommand extends HyperfCommand
     public function handle(): void
     {
         // gencallback
-//        var_dump($this->generateOssCallback(['hash' => "333333423"]));
-//        var_dump($this->genCallback());
-//        var_dump($this->genCallback() === $this->generateOssCallback(['hash' => "333333423"]));
-//        return;
+        //        var_dump($this->generateOssCallback(['hash' => "333333423"]));
+        //        var_dump($this->genCallback());
+        //        var_dump($this->genCallback() === $this->generateOssCallback(['hash' => "333333423"]));
+        //        return;
         // OSS简单上传回
         $config = di()->get(ConfigInterface::class)->get('sts');
         $service = new OssRamService($config);
         $credentials = $service->allowPutObject('2024/02/16/tdddw3ww.txt');
         $client = new OssClient($credentials['access_key_id'], $credentials['access_key_secret'], 'https://oss-cn-hangzhou.aliyuncs.com', false, $credentials['security_token']);
         try {
-            $data = $client->putObject($config['oss']['bucket'], '2024/02/16/tdddw3ww.txt', '123', $this->generateOssCallback(['hash' => "333333423"]));
+            $data = $client->putObject($config['oss']['bucket'], '2024/02/16/tdddw3ww.txt', '123', $this->generateOssCallback(['hash' => '333333423']));
             print_r($data['body']);
             print_r($data['info']['http_code']);
             //            $data = $client->getObject('wlf-upload-file', '2024/02/16/ceshice1231231shi111.txt');

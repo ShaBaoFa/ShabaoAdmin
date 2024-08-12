@@ -16,22 +16,22 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 
 /**
- * @property int $id 
- * @property string $username 
- * @property string $method 
- * @property string $router 
- * @property string $service_name 
- * @property string $ip 
- * @property string $ip_location 
- * @property string $request_data 
- * @property string $response_code 
- * @property string $response_data 
- * @property int $created_by 
- * @property int $updated_by 
- * @property Carbon $created_at 
- * @property Carbon $updated_at 
- * @property string $deleted_at 
- * @property string $remark 
+ * @property int $id
+ * @property string $username
+ * @property string $method
+ * @property string $router
+ * @property string $service_name
+ * @property string $ip
+ * @property string $ip_location
+ * @property string $request_data
+ * @property string $response_code
+ * @property string $response_data
+ * @property int $created_by
+ * @property int $updated_by
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property string $deleted_at
+ * @property string $remark
  */
 class OperationLog extends BaseModel
 {
