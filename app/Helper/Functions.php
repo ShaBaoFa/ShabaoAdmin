@@ -15,6 +15,8 @@ namespace App\Helper;
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
 use Countable;
+use Hyperf\Context\ApplicationContext;
+use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -105,5 +107,17 @@ if (! function_exists('format_size')) {
             $index = $i;
         }
         return round($size, 2) . $units[$index];
+    }
+}
+
+if (! function_exists('console')) {
+    /**
+     * 获取控制台输出实例.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    function console(): StdoutLoggerInterface
+    {
+        return ApplicationContext::getContainer()->get(StdoutLoggerInterface::class);
     }
 }

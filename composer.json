@@ -23,7 +23,8 @@
         "ext-swoole": ">=5.0",
         "ext-xlswriter": "*",
         "ext-xml": "*",
-        "hyperf/async-queue": "3.1.*",
+        "hyperf/amqp": "^3.1",
+        "hyperf/async-queue": "^3.1",
         "hyperf/cache": "3.1.*",
         "hyperf/command": "3.1.*",
         "hyperf/config": "3.1.*",
@@ -58,9 +59,9 @@
         "limingxinleo/hyperf-utils": "^3.9",
         "phpoffice/phpspreadsheet": "^1.24",
         "ramsey/uuid": "^4.7",
+        "wlfpanda1012/aliyun-sts": "*",
         "xmo/jwt-auth": "^2.0",
-        "zoujingli/ip2region": "^2.0",
-        "wlfpanda1012/aliyun-sts": "*"
+        "zoujingli/ip2region": "^2.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",

@@ -14,7 +14,6 @@ namespace App\Controller;
 
 use App\Annotation\Auth;
 use App\Annotation\OperationLog;
-use App\Annotation\UploaderCallback;
 use App\Base\BaseController;
 use App\Request\UploadRequest;
 use App\Service\FileSystemService;

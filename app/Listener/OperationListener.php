@@ -46,7 +46,7 @@ class OperationListener implements ListenerInterface
     public function process(object $event): void
     {
         /**
-         * @var $event Operation
+         * @var Operation $event
          */
         $requestInfo = $event->getRequestInfo();
         if (! in_array($requestInfo['router'], $this->ignoreRouter)) {

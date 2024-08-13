@@ -67,4 +67,18 @@ return [
     'memory' => '内存',
     's3' => 'S3',
     'minio' => 'Minio',
+
+    // produce
+    'produce_status_waiting' => '待生产',
+    'produce_status_doing' => '生产中',
+    'produce_status_success' => '生产成功',
+    'produce_status_fail' => '生产失败',
+    'produce_status_repeat' => '重复生产',
+
+    // consume
+    'consume_status_no' => '未消费',
+    'consume_status_doing' => '消费中',
+    'consume_status_success' => '消费成功',
+    'consume_status_fail' => '消费失败',
+    'consume_status_repeat' => '重复消费',
 ];

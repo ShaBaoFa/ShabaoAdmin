@@ -31,11 +31,11 @@ use Wlfpanda1012\AliyunSts\Constants\OSSClientCode;
 use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 
 #[Command]
-class TestCommand extends HyperfCommand
+class TestCommand1 extends HyperfCommand
 {
     public function __construct(protected ContainerInterface $container)
     {
-        parent::__construct('demo:c');
+        parent::__construct('demo:c1');
     }
 
     public function configure()
@@ -52,21 +52,15 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        for ($i = 0; $i < 4; $i++) {
-//            $message = new MessageProducer('produceTime:' . Carbon::now()->toDateTimeString());
-            $message = new MessageProducer($i);
-            $producer = di()->get(Producer::class);
-            $producer->produce($message);
-        }
         // amqp
         //1.delayed + direct
         // 发送50次 delay+direct消息
-//        for ($i = 0; $i < 1; $i++) {
-//            $message = new DelayedMessageProducer('delay+direct produceTime:' . Carbon::now()->toDateTimeString());
-//            $message->setDelayMs(5000);
-//            $producer = di()->get(Producer::class);
-//            $producer->produce($message);
-//        }
+        for ($i = 0; $i < 1; $i++) {
+            $message = new DelayedMessageProducer('delay+direct produceTime:' . Carbon::now()->toDateTimeString());
+            $message->setDelayMs(10000);
+            $producer = di()->get(Producer::class);
+            $producer->produce($message);
+        }
         return;
         // gencallback
         //        var_dump($this->generateOssCallback(['hash' => "333333423"]));
