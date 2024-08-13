@@ -67,4 +67,18 @@ return [
     'memory' => 'memory',
     's3' => 's3',
     'minio' => 'minio',
+
+    //produce
+    'produce_status_waiting' => 'produce_status_waiting',
+    'produce_status_doing' => 'produce_status_doing',
+    'produce_status_success' => 'produce_status_success',
+    'produce_status_fail' => 'produce_status_fail',
+    'produce_status_repeat' => 'produce_status_repeat',
+
+    // consume
+    'consume_status_no' => 'consume_status_no',
+    'consume_status_doing' => 'consume_status_doing',
+    'consume_status_success' => 'consume_status_success',
+    'consume_status_fail' => 'consume_status_fail',
+    'consume_status_repeat' => 'consume_status_repeat',
 ];
