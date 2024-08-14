@@ -15,10 +15,10 @@ namespace App\Dao;
 use App\Base\BaseDao;
 use App\Constants\QueueMesContentTypeCode;
 use App\Model\Message;
+use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Db;
 
-use function App\Helper\filled;
 use function App\Helper\user;
 
 class MessageDao extends BaseDao
@@ -65,21 +65,32 @@ class MessageDao extends BaseDao
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-        if (isset($params['title']) && filled($params['title'])) {
-            $query->where('title', 'like', '%' . $params['title'] . '%');
-        }
+        $query->when(
+            Arr::get($params, 'title'),
+            fn (Builder $query, $title) => $query->where('title', 'like', '%' . $title . '%')
+        );
 
-        // 内容类型
-        if (isset($params['content_type']) && filled($params['content_type']) && $params['content_type'] !== 'all') {
-            $query->where('content_type', '=', $params['content_type']);
-        }
+        $query->when(
+            Arr::get($params, 'content_type'),
+            function (Builder $query, $contentType) {
+                if ($contentType !== 'all') {
+                    $query->where('content_type', '=', $contentType);
+                }
+            }
+        );
 
-        if (isset($params['created_at']) && filled($params['created_at']) && is_array($params['created_at']) && count($params['created_at']) === 2) {
-            $query->whereBetween(
-                'created_at',
-                [$params['created_at'][0] . ' 00:00:00', $params['created_at'][1] . ' 23:59:59']
-            );
-        }
+        $query->when(
+            Arr::get($params, 'created_at'),
+            function (Builder $query, $createdAt) {
+                if (is_array($createdAt) && count($createdAt) === 2) {
+                    $query->whereBetween(
+                        'created_at',
+                        [$createdAt[0] . ' 00:00:00', $createdAt[1] . ' 23:59:59']
+                    );
+                }
+            }
+        );
+
         return $query;
     }
 }

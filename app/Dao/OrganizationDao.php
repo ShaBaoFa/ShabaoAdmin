@@ -15,12 +15,12 @@ namespace App\Dao;
 use App\Base\BaseCollection;
 use App\Base\BaseDao;
 use App\Model\Organization;
+use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
 use Hyperf\Stringable\Str;
 use JetBrains\PhpStorm\ArrayShape;
 
-use function App\Helper\filled;
 use function Hyperf\Config\config;
 
 class OrganizationDao extends BaseDao
@@ -132,35 +132,48 @@ class OrganizationDao extends BaseDao
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-        if (isset($params['status']) && filled($params['status'])) {
-            $query->where('status', $params['status']);
-        }
+        $query->when(
+            Arr::get($params, 'status'),
+            fn (Builder $query, $status) => $query->where('status', $status)
+        );
 
-        if (isset($params['level']) && filled($params['level'])) {
-            $query->where('level', 'like', '%' . $params['level'] . '%');
-        }
+        $query->when(
+            Arr::get($params, 'level'),
+            fn (Builder $query, $level) => $query->where('level', 'like', '%' . $level . '%')
+        );
 
-        if (isset($params['name']) && filled($params['name'])) {
-            $query->where('name', 'like', '%' . $params['name'] . '%');
-        }
+        $query->when(
+            Arr::get($params, 'name'),
+            fn (Builder $query, $name) => $query->where('name', 'like', '%' . $name . '%')
+        );
 
-        if (isset($params['address']) && filled($params['address'])) {
-            $query->where('address', $params['address']);
-        }
+        $query->when(
+            Arr::get($params, 'address'),
+            fn (Builder $query, $address) => $query->where('address', $address)
+        );
 
-        if (isset($params['legal_person']) && filled($params['legal_person'])) {
-            $query->where('legal_person', $params['legal_person']);
-        }
-        if (isset($params['phone']) && filled($params['phone'])) {
-            $query->where('phone', $params['phone']);
-        }
+        $query->when(
+            Arr::get($params, 'legal_person'),
+            fn (Builder $query, $legalPerson) => $query->where('legal_person', $legalPerson)
+        );
 
-        if (isset($params['created_at']) && filled($params['created_at']) && is_array($params['created_at']) && count($params['created_at']) == 2) {
-            $query->whereBetween(
-                'created_at',
-                [$params['created_at'][0] . ' 00:00:00', $params['created_at'][1] . ' 23:59:59']
-            );
-        }
+        $query->when(
+            Arr::get($params, 'phone'),
+            fn (Builder $query, $phone) => $query->where('phone', $phone)
+        );
+
+        $query->when(
+            Arr::get($params, 'created_at'),
+            function (Builder $query, $createdAt) {
+                if (is_array($createdAt) && count($createdAt) === 2) {
+                    $query->whereBetween(
+                        'created_at',
+                        [$createdAt[0] . ' 00:00:00', $createdAt[1] . ' 23:59:59']
+                    );
+                }
+            }
+        );
+
         return $query;
     }
 }

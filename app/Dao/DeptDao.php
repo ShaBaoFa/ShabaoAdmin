@@ -15,11 +15,11 @@ namespace App\Dao;
 use App\Base\BaseCollection;
 use App\Base\BaseDao;
 use App\Model\Department;
+use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
 use Hyperf\DbConnection\Db;
 
-use function App\Helper\filled;
 use function App\Helper\user;
 use function Hyperf\Config\config;
 
@@ -117,32 +117,43 @@ class DeptDao extends BaseDao
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-        if (isset($params['status']) && filled($params['status'])) {
-            $query->where('status', $params['status']);
-        }
+        $query->when(
+            $status = Arr::get($params, 'status'),
+            fn (Builder $query) => $query->where('status', $status)
+        );
 
-        if (isset($params['level']) && filled($params['level'])) {
-            $query->where('level', 'like', '%' . $params['level'] . '%');
-        }
+        $query->when(
+            $level = Arr::get($params, 'level'),
+            fn (Builder $query) => $query->where('level', 'like', '%' . $level . '%')
+        );
 
-        if (isset($params['name']) && filled($params['name'])) {
-            $query->where('name', 'like', '%' . $params['name'] . '%');
-        }
+        $query->when(
+            $name = Arr::get($params, 'name'),
+            fn (Builder $query) => $query->where('name', 'like', '%' . $name . '%')
+        );
 
-        if (isset($params['leader']) && filled($params['leader'])) {
-            $query->where('leader', $params['leader']);
-        }
+        $query->when(
+            $leader = Arr::get($params, 'leader'),
+            fn (Builder $query) => $query->where('leader', $leader)
+        );
 
-        if (isset($params['phone']) && filled($params['phone'])) {
-            $query->where('phone', $params['phone']);
-        }
+        $query->when(
+            $phone = Arr::get($params, 'phone'),
+            fn (Builder $query) => $query->where('phone', $phone)
+        );
 
-        if (isset($params['created_at']) && filled($params['created_at']) && is_array($params['created_at']) && count($params['created_at']) == 2) {
-            $query->whereBetween(
-                'created_at',
-                [$params['created_at'][0] . ' 00:00:00', $params['created_at'][1] . ' 23:59:59']
-            );
-        }
+        $query->when(
+            Arr::get($params, 'created_at'),
+            function (Builder $query, $createdAt) {
+                if (is_array($createdAt) && count($createdAt) === 2) {
+                    $query->whereBetween(
+                        'created_at',
+                        [$createdAt[0] . ' 00:00:00', $createdAt[1] . ' 23:59:59']
+                    );
+                }
+            }
+        );
+
         return $query;
     }
 }

@@ -18,10 +18,10 @@ use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
 use App\Model\Department;
 use App\Model\User;
+use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
 
-use function App\Helper\filled;
 use function App\Helper\user;
 use function Hyperf\Support\env;
 
@@ -161,11 +161,8 @@ class UserDao extends BaseDao
     /**
      * 根据用户ID列表获取用户基础信息.
      */
-    public function getUserInfoByIds(array $ids, ?array $select = null): array
+    public function getUserInfoByIds(array $ids, ?array $select = ['id', 'username', 'phone', 'created_at']): array
     {
-        if (! $select) {
-            $select = ['id', 'username', 'phone', 'created_at'];
-        }
         return $this->model::query()->whereIn('id', $ids)->select($select)->get()->toArray();
     }
 
@@ -174,69 +171,79 @@ class UserDao extends BaseDao
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-        if (isset($params['dept_id']) && filled($params['dept_id']) && is_string($params['dept_id'])) {
-            $deptIds = Department::query()
-                ->where(function ($query) use ($params) {
-                    $query->where('id', '=', $params['dept_id'])
-                        ->orWhere('level', 'like', $params['dept_id'] . ',%')
-                        ->orWhere('level', 'like', '%,' . $params['dept_id'])
-                        ->orWhere('level', 'like', '%,' . $params['dept_id'] . ',%');
-                })
-                ->pluck('id')
-                ->toArray();
-            $query->whereHas('depts', fn ($query) => $query->whereIn('id', $deptIds));
-        }
-        if (isset($params['username']) && filled($params['username'])) {
-            $query->where('username', 'like', '%' . $params['username'] . '%');
-        }
-        if (isset($params['phone']) && filled($params['phone'])) {
-            $query->where('phone', '=', $params['phone']);
-        }
-        if (isset($params['status']) && filled($params['status'])) {
-            $query->where('status', $params['status']);
-        }
+        $query->when(
+            Arr::get($params, 'dept_id'),
+            function (Builder $query, $deptId) {
+                $deptIds = Department::query()
+                    ->where(function ($query) use ($deptId) {
+                        $query->where('id', '=', $deptId)
+                            ->orWhere('level', 'like', $deptId . ',%')
+                            ->orWhere('level', 'like', '%,' . $deptId)
+                            ->orWhere('level', 'like', '%,' . $deptId . ',%');
+                    })
+                    ->pluck('id')
+                    ->toArray();
+                $query->whereHas('depts', fn ($query) => $query->whereIn('id', $deptIds));
+            }
+        );
 
-        if (isset($params['filterSuperAdmin']) && filled($params['filterSuperAdmin'])) {
-            $query->whereNotIn('id', [env('SUPER_ADMIN')]);
-        }
+        $query->when(
+            trim(Arr::get($params, 'username')),
+            fn (Builder $query, $username) => $query->where('username', 'like', '%' . $username . '%')
+        );
 
-        if (isset($params['created_at']) && filled($params['created_at']) && is_array($params['created_at']) && count($params['created_at']) == 2) {
-            $query->whereBetween(
-                'created_at',
-                [$params['created_at'][0] . ' 00:00:00', $params['created_at'][1] . ' 23:59:59']
-            );
-        }
+        $query->when(
+            Arr::get($params, 'phone'),
+            fn (Builder $query, $phone) => $query->where('phone', '=', $phone)
+        );
 
-        if (isset($params['userIds']) && filled($params['userIds'])) {
-            $query->whereIn('id', $params['userIds']);
-        }
+        $query->when(
+            Arr::get($params, 'status'),
+            fn (Builder $query, $status) => $query->where('status', $status)
+        );
 
-        if (isset($params['showDept']) && filled($params['showDept'])) {
-            $isAll = $params['showDeptAll'] ?? false;
+        $query->when(
+            Arr::get($params, 'filterSuperAdmin'),
+            fn (Builder $query) => $query->whereNotIn('id', [env('SUPER_ADMIN')])
+        );
 
-            $query->with(['depts' => function ($query) use ($isAll) {
-                /**
-                 * @var Builder $query
-                 */
-                $query->where('status', Department::ENABLE);
-                return $isAll ? $query->select(['*']) : $query->select(['id', 'name']);
-            }]);
-        }
+        $query->when(
+            Arr::get($params, 'created_at'),
+            function (Builder $query, $createdAt) {
+                if (is_array($createdAt) && count($createdAt) === 2) {
+                    $query->whereBetween(
+                        'created_at',
+                        [$createdAt[0] . ' 00:00:00', $createdAt[1] . ' 23:59:59']
+                    );
+                }
+            }
+        );
 
-        if (isset($params['role_ids']) && filled($params['role_ids'])) {
-            $query->whereHas('roles', fn ($query) => $query->whereIn('roles.id', $params['role_ids']));
-        }
-        if (isset($params['org_id']) && filled($params['org_id'])) {
-            $query->whereHas('organizations', fn ($query) => $query->whereIn('organizations.id', $params['org_id']));
-        }
-        //
-        //        if (isset($params['post_id']) && filled($params['post_id'])) {
-        //            $tablePrefix = env('DB_PREFIX');
-        //            $query->whereRaw(
-        //                "id IN ( SELECT user_id FROM {$tablePrefix}system_user_post WHERE post_id = ? )",
-        //                [$params['post_id']]
-        //            );
-        //        }
+        $query->when(
+            Arr::get($params, 'userIds'),
+            fn (Builder $query, $userIds) => $query->whereIn('id', $userIds)
+        );
+
+        $query->when(
+            Arr::get($params, 'showDept'),
+            function (Builder $query) use ($params) {
+                $isAll = Arr::get($params, 'showDeptAll', false);
+                $query->with(['depts' => function ($query) use ($isAll) {
+                    $query->where('status', Department::ENABLE);
+                    return $isAll ? $query->select(['*']) : $query->select(['id', 'name']);
+                }]);
+            }
+        );
+
+        $query->when(
+            Arr::get($params, 'role_ids'),
+            fn (Builder $query, $roleIds) => $query->whereHas('roles', fn ($query) => $query->whereIn('roles.id', $roleIds))
+        );
+
+        $query->when(
+            Arr::get($params, 'org_id'),
+            fn (Builder $query, $orgId) => $query->whereHas('organizations', fn ($query) => $query->whereIn('organizations.id', $orgId))
+        );
 
         return $query;
     }

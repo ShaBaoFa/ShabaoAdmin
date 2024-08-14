@@ -21,6 +21,7 @@ use App\Exception\BusinessException;
 use App\Model\User;
 use Hyperf\Cache\Annotation\Cacheable;
 use Hyperf\Cache\Annotation\CacheEvict;
+use Hyperf\Collection\Arr;
 use Hyperf\Redis\Redis;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -67,11 +68,11 @@ class UserService extends BaseService
     #[CacheEvict(prefix: 'loginInfo', value: 'userId_#{id}')]
     public function update(mixed $id, array $data): bool
     {
-        if (isset($data['username'])) {
-            unset($data['username']);
+        if (Arr::has($data, 'username')) {
+            Arr::forget($data, 'username');
         }
-        if (isset($data['password'])) {
-            unset($data['password']);
+        if (Arr::has($data, 'password')) {
+            Arr::forget($data, 'password');
         }
         return $this->dao->update($id, $this->handleData($data));
     }
@@ -93,7 +94,7 @@ class UserService extends BaseService
             foreach ($users as $user) {
                 // 如果是已经加入到黑名单的就代表不是登录状态了
                 // 重写正则 用来 匹配 多点登录 使用的token的key
-                if (! $this->hasTokenBlack($redis->get($user)) && preg_match('/:(\d+)(:|$)/', $user, $match) && isset($match[1])) {
+                if (! $this->hasTokenBlack($redis->get($user)) && preg_match('/:(\d+)(:|$)/', $user, $match) && Arr::has($match, 1)) {
                     $userIds[] = $match[1];
                 }
             }
