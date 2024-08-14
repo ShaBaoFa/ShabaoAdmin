@@ -52,21 +52,23 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        for ($i = 0; $i < 4; $i++) {
-//            $message = new MessageProducer('produceTime:' . Carbon::now()->toDateTimeString());
-            $message = new MessageProducer($i);
-            $producer = di()->get(Producer::class);
-            $producer->produce($message);
+        var_dump(true && true ?: '123');
+        return;
+        for ($i = 0; $i < 4; ++$i) {
+            //            $message = new MessageProducer('produceTime:' . Carbon::now()->toDateTimeString());
+            $message = new DelayedMessageProducer($i);
+            //            $producer = di()->get(Producer::class);
+            //            var_dump($producer->produce($message,true));
         }
         // amqp
-        //1.delayed + direct
+        // 1.delayed + direct
         // 发送50次 delay+direct消息
-//        for ($i = 0; $i < 1; $i++) {
-//            $message = new DelayedMessageProducer('delay+direct produceTime:' . Carbon::now()->toDateTimeString());
-//            $message->setDelayMs(5000);
-//            $producer = di()->get(Producer::class);
-//            $producer->produce($message);
-//        }
+        //        for ($i = 0; $i < 1; $i++) {
+        //            $message = new DelayedMessageProducer('delay+direct produceTime:' . Carbon::now()->toDateTimeString());
+        //            $message->setDelayMs(5000);
+        //            $producer = di()->get(Producer::class);
+        //            $producer->produce($message);
+        //        }
         return;
         // gencallback
         //        var_dump($this->generateOssCallback(['hash' => "333333423"]));

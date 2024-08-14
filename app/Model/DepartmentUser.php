@@ -15,8 +15,8 @@ namespace App\Model;
 use App\Base\BaseModel;
 
 /**
- * @property int $user_id
- * @property int $department_id
+ * @property int $user_id 用户主键
+ * @property int $department_id 部门主键
  */
 class DepartmentUser extends BaseModel
 {

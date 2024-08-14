@@ -20,17 +20,17 @@ use Hyperf\Database\Model\Relations\HasOne;
 
 /**
  * @property int $id
- * @property int $parent_id
- * @property int $super_admin_id
- * @property string $level
- * @property string $name
- * @property string $address
- * @property string $legal_person
- * @property string $phone
- * @property int $status
- * @property int $created_by
- * @property int $updated_by
- * @property string $remark
+ * @property int $parent_id 父ID
+ * @property int $super_admin_id 企业超管ID
+ * @property string $level 组级集合
+ * @property string $name 组织名称
+ * @property string $address 组织地址
+ * @property string $legal_person 法人
+ * @property string $phone 组织电话
+ * @property int $status 状态 (1正常 2停用)
+ * @property int $created_by 创建者
+ * @property int $updated_by 更新者
+ * @property string $remark 备注
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at

@@ -20,16 +20,16 @@ use Hyperf\Amqp\Result;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
-use function Hyperf\Config\config;
-
 #[Consumer(exchange: 'web-api', routingKey: 'message.routing', queue: 'message.queue', name: 'MessageConsumer', nums: 1)]
 class MessageConsumer extends ConsumerMessage
 {
     public function consumeMessage($data, AMQPMessage $message): Result
     {
-        if (empty($data)){
+        if (empty($data)) {
             return Result::DROP;
         }
+        sleep(1);
+        var_dump('created time:' . $data);
         var_dump('success consumeTime:' . Carbon::now()->toDateTimeString());
         return Result::ACK;
     }

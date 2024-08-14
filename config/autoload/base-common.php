@@ -39,4 +39,12 @@ return [
      * 上传地址
      */
     'update_path' => \Hyperf\Support\env('UPDATE_PATH', 'uploadFile'),
+    /**
+     * 队列交换机.
+     */
+    'queue_exchange' => \Hyperf\Support\env('QUEUE_EXCHANGE', 'web-api'),
+    /**
+     * 延时队列交换机.
+     */
+    'delay_queue_exchange' => \Hyperf\Support\env('DELAY_QUEUE_EXCHANGE', 'delay.web-api'),
 ];

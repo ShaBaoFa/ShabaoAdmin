@@ -18,25 +18,25 @@ use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
- * @property int $id
- * @property int $parent_id
- * @property string $level
- * @property string $name
- * @property string $code
- * @property string $icon
- * @property string $route
- * @property string $component
- * @property string $redirect
- * @property int $is_hidden
- * @property string $type
- * @property int $status
- * @property int $sort
- * @property int $created_by
- * @property int $updated_by
+ * @property int $id 主键
+ * @property int $parent_id 父ID
+ * @property string $level 组级集合
+ * @property string $name 菜单名称
+ * @property string $code 菜单标识代码
+ * @property string $icon 菜单图标
+ * @property string $route 路由地址
+ * @property string $component 组件路径
+ * @property string $redirect 跳转地址
+ * @property int $is_hidden 是否隐藏 (1是 2否)
+ * @property string $type 菜单类型, (M菜单 B按钮 L链接 I iframe)
+ * @property int $status 状态 (1正常 2停用)
+ * @property int $sort 排序
+ * @property int $created_by 创建者
+ * @property int $updated_by 更新者
  * @property Carbon $created_at
  * @property Carbon $updated_at
- * @property string $deleted_at
- * @property string $remark
+ * @property string $deleted_at 删除时间
+ * @property string $remark 备注
  * @property null|Collection|Role[] $roles
  */
 class Menu extends BaseModel

@@ -48,6 +48,7 @@ return [
                 'uses' => 'App\Base\BaseModel',
                 'refresh_fillable' => true,
                 'table_mapping' => [],
+                'with-comments' => true,
             ],
         ],
     ],

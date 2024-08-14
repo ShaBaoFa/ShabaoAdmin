@@ -68,7 +68,7 @@ return [
     's3' => 's3',
     'minio' => 'minio',
 
-    //produce
+    // produce
     'produce_status_waiting' => 'produce_status_waiting',
     'produce_status_doing' => 'produce_status_doing',
     'produce_status_success' => 'produce_status_success',
@@ -81,4 +81,11 @@ return [
     'consume_status_success' => 'consume_status_success',
     'consume_status_fail' => 'consume_status_fail',
     'consume_status_repeat' => 'consume_status_repeat',
+
+    // queue_mes
+    'queue_notice' => 'queue_notice',
+    'queue_announcement' => 'queue_announcement',
+    'queue_todo' => 'queue_todo',
+    'queue_copy_mine' => 'queue_copy_mine',
+    'queue_private_message' => 'queue_private_message',
 ];
