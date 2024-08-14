@@ -23,17 +23,23 @@ enum QueueMesContentTypeCode: int
 
     // 消息类
     #[Message('common.queue_notice')]
-    case TYPE_NOTICE = 1;
+    case TYPE_NOTICE = 1001;
 
     #[Message('common.queue_announcement')]
-    case TYPE_ANNOUNCE = 2;
+    case TYPE_ANNOUNCE = 1002;
 
     #[Message('common.queue_todo')]
-    case TYPE_TODO = 3;
+    case TYPE_TODO = 1003;
 
     #[Message('common.queue_copy_mine')]
-    case TYPE_COPY_MINE = 4;
+    case TYPE_COPY_MINE = 1004;
 
     #[Message('common.queue_private_message')]
-    case TYPE_PRIVATE_MESSAGE = 5;
+    case TYPE_PRIVATE_MESSAGE = 1005;
+
+    // 订单类
+
+    // 系统类
+
+    // 其他类
 }

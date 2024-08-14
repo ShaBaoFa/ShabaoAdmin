@@ -15,12 +15,16 @@ namespace App\Command;
 use App\Amqp\Producer\DelayedMessageProducer;
 use App\Amqp\Producer\MessageProducer;
 use App\Constants\ErrorCode;
+use App\Constants\QueueMesContentTypeCode;
 use App\Exception\BusinessException;
+use App\Model\Message;
+use App\Vo\QueueMessageVo;
 use Carbon\Carbon;
 use Hyperf\Amqp\Producer;
 use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
 use Hyperf\Contract\ConfigInterface;
+use Hyperf\DbConnection\Db;
 use OSS\Core\OssException;
 use OSS\Http\RequestCore_Exception;
 use OSS\OssClient;
@@ -52,14 +56,49 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        var_dump(true && true ?: '123');
+        //        for ($i = 0; $i < 500; ++$i) {
+        //            // 随机一个过去的时间
+        //            $time = rand(0, 10);
+        //            $time = Carbon::now()->subDays($time)->toDateTimeString();
+        //            $send_by = rand(1, 4);
+        //            $receive_by = rand(5, 10);
+        //            Message::insert(['send_by' => $send_by, 'receive_by' => $receive_by, 'title' => '123', 'content' => '123', 'content_type' => '1', 'created_at' => $time]);
+        //        }
+        // 第一步：获取步骤1的结果并将其作为子查询
+        $subQuery = Db::table('messages')
+            ->selectRaw('LEAST(send_by, receive_by) AS user1, GREATEST(send_by, receive_by) AS user2, MAX(created_at) AS first_message_time')
+            ->where(function ($query) {
+                $query->where('send_by', 2)
+                    ->orWhere('receive_by', 2);
+            })
+            ->where('content_type', 1)
+            ->groupBy(Db::raw('LEAST(send_by, receive_by), GREATEST(send_by, receive_by)'));
+
+        // 第二步：使用子查询与原表进行 JOIN
+        $messages = Db::table('messages')
+            ->joinSub($subQuery, 'sub', function ($join) {
+                $join->on(Db::raw('LEAST(messages.send_by, messages.receive_by)'), '=', 'sub.user1')
+                    ->on(Db::raw('GREATEST(messages.send_by, messages.receive_by)'), '=', 'sub.user2')
+                    ->on('messages.created_at', '=', 'sub.first_message_time');
+            })
+            ->select('messages.*')
+            ->get();
+        // 执行查询
+        var_dump(count($messages));
+
         return;
-        for ($i = 0; $i < 4; ++$i) {
-            //            $message = new MessageProducer('produceTime:' . Carbon::now()->toDateTimeString());
-            $message = new DelayedMessageProducer($i);
-            //            $producer = di()->get(Producer::class);
-            //            var_dump($producer->produce($message,true));
-        }
+        //        $vo = new QueueMessageVo();
+        //        $vo->setTitle('123');
+        //        $vo->setContent('123');
+        //        $vo->setContentType(QueueMesContentTypeCode::TYPE_ANNOUNCE);
+        //        var_dump($vo->toMap());
+        //        return;
+        //        for ($i = 0; $i < 4; ++$i) {
+        //            //            $message = new MessageProducer('produceTime:' . Carbon::now()->toDateTimeString());
+        //            $message = new DelayedMessageProducer($i);
+        //            //            $producer = di()->get(Producer::class);
+        //            //            var_dump($producer->produce($message,true));
+        //        }
         // amqp
         // 1.delayed + direct
         // 发送50次 delay+direct消息

@@ -17,5 +17,5 @@ use Hyperf\Amqp\Message\ProducerMessageInterface;
 
 interface QueueLogServiceInterface
 {
-    public function pushMessage(ProducerMessageInterface $producer, QueueMessageVo $messageVo, array $option = []): bool;
+    public function pushMessage(ProducerMessageInterface $producer, QueueMessageVo $messageVo): bool;
 }

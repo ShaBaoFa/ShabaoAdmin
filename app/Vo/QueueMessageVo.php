@@ -12,32 +12,34 @@ declare(strict_types=1);
 
 namespace App\Vo;
 
+use App\Constants\QueueMesContentTypeCode;
+
 class QueueMessageVo
 {
     /**
      * 消息标题.
      */
-    protected string $title;
+    protected string $title = '';
 
     /**
      * 消息类型.
      */
-    protected string $contentType;
+    protected QueueMesContentTypeCode $contentType;
 
     /**
      * 消息内容.
      */
-    protected string $content;
+    protected string $content = '';
 
     /**
      * 发送人.
      */
-    protected int $sendBy;
+    protected int $sendBy = 0;
 
     /**
      * 备注.
      */
-    protected string $remark;
+    protected string $remark = '';
 
     /**
      * 是否需要确认.
@@ -53,6 +55,21 @@ class QueueMessageVo
      * 队列延迟生产时间秒.
      */
     protected int $delayTime = 0;
+
+    /**
+     * 额外配置.
+     */
+    protected array $options = [];
+
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    public function setOptions(array $options): void
+    {
+        $this->options = $options;
+    }
 
     /**
      * @return mixed
@@ -74,7 +91,7 @@ class QueueMessageVo
     /**
      * @return mixed
      */
-    public function getContentType(): string
+    public function getContentType(): QueueMesContentTypeCode
     {
         return $this->contentType;
     }
@@ -82,7 +99,7 @@ class QueueMessageVo
     /**
      * @return $this
      */
-    public function setContentType(string $contentType): QueueMessageVo
+    public function setContentType(QueueMesContentTypeCode $contentType): QueueMessageVo
     {
         $this->contentType = $contentType;
         return $this;
@@ -163,6 +180,40 @@ class QueueMessageVo
     public function setDelayTime(int $delayTime): QueueMessageVo
     {
         $this->delayTime = $delayTime;
+        return $this;
+    }
+
+    public function toMap(): array
+    {
+        return [
+            'title' => $this->getTitle(),
+            'content' => $this->getContent(),
+            'content_type' => $this->getContentType()->value,
+            'send_by' => $this->getSendBy(),
+            'remark' => $this->getRemark(),
+            'is_confirm' => $this->getIsConfirm(),
+            'timeout' => $this->getTimeout(),
+            'delay_time' => $this->getDelayTime(),
+            'options' => $this->getOptions(),
+        ];
+    }
+
+    public function fromMap(array $map): QueueMessageVo
+    {
+        $this->setTitle($map['title'] ?? $this->getTitle());
+        $this->setContent($map['content'] ?? $this->getContent());
+
+        if (isset($map['content_type']) && QueueMesContentTypeCode::tryFrom($map['content_type']) !== null) {
+            $this->setContentType(QueueMesContentTypeCode::from($map['content_type']));
+        }
+
+        $this->setSendBy($map['send_by'] ?? $this->getSendBy());
+        $this->setRemark($map['remark'] ?? $this->getRemark());
+        $this->setIsConfirm($map['is_confirm'] ?? $this->getIsConfirm());
+        $this->setTimeout($map['timeout'] ?? $this->getTimeout());
+        $this->setDelayTime($map['delay_time'] ?? $this->getDelayTime());
+        $this->setOptions($map['options'] ?? $this->getOptions());
+
         return $this;
     }
 }
