@@ -14,9 +14,8 @@ namespace App\Dao;
 
 use App\Base\BaseDao;
 use App\Model\QueueLog;
+use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
-
-use function App\Helper\filled;
 
 class QueueLogDao extends BaseDao
 {
@@ -35,37 +34,43 @@ class QueueLogDao extends BaseDao
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-        // 交换机名称
-        if (isset($params['exchange_name']) && filled($params['exchange_name'])) {
-            $query->where('exchange_name', '=', $params['exchange_name']);
-        }
+        $query->when(
+            Arr::get($params, 'exchange_name'),
+            fn (Builder $query, $exchangeName) => $query->where('exchange_name', '=', $exchangeName)
+        );
 
-        // 路由名称
-        if (isset($params['routing_key_name']) && filled($params['routing_key_name'])) {
-            $query->where('routing_key_name', '=', $params['routing_key_name']);
-        }
+        $query->when(
+            Arr::get($params, 'routing_key_name'),
+            fn (Builder $query, $routingKeyName) => $query->where('routing_key_name', '=', $routingKeyName)
+        );
 
-        // 队列名称
-        if (isset($params['queue_name']) && filled($params['queue_name'])) {
-            $query->where('queue_name', '=', $params['queue_name']);
-        }
+        $query->when(
+            Arr::get($params, 'queue_name'),
+            fn (Builder $query, $queueName) => $query->where('queue_name', '=', $queueName)
+        );
 
-        // 生产状态 1:未生产 2:生产中 3:生产成功 4:生产失败 5:生产重复
-        if (isset($params['produce_status']) && filled($params['produce_status'])) {
-            $query->where('produce_status', '=', $params['produce_status']);
-        }
+        $query->when(
+            Arr::get($params, 'produce_status'),
+            fn (Builder $query, $produceStatus) => $query->where('produce_status', '=', $produceStatus)
+        );
 
-        // 消费状态 1:未消费 2:消费中 3:消费成功 4:消费失败 5:消费重复
-        if (isset($params['consume_status']) && filled($params['consume_status'])) {
-            $query->where('consume_status', '=', $params['consume_status']);
-        }
+        $query->when(
+            Arr::get($params, 'consume_status'),
+            fn (Builder $query, $consumeStatus) => $query->where('consume_status', '=', $consumeStatus)
+        );
 
-        if (isset($params['created_at']) && filled($params['created_at']) && is_array($params['created_at']) && count($params['created_at']) == 2) {
-            $query->whereBetween(
-                'created_at',
-                [$params['created_at'][0] . ' 00:00:00', $params['created_at'][1] . ' 23:59:59']
-            );
-        }
+        $query->when(
+            Arr::get($params, 'created_at'),
+            function (Builder $query, $createdAt) {
+                if (is_array($createdAt) && count($createdAt) === 2) {
+                    $query->whereBetween(
+                        'created_at',
+                        [$createdAt[0] . ' 00:00:00', $createdAt[1] . ' 23:59:59']
+                    );
+                }
+            }
+        );
+
         return $query;
     }
 }

@@ -16,13 +16,13 @@ use App\Base\BaseDao;
 use App\Model\Menu;
 use App\Model\User;
 use Hyperf\Cache\Annotation\CacheEvict;
+use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RedisException;
 
-use function App\Helper\filled;
 use function App\Helper\user;
 
 class MenuDao extends BaseDao
@@ -220,24 +220,33 @@ class MenuDao extends BaseDao
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-        if (isset($params['status']) && filled($params['status'])) {
-            $query->where('status', $params['status']);
-        }
+        $query->when(
+            Arr::get($params, 'status'),
+            fn (Builder $query, $status) => $query->where('status', $status)
+        );
 
-        if (isset($params['name']) && filled($params['name'])) {
-            $query->where('name', 'like', '%' . $params['name'] . '%');
-        }
+        $query->when(
+            $name = Arr::get($params, 'name'),
+            fn (Builder $query) => $query->where('name', 'like', '%' . $name . '%')
+        );
 
-        if (isset($params['created_at']) && filled($params['created_at']) && is_array($params['created_at']) && count($params['created_at']) == 2) {
-            $query->whereBetween(
-                'created_at',
-                [$params['created_at'][0] . ' 00:00:00', $params['created_at'][1] . ' 23:59:59']
-            );
-        }
+        $query->when(
+            Arr::get($params, 'created_at'),
+            function (Builder $query, $createdAt) {
+                if (is_array($createdAt) && count($createdAt) === 2) {
+                    $query->whereBetween(
+                        'created_at',
+                        [$createdAt[0] . ' 00:00:00', $createdAt[1] . ' 23:59:59']
+                    );
+                }
+            }
+        );
 
-        if (isset($params['noButton']) && filled($params['noButton']) && $params['noButton'] === true) {
-            $query->where('type', '<>', $this->model::BUTTON);
-        }
+        $query->when(
+            Arr::get($params, 'noButton') === true,
+            fn (Builder $query) => $query->where('type', '<>', $this->model::BUTTON)
+        );
+
         return $query;
     }
 }

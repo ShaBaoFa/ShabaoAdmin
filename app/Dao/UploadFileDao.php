@@ -17,6 +17,7 @@ use App\Constants\FileSystemCode;
 use App\Constants\UploadStatusCode;
 use App\Events\RealDeleteUploadFile;
 use App\Model\UploadFile;
+use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Filesystem\FilesystemFactory;
@@ -25,8 +26,6 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
-
-use function App\Helper\filled;
 
 class UploadFileDao extends BaseDao
 {
@@ -71,24 +70,38 @@ class UploadFileDao extends BaseDao
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-        if (isset($params['storage_mode']) && filled($params['storage_mode'])) {
-            $query->where('storage_mode', $params['storage_mode']);
-        }
-        if (isset($params['origin_name']) && filled($params['origin_name'])) {
-            $query->where('origin_name', 'like', '%' . $params['origin_name'] . '%');
-        }
-        if (isset($params['storage_path']) && filled($params['storage_path'])) {
-            $query->where('storage_path', 'like', $params['storage_path'] . '%');
-        }
-        if (isset($params['mime_type']) && filled($params['mime_type'])) {
-            $query->where('mime_type', 'like', $params['mime_type'] . '/%');
-        }
-        if (isset($params['minDate']) && filled($params['minDate']) && isset($params['maxDate']) && filled($params['maxDate'])) {
-            $query->whereBetween(
-                'created_at',
-                [$params['minDate'] . ' 00:00:00', $params['maxDate'] . ' 23:59:59']
-            );
-        }
+        $query->when(
+            Arr::get($params, 'storage_mode'),
+            fn (Builder $query, $storageMode) => $query->where('storage_mode', $storageMode)
+        );
+
+        $query->when(
+            Arr::get($params, 'origin_name'),
+            fn (Builder $query, $originName) => $query->where('origin_name', 'like', '%' . $originName . '%')
+        );
+
+        $query->when(
+            Arr::get($params, 'storage_path'),
+            fn (Builder $query, $storagePath) => $query->where('storage_path', 'like', $storagePath . '%')
+        );
+
+        $query->when(
+            Arr::get($params, 'mime_type'),
+            fn (Builder $query, $mimeType) => $query->where('mime_type', 'like', $mimeType . '/%')
+        );
+
+        $query->when(
+            Arr::get($params, 'created_at'),
+            function (Builder $query, $createdAt) {
+                if (is_array($createdAt) && count($createdAt) === 2) {
+                    $query->whereBetween(
+                        'created_at',
+                        [$createdAt[0] . ' 00:00:00', $createdAt[1] . ' 23:59:59']
+                    );
+                }
+            }
+        );
+
         return $query;
     }
 

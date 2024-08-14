@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace App\Base;
 
+use Hyperf\Collection\Arr;
 use Hyperf\HttpServer\Request;
 
 class BaseRequest extends Request
@@ -24,11 +25,11 @@ class BaseRequest extends Request
         $ip = $this->getServerParams()['remote_addr'] ?? '0.0.0.0';
         $headers = $this->getHeaders();
 
-        if (isset($headers['x-real-ip'])) {
+        if (Arr::has($headers, 'x-real-ip')) {
             $ip = $headers['x-real-ip'][0];
-        } elseif (isset($headers['x-forwarded-for'])) {
+        } elseif (Arr::has($headers, 'x-forwarded-for')) {
             $ip = $headers['x-forwarded-for'][0];
-        } elseif (isset($headers['http_x_forwarded_for'])) {
+        } elseif (Arr::has($headers, 'http_x_forwarded_for')) {
             $ip = $headers['http_x_forwarded_for'][0];
         }
 

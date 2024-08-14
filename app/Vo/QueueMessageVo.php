@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Vo;
 
 use App\Constants\QueueMesContentTypeCode;
+use Hyperf\Collection\Arr;
 
 class QueueMessageVo
 {
@@ -203,7 +204,7 @@ class QueueMessageVo
         $this->setTitle($map['title'] ?? $this->getTitle());
         $this->setContent($map['content'] ?? $this->getContent());
 
-        if (isset($map['content_type']) && QueueMesContentTypeCode::tryFrom($map['content_type']) !== null) {
+        if (Arr::has($map, 'content_type') && QueueMesContentTypeCode::tryFrom($map['content_type']) !== null) {
             $this->setContentType(QueueMesContentTypeCode::from($map['content_type']));
         }
 
