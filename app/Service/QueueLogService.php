@@ -24,7 +24,6 @@ use Hyperf\Amqp\Producer;
 use Hyperf\Codec\Json;
 use Throwable;
 
-use function App\Helper\user;
 use function Hyperf\Config\config;
 
 class QueueLogService extends BaseService implements QueueLogServiceInterface
@@ -44,7 +43,7 @@ class QueueLogService extends BaseService implements QueueLogServiceInterface
         $this->dao = $dao;
     }
 
-    public function pushMessage(ProducerMessageInterface $producer, QueueMessageVo $messageVo, array $option = []): bool
+    public function pushMessage(ProducerMessageInterface $producer, QueueMessageVo $messageVo): bool
     {
         if (! config('amqp.enable')) {
             throw new BusinessException(ErrorCode::QUEUE_NOT_ENABLE);
@@ -52,13 +51,7 @@ class QueueLogService extends BaseService implements QueueLogServiceInterface
         if (empty($messageVo->getTitle()) || empty($messageVo->getContent()) || empty($messageVo->getContentType())) {
             throw new BusinessException(ErrorCode::QUEUE_MISSING_MESSAGE);
         }
-        $data = [
-            'title' => $messageVo->getTitle(),
-            'content' => $messageVo->getContent(),
-            'content_type' => $messageVo->getContentType(),
-            'send_by' => $messageVo->getSendBy() ?: user()->getId(),
-            'option' => $option,
-        ];
+        $data = array_merge($messageVo->toMap());
         $producer->setPayload($data);
         $queueName = strchr($producer->getRoutingKey(), '.', true) . '.queue';
         $id = $this->save([
