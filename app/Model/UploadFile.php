@@ -16,24 +16,24 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 
 /**
- * @property int $id
- * @property int $storage_mode
- * @property string $origin_name
- * @property string $object_name
- * @property string $hash
- * @property string $mime_type
- * @property string $storage_path
- * @property string $suffix
- * @property int $size_byte
- * @property string $size_info
- * @property string $url
- * @property int $status
- * @property int $created_by
- * @property int $updated_by
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property string $deleted_at
- * @property string $remark
+ * @property int $id 主键
+ * @property int $storage_mode 存储模式 (1.本地 2.阿里云OSS 3.FTP 4.内存 5.S3 6.Minio 7.七牛云 8.腾讯云COS)
+ * @property string $origin_name 原文件名
+ * @property string $object_name 新文件名
+ * @property string $hash 文件hash
+ * @property string $mime_type 资源类型
+ * @property string $storage_path 存储目录
+ * @property string $suffix 文件后缀
+ * @property int $size_byte 字节数
+ * @property string $size_info 文件大小
+ * @property string $url url地址
+ * @property int $status 状态 (1完成 2未完成)
+ * @property int $created_by 创建者
+ * @property int $updated_by 更新者
+ * @property Carbon $created_at 创建时间
+ * @property Carbon $updated_at 更新时间
+ * @property string $deleted_at 删除时间
+ * @property string $remark 备注
  */
 class UploadFile extends BaseModel
 {

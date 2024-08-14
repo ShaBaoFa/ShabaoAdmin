@@ -15,8 +15,8 @@ namespace App\Model;
 use App\Base\BaseModel;
 
 /**
- * @property int $role_id
- * @property int $department_id
+ * @property int $role_id 角色主键
+ * @property int $department_id 部门主键
  */
 class DepartmentRole extends BaseModel
 {

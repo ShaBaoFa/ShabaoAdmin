@@ -17,22 +17,23 @@ use Hyperf\Constants\Annotation\Message;
 use Hyperf\Constants\EnumConstantsTrait;
 
 #[Constants]
-enum ProduceStatusCode: int
+enum QueueMesContentTypeCode: int
 {
     use EnumConstantsTrait;
 
-    #[Message('common.produce_status_waiting')]
-    case PRODUCE_STATUS_WAITING = 1;
+    // 消息类
+    #[Message('common.queue_notice')]
+    case TYPE_NOTICE = 1;
 
-    #[Message('common.produce_status_doing')]
-    case PRODUCE_STATUS_DOING = 2;
+    #[Message('common.queue_announcement')]
+    case TYPE_ANNOUNCE = 2;
 
-    #[Message('common.produce_status_success')]
-    case PRODUCE_STATUS_SUCCESS = 3;
+    #[Message('common.queue_todo')]
+    case TYPE_TODO = 3;
 
-    #[Message('common.produce_status_fail')]
-    case PRODUCE_STATUS_FAIL = 4;
+    #[Message('common.queue_copy_mine')]
+    case TYPE_COPY_MINE = 4;
 
-    #[Message('common.produce_status_repeat')]
-    case PRODUCE_STATUS_REPEAT = 5;
+    #[Message('common.queue_private_message')]
+    case TYPE_PRIVATE_MESSAGE = 5;
 }

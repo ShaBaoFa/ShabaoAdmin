@@ -15,8 +15,8 @@ namespace App\Model;
 use App\Base\BaseModel;
 
 /**
- * @property int $user_id
- * @property int $role_id
+ * @property int $user_id 用户主键
+ * @property int $role_id 角色主键
  */
 class RoleUser extends BaseModel
 {

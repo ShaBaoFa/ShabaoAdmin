@@ -13,7 +13,6 @@ declare(strict_types=1);
 namespace App\Command;
 
 use App\Amqp\Producer\DelayedMessageProducer;
-use App\Amqp\Producer\MessageProducer;
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
 use Carbon\Carbon;
@@ -53,9 +52,9 @@ class TestCommand1 extends HyperfCommand
     public function handle(): void
     {
         // amqp
-        //1.delayed + direct
+        // 1.delayed + direct
         // 发送50次 delay+direct消息
-        for ($i = 0; $i < 1; $i++) {
+        for ($i = 0; $i < 1; ++$i) {
             $message = new DelayedMessageProducer('delay+direct produceTime:' . Carbon::now()->toDateTimeString());
             $message->setDelayMs(10000);
             $producer = di()->get(Producer::class);

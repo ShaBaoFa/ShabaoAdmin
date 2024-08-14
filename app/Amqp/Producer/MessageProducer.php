@@ -1,18 +1,24 @@
 <?php
 
 declare(strict_types=1);
+/**
+ * This file is part of web-api.
+ *
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
+ */
 
 namespace App\Amqp\Producer;
 
-use Hyperf\Amqp\Annotation\Producer;
-use Hyperf\Amqp\Message\ProducerMessage;
+use App\Base\BaseProducer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-use function App\Helper\console;
+use function Hyperf\Config\config;
 
-#[Producer(exchange: 'web-api', routingKey: 'message.routing')]
-class MessageProducer extends ProducerMessage
+class MessageProducer extends BaseProducer
 {
     /**
      * @throws ContainerExceptionInterface
@@ -20,14 +26,8 @@ class MessageProducer extends ProducerMessage
      */
     public function __construct(mixed $data)
     {
-        console()->info(
-            sprintf(
-                'web-api created queue message time at: %s, data is: %s',
-                date('Y-m-d H:i:s'),
-                (is_array($data) || is_object($data)) ? json_encode($data) : $data
-            )
-        );
-        $this->payload = $data;
+        $this->setExchange(config('base-common.queue_exchange'));
+        $this->setRoutingKey($this->generateRoutingKey());
+        parent::__construct($data);
     }
-
 }

@@ -106,6 +106,13 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.file_has_not_been_uploaded')]
     case FILE_HAS_NOT_BEEN_UPLOADED = 70009;
 
+    // QueueLogService
+    #[Message('common.queue_not_enable')]
+    case QUEUE_NOT_ENABLE = 80001;
+
+    #[Message('common.queue_missing_message')]
+    case QUEUE_MISSING_MESSAGE = 80002;
+
     public function getMessage(?array $translate = null): string
     {
         $arguments = [];

@@ -12,17 +12,14 @@ declare(strict_types=1);
 
 namespace App\Amqp\Producer;
 
-use Hyperf\Amqp\Annotation\Producer;
+use App\Base\BaseProducer;
 use Hyperf\Amqp\Message\ProducerDelayedMessageTrait;
-use Hyperf\Amqp\Message\ProducerMessage;
-use Hyperf\Amqp\Message\Type;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-use function App\Helper\console;
+use function Hyperf\Config\config;
 
-#[Producer(exchange: 'web-api.delay', routingKey: 'delay.message.routing')]
-class DelayedMessageProducer extends ProducerMessage
+class DelayedMessageProducer extends BaseProducer
 {
     use ProducerDelayedMessageTrait;
 
@@ -32,13 +29,8 @@ class DelayedMessageProducer extends ProducerMessage
      */
     public function __construct(mixed $data)
     {
-        console()->info(
-            sprintf(
-                'web-api created delay queue message time at: %s, data is: %s',
-                date('Y-m-d H:i:s'),
-                (is_array($data) || is_object($data)) ? json_encode($data) : $data
-            )
-        );
-        $this->payload = $data;
+        $this->setExchange(config('base-common.queue_exchange'));
+        $this->setRoutingKey($this->generateRoutingKey());
+        parent::__construct($data);
     }
 }

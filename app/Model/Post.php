@@ -17,12 +17,12 @@ use Carbon\Carbon;
 
 /**
  * @property int $id
- * @property string $name
- * @property string $code
- * @property int $status
- * @property int $created_by
- * @property int $updated_by
- * @property string $remark
+ * @property string $name 岗位名称
+ * @property string $code 岗位代码
+ * @property int $status 状态 (1正常 2停用)
+ * @property int $created_by 创建者
+ * @property int $updated_by 更新者
+ * @property string $remark 备注
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at

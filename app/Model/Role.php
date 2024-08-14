@@ -19,14 +19,14 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
  * @property int $id
- * @property string $name
- * @property string $code
- * @property int $type
- * @property int $data_scope
- * @property int $status
- * @property int $created_by
- * @property int $updated_by
- * @property string $remark
+ * @property string $name 角色名称
+ * @property string $code 角色代码
+ * @property int $type 角色类型(1公共角色 2UGC角色)
+ * @property int $data_scope 数据范围（1：全部数据权限 2：自定义数据权限 3：本部门数据权限 4：本部门及以下数据权限 5：本人数据权限）
+ * @property int $status 状态 (1正常 2停用)
+ * @property int $created_by 创建者
+ * @property int $updated_by 更新者
+ * @property string $remark 备注
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at

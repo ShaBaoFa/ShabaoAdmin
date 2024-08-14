@@ -81,4 +81,11 @@ return [
     'consume_status_success' => '消费成功',
     'consume_status_fail' => '消费失败',
     'consume_status_repeat' => '重复消费',
+
+    // queue_mes
+    'queue_notice' => '通知',
+    'queue_announcement' => '公告',
+    'queue_todo' => '待办',
+    'queue_copy_mine' => '抄送我的',
+    'queue_private_message' => '私信',
 ];
