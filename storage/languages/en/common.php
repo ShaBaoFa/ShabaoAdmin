@@ -82,10 +82,11 @@ return [
     'consume_status_fail' => 'consume_status_fail',
     'consume_status_repeat' => 'consume_status_repeat',
 
-    // queue_mes
-    'queue_notice' => 'queue_notice',
-    'queue_announcement' => 'queue_announcement',
-    'queue_todo' => 'queue_todo',
-    'queue_copy_mine' => 'queue_copy_mine',
-    'queue_private_message' => 'queue_private_message',
+    // message
+    'message_notice' => 'message_notice',
+    'message_announcement' => 'message_announcement',
+    'message_todo' => 'message_todo',
+    'message_copy_mine' => 'message_copy_mine',
+    'message_private_message' => 'message_private_message',
+    'message_cannot_send_to_yourself' => 'message_cannot_send_to_yourself',
 ];

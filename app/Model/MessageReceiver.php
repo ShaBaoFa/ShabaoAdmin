@@ -12,14 +12,14 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use App\Base\BaseModel;
+use Hyperf\Database\Model\Relations\Pivot;
 
 /**
  * @property int $message_id 队列消息主键
  * @property int $receiver_id 接收用户主键
  * @property int $read_status 已读状态 (1未读 2已读)
  */
-class MessageReceiver extends BaseModel
+class MessageReceiver extends Pivot
 {
     /**
      * The table associated with the model.

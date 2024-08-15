@@ -17,24 +17,24 @@ use Hyperf\Constants\Annotation\Message;
 use Hyperf\Constants\EnumConstantsTrait;
 
 #[Constants]
-enum QueueMesContentTypeCode: int
+enum MessageContentTypeCode: int
 {
     use EnumConstantsTrait;
 
     // 消息类
-    #[Message('common.queue_notice')]
+    #[Message('common.message_notice')]
     case TYPE_NOTICE = 1001;
 
-    #[Message('common.queue_announcement')]
+    #[Message('common.message_announcement')]
     case TYPE_ANNOUNCE = 1002;
 
-    #[Message('common.queue_todo')]
+    #[Message('common.message_todo')]
     case TYPE_TODO = 1003;
 
-    #[Message('common.queue_copy_mine')]
+    #[Message('common.message_copy_mine')]
     case TYPE_COPY_MINE = 1004;
 
-    #[Message('common.queue_private_message')]
+    #[Message('common.message_private_message')]
     case TYPE_PRIVATE_MESSAGE = 1005;
 
     // 订单类

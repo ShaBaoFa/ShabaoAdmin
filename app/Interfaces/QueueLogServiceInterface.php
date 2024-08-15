@@ -12,10 +12,6 @@ declare(strict_types=1);
 
 namespace App\Interfaces;
 
-use App\Vo\QueueMessageVo;
-use Hyperf\Amqp\Message\ProducerMessageInterface;
-
 interface QueueLogServiceInterface
 {
-    public function pushMessage(ProducerMessageInterface $producer, QueueMessageVo $messageVo): bool;
 }

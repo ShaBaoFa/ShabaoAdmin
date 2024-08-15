@@ -82,10 +82,11 @@ return [
     'consume_status_fail' => '消费失败',
     'consume_status_repeat' => '重复消费',
 
-    // queue_mes
-    'queue_notice' => '通知',
-    'queue_announcement' => '公告',
-    'queue_todo' => '待办',
-    'queue_copy_mine' => '抄送我的',
-    'queue_private_message' => '私信',
+    // message
+    'message_notice' => '通知',
+    'message_announcement' => '公告',
+    'message_todo' => '待办',
+    'message_copy_mine' => '抄送我的',
+    'message_private_message' => '私信',
+    'message_cannot_send_to_yourself' => '不能发送给自己',
 ];
