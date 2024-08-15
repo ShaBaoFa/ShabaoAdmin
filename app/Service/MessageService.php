@@ -53,6 +53,10 @@ class MessageService extends BaseService
             'content' => $params['content'],
             'content_type' => MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value,
         ];
+        /**
+         * 使用RabbitMQ异步发送私信会在model save的时候出现 user()->check() 失败. 因为队列的信息是不包含token，也不应该包含token....
+         * 所以这里直接使用同步的方式发送私信.
+         */
         if (config('amqp.enable') && di()->get(MessageConsumer::class)->isEnable()) {
             $amqpQueueVo = new AmqpQueueVo();
             $amqpQueueVo->setProducer(MessageProducer::class);
