@@ -15,8 +15,9 @@ namespace App\Model;
 use App\Base\BaseModel;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Collection;
-use Hyperf\Database\Model\Relations\BelongsToMany;
+use Hyperf\Database\Model\Relations\HasManyThrough;
 use Hyperf\Database\Model\Relations\HasOne;
+use Hyperf\Database\Model\Relations\HasOneThrough;
 
 /**
  * @property int $id 主键
@@ -58,11 +59,30 @@ class Message extends BaseModel
         return $this->hasOne(User::class, 'id', 'send_by');
     }
 
+    public function receiveUser(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            User::class, // 最终你想获取的模型
+            MessageReceiver::class, // 中间模型
+            'message_id', // MessageReceiver 表中的外键
+            'id', // User 表中的本地键
+            'id', // Message 表中的本地键
+            'receiver_id' // MessageReceiver 表中的本地键
+        );
+    }
+
     /**
      * 关联接收人中间表.
      */
-    public function receiveUsers(): BelongsToMany
+    public function receiveUsers(): HasManyThrough
     {
-        return $this->belongsToMany(User::class, 'message_receivers', 'message_id', 'receiver_id')->as('receive_users')->withPivot(['read_status']);
+        return $this->hasManyThrough(
+            User::class, // 最终你想获取的模型
+            MessageReceiver::class, // 中间模型
+            'message_id', // MessageReceiver 表中的外键
+            'id', // User 表中的本地键
+            'id', // Message 表中的本地键
+            'receiver_id' // MessageReceiver 表中的本地键
+        ); // 加载 read_status 字段
     }
 }

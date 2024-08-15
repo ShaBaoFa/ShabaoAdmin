@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Aspect;
 
 use App\Base\BaseModel;
+use Hyperf\Collection\Arr;
 use Hyperf\Di\Annotation\Aspect;
 use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
@@ -39,21 +40,20 @@ class ModelSaveAspect extends AbstractAspect
     public function process(ProceedingJoinPoint $proceedingJoinPoint)
     {
         $instance = $proceedingJoinPoint->getInstance();
-
         if (config('base-common.data_scope_enabled')) {
             // 获取当前登录用户信息
             // 设置创建人
             if ($instance instanceof BaseModel && in_array($instance->getDataScopeField(), $instance->getFillable()) && is_null($instance[$instance->getDataScopeField()])) {
                 $user = user();
                 $user->check();
-                $instance[$instance->getDataScopeField()] = $user->getId();
+                $instance[$instance->getDataScopeField()] = Arr::get($user->getUserInfo(), 'id');
             }
 
             // 设置更新人
             if ($instance instanceof BaseModel && in_array('updated_by', $instance->getFillable())) {
                 $user = user();
                 $user->check();
-                $instance->updated_by = $user->getId();
+                $instance->updated_by = Arr::get($user->getUserInfo(), 'id');
             }
         }
         return $proceedingJoinPoint->process();

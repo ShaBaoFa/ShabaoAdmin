@@ -113,6 +113,11 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.queue_missing_message')]
     case QUEUE_MISSING_MESSAGE = 80002;
 
+    // Message
+    // 不可以对自己发私信
+    #[Message('common.message_cannot_send_to_yourself')]
+    case MESSAGE_CANNOT_SEND_TO_YOURSELF = 90001;
+
     public function getMessage(?array $translate = null): string
     {
         $arguments = [];

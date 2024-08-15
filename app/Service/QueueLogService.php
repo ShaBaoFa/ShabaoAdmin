@@ -18,13 +18,13 @@ use App\Constants\ProduceStatusCode;
 use App\Dao\QueueLogDao;
 use App\Exception\BusinessException;
 use App\Interfaces\QueueLogServiceInterface;
-use App\Vo\QueueMessageVo;
-use Hyperf\Amqp\Message\ProducerMessageInterface;
+use App\Vo\AmqpQueueVo;
 use Hyperf\Amqp\Producer;
 use Hyperf\Codec\Json;
 use Throwable;
 
 use function Hyperf\Config\config;
+use function Hyperf\Support\make;
 
 class QueueLogService extends BaseService implements QueueLogServiceInterface
 {
@@ -43,31 +43,32 @@ class QueueLogService extends BaseService implements QueueLogServiceInterface
         $this->dao = $dao;
     }
 
-    public function pushMessage(ProducerMessageInterface $producer, QueueMessageVo $messageVo): bool
+    public function addQueue(AmqpQueueVo $amqpQueueVo): bool
     {
-        if (! config('amqp.enable')) {
+        if (! config('amqp.enable') || ! class_exists($amqpQueueVo->getProducer())) {
             throw new BusinessException(ErrorCode::QUEUE_NOT_ENABLE);
         }
-        if (empty($messageVo->getTitle()) || empty($messageVo->getContent()) || empty($messageVo->getContentType())) {
+        if (empty($amqpQueueVo->getData())) {
             throw new BusinessException(ErrorCode::QUEUE_MISSING_MESSAGE);
         }
-        $data = array_merge($messageVo->toMap());
-        $producer->setPayload($data);
+        $class = $amqpQueueVo->getProducer();
+        // 通过反射获取实例
+        $producer = make($class, [$amqpQueueVo->getData()]);
         $queueName = strchr($producer->getRoutingKey(), '.', true) . '.queue';
         $id = $this->save([
             'exchange_name' => $producer->getExchange(),
             'routing_key_name' => $producer->getRoutingKey(),
             'queue_name' => $queueName,
             'queue_content' => $producer->payload(),
-            'delay_time' => $messageVo->getDelayTime() ?? 0,
+            'delay_time' => $amqpQueueVo->getDelayTime() ?? 0,
             'produce_status' => ProduceStatusCode::PRODUCE_STATUS_WAITING->value,
         ]);
         $payload = Json::decode($producer->payload());
         $producer->setPayload([
             'queue_id' => $id, 'data' => $payload,
         ]);
-        if ($messageVo->getDelayTime() > 0 && method_exists($producer, 'setDelayMs')) {
-            $producer->setDelayMs($messageVo->getDelayTime() * 1000);
+        if ($amqpQueueVo->getDelayTime() > 0 && method_exists($producer, 'setDelayMs')) {
+            $producer->setDelayMs($amqpQueueVo->getDelayTime() * 1000);
         }
         try {
             $result = $this->producer->produce($producer);
