@@ -26,8 +26,6 @@ use Psr\Container\NotFoundExceptionInterface;
 
 use function App\Helper\user;
 use function Hyperf\Config\config;
-use function Swow\Utils\info;
-use function Symfony\Component\String\u;
 
 class MessageService extends BaseService
 {
@@ -84,10 +82,9 @@ class MessageService extends BaseService
             'getPrivateConversationInfo' => $params['receive_by'],
             'orderBy' => 'created_at',
             'orderType' => 'desc',
-            'select' => ['id', 'content', 'content_type', 'created_at', 'send_by', 'receive_by']
+            'select' => ['id', 'content', 'content_type', 'created_at', 'send_by', 'receive_by'],
         ]);
     }
-
 
     public function getPrivateConversationList($params): array
     {
@@ -96,6 +93,21 @@ class MessageService extends BaseService
             'orderBy' => 'created_at',
             'orderType' => 'desc',
             'select' => ['id', 'content', 'content_type', 'created_at', 'send_by']]);
+    }
+
+    /**
+     * 获取未读消息.
+     */
+    public function getUnreadMessages(?int $id = null): array
+    {
+        $params = [
+            'user_id' => ! empty($id) ? $id : user()->getId(),
+            'orderBy' => 'created_at',
+            'orderType' => 'desc',
+            'getUnreadMessages' => true,
+            'read_status' => MessageContentTypeCode::STATUS_MESSAGE_UNREAD->value,
+        ];
+        return $this->dao->getPageList($params, false);
     }
 
     public function handleData(array $params): array

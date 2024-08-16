@@ -37,6 +37,14 @@ enum MessageContentTypeCode: int
     #[Message('common.message_private_message')]
     case TYPE_PRIVATE_MESSAGE = 1005;
 
+    // 信息已读
+    #[Message('common.message_read')]
+    case STATUS_MESSAGE_READ = 2;
+
+    // 信息未读
+    #[Message('common.message_unread')]
+    case STATUS_MESSAGE_UNREAD = 1;
+
     // 订单类
 
     // 系统类

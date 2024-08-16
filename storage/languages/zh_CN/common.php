@@ -89,4 +89,6 @@ return [
     'message_copy_mine' => '抄送我的',
     'message_private_message' => '私信',
     'message_cannot_send_to_yourself' => '不能发送给自己',
+    'message_read' => '已读',
+    'message_unread' => '未读',
 ];

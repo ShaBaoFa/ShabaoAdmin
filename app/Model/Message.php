@@ -15,7 +15,7 @@ namespace App\Model;
 use App\Base\BaseModel;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Collection;
-use Hyperf\Database\Model\Relations\HasManyThrough;
+use Hyperf\Database\Model\Relations\BelongsToMany;
 use Hyperf\Database\Model\Relations\HasOne;
 use Hyperf\Database\Model\Relations\HasOneThrough;
 
@@ -74,7 +74,7 @@ class Message extends BaseModel
     /**
      * 关联接收人中间表.
      */
-    public function receiveUsers(): \Hyperf\Database\Model\Relations\BelongsToMany
+    public function receiveUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'message_receivers', 'message_id', 'receiver_id')
             ->withPivot('read_status'); // 读取额外的字段

@@ -60,4 +60,14 @@ class MessageController extends BaseController
     {
         return $this->response->success($this->service->getPrivateConversationList($request->all()));
     }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[GetMapping('getUnreadMessages'), Permission('messages:get_unread_messages')]
+    public function getUnreadMessages(MessageRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->getUnreadMessages());
+    }
 }
