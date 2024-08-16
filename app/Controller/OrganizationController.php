@@ -46,7 +46,7 @@ class OrganizationController extends BaseController
     }
 
     /**
-     * 回收站组织树列表.
+     * 回收站组织列表.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
@@ -54,6 +54,27 @@ class OrganizationController extends BaseController
     public function recycle(): ResponseInterface
     {
         return $this->response->success($this->service->getListByRecycle($this->request->all()));
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[GetMapping('treeIndex'), Permission('organizations, organizations:index')]
+    public function treeIndex(): ResponseInterface
+    {
+        return $this->response->success($this->service->getTreeList($this->request->all()));
+    }
+
+    /**
+     * 回收站部门树列表.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[GetMapping('treeRecycle'), Permission('organizations:recycle')]
+    public function treeRecycle(): ResponseInterface
+    {
+        return $this->response->success($this->service->getTreeListByRecycle($this->request->all()));
     }
 
     /**
