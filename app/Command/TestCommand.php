@@ -15,6 +15,7 @@ namespace App\Command;
 use App\Amqp\Producer\DelayedMessageProducer;
 use App\Amqp\Producer\MessageProducer;
 use App\Constants\ErrorCode;
+use App\Constants\MessageContentTypeCode;
 use App\Constants\QueueMesContentTypeCode;
 use App\Exception\BusinessException;
 use App\Model\Message;
@@ -56,22 +57,32 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        //        for ($i = 0; $i < 500; ++$i) {
-        //            // 随机一个过去的时间
-        //            $time = rand(0, 10);
-        //            $time = Carbon::now()->subDays($time)->toDateTimeString();
-        //            $send_by = rand(1, 4);
-        //            $receive_by = rand(5, 10);
-        //            Message::insert(['send_by' => $send_by, 'receive_by' => $receive_by, 'title' => '123', 'content' => '123', 'content_type' => '1', 'created_at' => $time]);
-        //        }
+                for ($i = 0; $i < 1; ++$i) {
+                    // 随机一个过去的时间
+                    $day = rand(0, 10);
+                    $hour = rand(0, 10);
+                    $minute = rand(0, 10);
+                    $second = rand(0, 10);
+                    $time = Carbon::now()->subDays($day)->subHours($hour)->subMinutes($minute)->subSeconds($second)->toDateTimeString();
+                    $send_by = rand(1, 3);
+                    $receive_by = rand(1, 3);
+                    while ($send_by == $receive_by){
+                        $send_by = rand(1, 3);
+                        $receive_by = rand(1, 3);
+                    }
+                    $messageId = Message::insertGetId(['send_by' => $send_by, 'receive_by' => $receive_by, 'content' => '123', 'content_type' => MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value, 'created_at' => $time]);
+                    $message = Message::find($messageId);
+                    $message->receiveUsers()->sync($receive_by);
+                }
+                return;
         // 第一步：获取步骤1的结果并将其作为子查询
         $subQuery = Db::table('messages')
             ->selectRaw('LEAST(send_by, receive_by) AS user1, GREATEST(send_by, receive_by) AS user2, MAX(created_at) AS first_message_time')
             ->where(function ($query) {
-                $query->where('send_by', 2)
-                    ->orWhere('receive_by', 2);
+                $query->where('send_by', 1)
+                    ->orWhere('receive_by', 1);
             })
-            ->where('content_type', 1)
+            ->where('content_type', MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value)
             ->groupBy(Db::raw('LEAST(send_by, receive_by), GREATEST(send_by, receive_by)'));
 
         // 第二步：使用子查询与原表进行 JOIN

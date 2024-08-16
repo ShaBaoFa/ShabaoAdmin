@@ -49,6 +49,18 @@ class MessageDao extends BaseDao
         return $model->{$model->getKeyName()};
     }
 
+    #[Transactional]
+    public function saveByQueue($data): int
+    {
+        $receiveBy = $data['receive_by'];
+        $this->filterExecuteAttributes($data);
+        Arr::get($data, 'content_type') != MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value && Arr::forget($data, 'receive_by');
+        $modelId = $this->model::insertGetId($data);
+        if (!Arr::accessible($receiveBy) && is_int($receiveBy)) $receiveBy = [$receiveBy];
+        Message::find($modelId)->receiveUsers()->sync($receiveBy);
+        return $modelId;
+    }
+
     /**
      * 获取私信对话详情(只取当前用户的私信).
      */
@@ -134,6 +146,15 @@ class MessageDao extends BaseDao
                         [$createdAt[0] . ' 00:00:00', $createdAt[1] . ' 23:59:59']
                     );
                 }
+            }
+        );
+
+        $query->when(
+            Arr::get($params,'getPrivateConversationList'),
+            function (Builder $query) {
+                $query->with(['sendUser' => function ($query) {
+                    $query->select(['id', 'username']);
+                }]);
             }
         );
 
