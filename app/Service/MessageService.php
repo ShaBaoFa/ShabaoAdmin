@@ -18,9 +18,12 @@ use App\Base\BaseService;
 use App\Constants\ErrorCode;
 use App\Constants\MessageContentTypeCode;
 use App\Dao\MessageDao;
+use App\Events\PrivateMessageSent;
 use App\Exception\BusinessException;
 use App\Vo\AmqpQueueVo;
 use Carbon\Carbon;
+use Hyperf\Collection\Arr;
+use Hyperf\Event\EventDispatcher;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -51,18 +54,21 @@ class MessageService extends BaseService
         $data = [
             'send_by' => user()->getId(),
             'receive_by' => $params['receive_by'],
-            $this->dao->getModel()->getDataScopeField() => user()->getId(),
-            'updated_by' => user()->getId(),
             'content' => $params['content'],
             'content_type' => MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value,
-            'created_at' => Carbon::now()->toDateTimeString(),
-            'updated_at' => Carbon::now()->toDateTimeString(),
         ];
         /**
          * 使用RabbitMQ异步发送私信会在model save的时候出现 user()->check() 失败. 因为队列的信息是不包含token，也不应该包含token....
          * 所以这里直接使用同步的方式发送私信.
+         * 解决了(队列用 insert 不用 save).
          */
         if (config('amqp.enable') && di()->get(MessageConsumer::class)->isEnable()) {
+            $data = Arr::merge($data, [
+                'created_at' => Carbon::now()->toDateTimeString(),
+                'updated_at' => Carbon::now()->toDateTimeString(),
+                $this->dao->getModel()->getDataScopeField() => user()->getId(),
+                'updated_by' => user()->getId(),
+            ]);
             $amqpQueueVo = new AmqpQueueVo();
             $amqpQueueVo->setProducer(MessageProducer::class);
             $amqpQueueVo->setData($data);
@@ -70,7 +76,12 @@ class MessageService extends BaseService
                 return true;
             }
         }
-        return $this->dao->save($data) > 0;
+        $evDispatcher = di()->get(EventDispatcher::class);
+        if ($this->dao->save($data) > 0) {
+            $evDispatcher->dispatch(new PrivateMessageSent($data));
+            return true;
+        }
+        return false;
     }
 
     public function getPrivateConversationInfo($params): array

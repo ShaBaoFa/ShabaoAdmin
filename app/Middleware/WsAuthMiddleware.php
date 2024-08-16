@@ -32,7 +32,7 @@ class WsAuthMiddleware implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $token = Arr::get($request->getQueryParams(),'token');
+        $token = Arr::get($request->getQueryParams(), 'token');
         try {
             if ($token && user()->check($token)) {
                 return $handler->handle($request);

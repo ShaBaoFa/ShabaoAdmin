@@ -15,9 +15,10 @@ namespace App\Helper;
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
 use Countable;
-use Hyperf\Context\ApplicationContext;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Hyperf\HttpServer\Contract\RequestInterface;
+use Hyperf\Redis\Redis;
+use Hyperf\WebSocketServer\Sender;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -118,6 +119,30 @@ if (! function_exists('console')) {
      */
     function console(): StdoutLoggerInterface
     {
-        return ApplicationContext::getContainer()->get(StdoutLoggerInterface::class);
+        return di()->get(StdoutLoggerInterface::class);
+    }
+}
+
+if (! function_exists('redis')) {
+    /**
+     * 获取Redis实例.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    function redis(): Redis
+    {
+        return di()->get(Redis::class);
+    }
+}
+
+if (! function_exists('ws_sender')) {
+    /**
+     * 获取websocket发送实例.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    function ws_sender(): Sender
+    {
+        return di()->get(Sender::class);
     }
 }

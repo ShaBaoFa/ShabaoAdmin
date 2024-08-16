@@ -24,6 +24,7 @@ return [
     'user_not_login' => 'user_not_login',
     'user_login_failed' => 'user_login_failed',
     'user_ban' => 'user_ban',
+    'user_login_type_error' => 'user_login_type_error',
 
     // excel
     'export_data_failed' => 'export_data_failed',
@@ -91,4 +92,6 @@ return [
     'message_cannot_send_to_yourself' => 'message_cannot_send_to_yourself',
     'message_read' => 'message_read',
     'message_unread' => 'message_unread',
+    'new_message' => 'you have new message',
+    'new_private_message' => 'you have new private message',
 ];

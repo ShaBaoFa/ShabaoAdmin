@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 /**
- * This file is part of MineAdmin.
+ * This file is part of web-api.
  *
- * @link     https://www.mineadmin.com
- * @document https://doc.mineadmin.com
- * @contact  root@imoi.cn
- * @license  https://github.com/mineadmin/MineAdmin/blob/master/LICENSE
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
  */
 
 namespace App\Controller;
@@ -22,12 +22,16 @@ use Hyperf\WebSocketServer\Context;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use RedisException;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
+
 use function App\Helper\console;
+use function App\Helper\redis;
 use function App\Helper\user;
+use function Hyperf\Config\config;
 
 /**
  * Class ServerController.
@@ -40,6 +44,7 @@ class WsServerController implements OnMessageInterface, OnOpenInterface, OnClose
      * @param Request $request
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws RedisException
      */
     public function onOpen($server, $request): void
     {
@@ -47,7 +52,8 @@ class WsServerController implements OnMessageInterface, OnOpenInterface, OnClose
             di()->get(ServerRequestInterface::class)->getQueryParams()['token']
         )['id'];
         Context::set('uid', $uid);
-
+        $key = sprintf('%sws:uid:%s:fd:%s', config('cache.default.prefix'), $uid, $request->fd);
+        redis()->setex($key, config('jwt.ttl'), 1);
         console()->info(
             "WebSocket [ user connection to message server: id > {$uid}, " .
             "fd > {$request->fd}, time > " . date('Y-m-d H:i:s') . ' ]'
@@ -72,7 +78,8 @@ class WsServerController implements OnMessageInterface, OnOpenInterface, OnClose
                 $service = di()->get(MessageService::class);
                 $data = json_encode([
                     'event' => WsEventCode::EV_NEW_MESSAGE->value,
-                    'message' => 'success',
+                    'success' => true,
+                    'message' => WsEventCode::EV_NEW_MESSAGE->getMessage(),
                     'data' => $service->getUnreadMessages(Context::get('uid'))['items'],
                 ]);
                 $server->push($data);
@@ -85,9 +92,12 @@ class WsServerController implements OnMessageInterface, OnOpenInterface, OnClose
      * @param Response|\Swoole\Server $server
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws RedisException
      */
     public function onClose($server, int $fd, int $reactorId): void
     {
+        $key = sprintf('%sws:uid:%s:fd:%s', config('cache.default.prefix'), Context::get('uid'), $fd);
+        redis()->del($key);
         console()->info(
             'WebSocket [ user close connect for message server: id > ' . Context::get('uid') . ', ' .
             "fd > {$fd}, time > " . date('Y-m-d H:i:s') . ' ]'

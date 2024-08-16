@@ -24,6 +24,7 @@ return [
     'user_not_login' => '用户未登录',
     'user_login_failed' => '用户登录失败',
     'user_ban' => '用户被禁用',
+    'user_login_type_error' => '不正确的登陆方式',
 
     // excel
     'export_data_failed' => '导出数据失败',
@@ -91,4 +92,6 @@ return [
     'message_cannot_send_to_yourself' => '不能发送给自己',
     'message_read' => '已读',
     'message_unread' => '未读',
+    'new_message' => '您有新的消息',
+    'new_private_message' => '您有新的私信',
 ];

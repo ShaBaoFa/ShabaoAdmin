@@ -32,7 +32,7 @@ return [
             'callbacks' => [
                 Event::ON_REQUEST => [Hyperf\HttpServer\Server::class, 'onRequest'],
             ],
-            'open_websocket_protocol' => false
+            'open_websocket_protocol' => false,
         ],
         [
             'name' => 'message',
