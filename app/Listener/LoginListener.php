@@ -13,7 +13,9 @@ declare(strict_types=1);
 namespace App\Listener;
 
 use App\Base\BaseRequest;
+use App\Constants\ErrorCode;
 use App\Events\AfterLogin;
+use App\Exception\BusinessException;
 use App\Helper\Ip2region;
 use App\Model\LoginLog;
 use App\Model\User;
@@ -82,9 +84,10 @@ class LoginListener implements ListenerInterface
             $parserData = $jwt->getParserData($event->token);
             $scene = $parserData['jwt_scene'];
             $config = $jwt->getSceneConfig($scene);
-            $key = match ($config['login_type']) {
+            $key = match ((string) $config['login_type']) {
                 'sso' => sprintf('%sToken:%s', config('cache.default.prefix'), $event->userinfo['id']),
                 'mpop' => sprintf('%sToken:%s:%s', config('cache.default.prefix'), $event->userinfo['id'], $parserData['jti']),
+                default => throw new BusinessException(ErrorCode::USER_LOGIN_TYPE_ERROR),
             };
             $redis = di()->get(Redis::class);
             $redis->del($key);

@@ -16,7 +16,7 @@ use App\Annotation\Auth;
 use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Request\MessageRequest;
-use App\Service\messageservice;
+use App\Service\MessageService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
@@ -29,13 +29,13 @@ use Psr\Http\Message\ResponseInterface;
 class MessageController extends BaseController
 {
     #[Inject]
-    protected messageservice $service;
+    protected MessageService $service;
 
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PostMapping('sendPrivateMessage'), Permission('messages:send_private_message')]
+    #[PostMapping('sendPrivateMessage')]
     public function sendPrivateMessage(MessageRequest $request): ResponseInterface
     {
         return $this->service->sendPrivateMessage($request->all()) ? $this->response->success() : $this->response->fail();

@@ -18,7 +18,7 @@ use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Constants\ErrorCode;
 use App\Request\OrganizationRequest;
-use App\Service\organizationservice;
+use App\Service\OrganizationService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
@@ -33,7 +33,7 @@ use Psr\Http\Message\ResponseInterface;
 class OrganizationController extends BaseController
 {
     #[Inject]
-    protected organizationservice $service;
+    protected OrganizationService $service;
 
     /**
      * @throws ContainerExceptionInterface

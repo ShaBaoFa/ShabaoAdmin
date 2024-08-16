@@ -118,6 +118,7 @@ class UserService extends BaseService
     {
         $redis = di()->get(Redis::class);
         // 保证获取到所有token，方便一次性全部下线。
+        $iterator = null;
         $key = sprintf('%sToken:%s*', config('cache.default.prefix'), $id);
         while (false !== ($users = $redis->scan($iterator, $key, 100))) {
             $jwt = di()->get(JWT::class);
@@ -132,6 +133,7 @@ class UserService extends BaseService
             }
             unset($users);
         }
+        # todo::踢用户下线时应ws也全部踢掉,可以通过ws通知用户被踢了.
         return true;
     }
 

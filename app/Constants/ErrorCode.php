@@ -45,6 +45,10 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.user_not_login')]
     case NO_LOGIN_USER = 10004;
 
+    // 不正确的登陆方式
+    #[Message('common.user_login_type_error')]
+    case USER_LOGIN_TYPE_ERROR = 10005;
+
     # 导出数据失败
     #[Message('common.export_data_failed')]
     case EXPORT_DATA_FAILED = 20002;

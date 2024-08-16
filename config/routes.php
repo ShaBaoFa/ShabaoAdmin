@@ -10,11 +10,12 @@ declare(strict_types=1);
  * @contact  mail@wlfpanda1012.com
  */
 // 消息ws服务器
+use App\Controller\WsServerController;
 use App\Middleware\WsAuthMiddleware;
 use Hyperf\HttpServer\Router\Router;
 
 Router::addServer('message', function () {
-    Router::get('/ws.message.io', \App\Controller\WsServerController::class, [
+    Router::get('/ws.message.io', WsServerController::class, [
         'middleware' => [WsAuthMiddleware::class],
     ]);
 });

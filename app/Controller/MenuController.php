@@ -17,7 +17,7 @@ use App\Annotation\OperationLog;
 use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Request\MenuRequest;
-use App\Service\menuservice;
+use App\Service\MenuService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
@@ -32,7 +32,7 @@ use Psr\Http\Message\ResponseInterface;
 class MenuController extends BaseController
 {
     #[Inject]
-    protected menuservice $service;
+    protected MenuService $service;
 
     /**
      * 菜单树状列表.
