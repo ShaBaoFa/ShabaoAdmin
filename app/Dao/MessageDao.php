@@ -62,63 +62,6 @@ class MessageDao extends BaseDao
     }
 
     /**
-     * 获取私信对话详情(只取当前用户的私信).
-     */
-    public function getPrivateConversationInfo(int $id): array
-    {
-        $currentUserId = user()->getId();
-        $select = ['messages.id', 'messages.content', 'messages.content_type', 'messages.created_at', 'messages.send_by', 'messages.receive_by'];
-        return $this->model::query()
-            ->where(function ($query) use ($currentUserId, $id) {
-                $query->where('send_by', $currentUserId)
-                    ->where('receive_by', $id);
-            })
-            ->orWhere(function ($query) use ($currentUserId, $id) {
-                $query->where('send_by', $id)
-                    ->where('receive_by', $currentUserId);
-            })
-            ->with(['sendUser' => function ($query) {
-                $query->select(['id', 'username']);
-            }, 'receiveUser' => function ($query) {
-                $query->select(['id', 'username', 'message_receivers.read_status']);
-            }])->select($select)->get()->toArray();
-    }
-
-    /**
-     * 获取私信对话列表(只取当前用户的私信).
-     * @param mixed $params
-     */
-    public function getPrivateConversationList($params): array
-    {
-        $select = ['messages.id', 'messages.content', 'messages.content_type', 'messages.created_at', 'messages.send_by'];
-
-        $this->filterQueryAttributes($params);
-        $id = user()->getId();
-        // 第一步：获取步骤1的结果并将其作为子查询
-        $subQuery = Db::table('messages')
-            ->selectRaw('LEAST(send_by, receive_by) AS user1, GREATEST(send_by, receive_by) AS user2, MAX(created_at) AS last_message_time')
-            ->where(function ($query) use ($id) {
-                $query->where('send_by', $id)
-                    ->orWhere('receive_by', $id);
-            })
-            ->where('content_type', MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value)
-            ->groupBy(Db::raw('LEAST(send_by, receive_by), GREATEST(send_by, receive_by)'));
-
-        // 第二步：使用子查询与原表进行 JOIN
-        return $this->model::query()
-            ->joinSub($subQuery, 'sub', function ($join) {
-                $join->on(Db::raw('LEAST(messages.send_by, messages.receive_by)'), '=', 'sub.user1')
-                    ->on(Db::raw('GREATEST(messages.send_by, messages.receive_by)'), '=', 'sub.user2')
-                    ->on('messages.created_at', '=', 'sub.last_message_time');
-            })
-            ->select($select)
-            ->with(['sendUser' => function ($query) {
-                $query->select(['id', 'username']);
-            }])
-            ->get()->toArray();
-    }
-
-    /**
      * 搜索处理器.
      */
     public function handleSearch(Builder $query, array $params): Builder
@@ -149,15 +92,58 @@ class MessageDao extends BaseDao
             }
         );
 
+        /**
+         * 获取私信对话详情(只取当前用户的私信).
+         */
+        $query->when(
+            Arr::get($params, 'getPrivateConversationInfo'),
+            function (Builder $query, $id) {
+                $currentUserId = user()->getId();
+                return $query
+                    ->where(function ($query) use ($currentUserId, $id) {
+                        $query->where('send_by', $currentUserId)
+                            ->where('receive_by', $id);
+                    })
+                    ->orWhere(function ($query) use ($currentUserId, $id) {
+                        $query->where('send_by', $id)
+                            ->where('receive_by', $currentUserId);
+                    })
+                    ->with(['sendUser' => function ($query) {
+                        $query->select(['id', 'username']);
+                    }, 'receiveUser' => function ($query) {
+                        $query->select(['id', 'username', 'message_receivers.read_status']);
+                    }]);
+            }
+        );
+        /**
+         * 获取私信对话列表(只取当前用户的私信).
+         */
         $query->when(
             Arr::get($params,'getPrivateConversationList'),
             function (Builder $query) {
-                $query->with(['sendUser' => function ($query) {
-                    $query->select(['id', 'username']);
-                }]);
+                $id = user()->getId();
+                // 第一步：获取步骤1的结果并将其作为子查询
+                $subQuery = Db::table('messages')
+                    ->selectRaw('LEAST(send_by, receive_by) AS user1, GREATEST(send_by, receive_by) AS user2, MAX(created_at) AS last_message_time')
+                    ->where(function ($query) use ($id) {
+                        $query->where('send_by', $id)
+                            ->orWhere('receive_by', $id);
+                    })
+                    ->where('content_type', MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value)
+                    ->groupBy(Db::raw('LEAST(send_by, receive_by), GREATEST(send_by, receive_by)'));
+
+                // 第二步：使用子查询与原表进行 JOIN
+                return $query
+                    ->joinSub($subQuery, 'sub', function ($join) {
+                        $join->on(Db::raw('LEAST(messages.send_by, messages.receive_by)'), '=', 'sub.user1')
+                            ->on(Db::raw('GREATEST(messages.send_by, messages.receive_by)'), '=', 'sub.user2')
+                            ->on('messages.created_at', '=', 'sub.last_message_time');
+                    })
+                    ->with(['sendUser' => function ($query) {
+                        $query->select(['id', 'username']);
+                    }]);
             }
         );
-
         return $query;
     }
 }
