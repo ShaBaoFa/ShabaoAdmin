@@ -26,6 +26,7 @@ use Psr\Container\NotFoundExceptionInterface;
 
 use function App\Helper\user;
 use function Hyperf\Config\config;
+use function Swow\Utils\info;
 use function Symfony\Component\String\u;
 
 class MessageService extends BaseService
@@ -79,11 +80,26 @@ class MessageService extends BaseService
         if ($params['receive_by'] === user()->getId()) {
             throw new BusinessException(ErrorCode::MESSAGE_CANNOT_SEND_TO_YOURSELF);
         }
-        return $this->dao->getPrivateConversationInfo((int) $params['receive_by']);
+        return $this->dao->getPageList([
+            'getPrivateConversationInfo' => $params['receive_by'],
+            'orderBy' => 'created_at',
+            'orderType' => 'desc',
+            'select' => ['id', 'content', 'content_type', 'created_at', 'send_by', 'receive_by']
+        ]);
     }
+
 
     public function getPrivateConversationList($params): array
     {
-        return $this->dao->getPrivateConversationList($params);
+        return $this->dao->getPageList([
+            'getPrivateConversationList' => true,
+            'orderBy' => 'created_at',
+            'orderType' => 'desc',
+            'select' => ['id', 'content', 'content_type', 'created_at', 'send_by']]);
+    }
+
+    public function handleData(array $params): array
+    {
+        return $params;
     }
 }
