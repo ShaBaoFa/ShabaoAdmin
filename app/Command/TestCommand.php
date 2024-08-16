@@ -57,24 +57,24 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-                for ($i = 0; $i < 1; ++$i) {
-                    // 随机一个过去的时间
-                    $day = rand(0, 10);
-                    $hour = rand(0, 10);
-                    $minute = rand(0, 10);
-                    $second = rand(0, 10);
-                    $time = Carbon::now()->subDays($day)->subHours($hour)->subMinutes($minute)->subSeconds($second)->toDateTimeString();
-                    $send_by = rand(1, 3);
-                    $receive_by = rand(1, 3);
-                    while ($send_by == $receive_by){
-                        $send_by = rand(1, 3);
-                        $receive_by = rand(1, 3);
-                    }
-                    $messageId = Message::insertGetId(['send_by' => $send_by, 'receive_by' => $receive_by, 'content' => '123', 'content_type' => MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value, 'created_at' => $time]);
-                    $message = Message::find($messageId);
-                    $message->receiveUsers()->sync($receive_by);
-                }
-                return;
+        for ($i = 0; $i < 50; ++$i) {
+            // 随机一个过去的时间
+            $day = rand(0, 10);
+            $hour = rand(0, 10);
+            $minute = rand(0, 10);
+            $second = rand(0, 10);
+            $time = Carbon::now()->subDays($day)->subHours($hour)->subMinutes($minute)->subSeconds($second)->toDateTimeString();
+            $send_by = rand(1, 3);
+            $receive_by = rand(1, 3);
+            while ($send_by == $receive_by) {
+                $send_by = rand(1, 3);
+                $receive_by = rand(1, 3);
+            }
+            $messageId = Message::insertGetId(['send_by' => $send_by, 'receive_by' => $receive_by, 'content' => '123', 'content_type' => MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value, 'created_at' => $time, 'created_by' => $send_by, 'updated_by' => $send_by]);
+            $message = Message::find($messageId);
+            $message->receiveUsers()->sync([$receive_by]);
+        }
+        return;
         // 第一步：获取步骤1的结果并将其作为子查询
         $subQuery = Db::table('messages')
             ->selectRaw('LEAST(send_by, receive_by) AS user1, GREATEST(send_by, receive_by) AS user2, MAX(created_at) AS first_message_time')

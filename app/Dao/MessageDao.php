@@ -56,7 +56,9 @@ class MessageDao extends BaseDao
         $this->filterExecuteAttributes($data);
         Arr::get($data, 'content_type') != MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value && Arr::forget($data, 'receive_by');
         $modelId = $this->model::insertGetId($data);
-        if (!Arr::accessible($receiveBy) && is_int($receiveBy)) $receiveBy = [$receiveBy];
+        if (! Arr::accessible($receiveBy) && is_int($receiveBy)) {
+            $receiveBy = [$receiveBy];
+        }
         Message::find($modelId)->receiveUsers()->sync($receiveBy);
         return $modelId;
     }
@@ -93,6 +95,17 @@ class MessageDao extends BaseDao
         );
 
         /**
+         * 获取未读消息列表.
+         */
+        $query->when(
+            Arr::get($params, 'getUnreadMessages'),
+            function (Builder $query) use ($params) {
+                return $query->join('message_receivers', 'messages.id', '=', 'message_receivers.message_id')
+                    ->where('message_receivers.receiver_id', Arr::get($params, 'user_id'))
+                    ->where('message_receivers.read_status', Arr::get($params, 'read_status', MessageContentTypeCode::STATUS_MESSAGE_UNREAD->value));
+            }
+        );
+        /**
          * 获取私信对话详情(只取当前用户的私信).
          */
         $query->when(
@@ -119,7 +132,7 @@ class MessageDao extends BaseDao
          * 获取私信对话列表(只取当前用户的私信).
          */
         $query->when(
-            Arr::get($params,'getPrivateConversationList'),
+            Arr::get($params, 'getPrivateConversationList'),
             function (Builder $query) {
                 $id = user()->getId();
                 // 第一步：获取步骤1的结果并将其作为子查询

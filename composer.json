@@ -56,6 +56,7 @@
         "hyperf/swagger": "3.1.*",
         "hyperf/utils": "3.1.*",
         "hyperf/validation": "3.1.*",
+        "hyperf/websocket-server": "^3.1",
         "limingxinleo/hyperf-utils": "^3.9",
         "phpoffice/phpspreadsheet": "^1.24",
         "ramsey/uuid": "^4.7",
