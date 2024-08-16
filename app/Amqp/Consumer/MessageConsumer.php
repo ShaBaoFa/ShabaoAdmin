@@ -79,6 +79,6 @@ class MessageConsumer extends ConsumerMessage
 
     public function isEnable(): bool
     {
-        return false;
+        return true;
     }
 }

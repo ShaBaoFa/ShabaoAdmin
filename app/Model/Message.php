@@ -74,15 +74,9 @@ class Message extends BaseModel
     /**
      * 关联接收人中间表.
      */
-    public function receiveUsers(): HasManyThrough
+    public function receiveUsers(): \Hyperf\Database\Model\Relations\BelongsToMany
     {
-        return $this->hasManyThrough(
-            User::class, // 最终你想获取的模型
-            MessageReceiver::class, // 中间模型
-            'message_id', // MessageReceiver 表中的外键
-            'id', // User 表中的本地键
-            'id', // Message 表中的本地键
-            'receiver_id' // MessageReceiver 表中的本地键
-        ); // 加载 read_status 字段
+        return $this->belongsToMany(User::class, 'message_receivers', 'message_id', 'receiver_id')
+            ->withPivot('read_status'); // 读取额外的字段
     }
 }
