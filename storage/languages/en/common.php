@@ -92,6 +92,8 @@ return [
     'message_cannot_send_to_yourself' => 'message_cannot_send_to_yourself',
     'message_read' => 'message_read',
     'message_unread' => 'message_unread',
-    'new_message' => 'you have new message',
-    'new_private_message' => 'you have new private message',
+    // ws_event
+    'ev_new_message' => 'you have new message',
+    'ev_new_private_message' => 'you have new private message',
+    'ev_user_kick_out' => 'you have been kicked out',
 ];

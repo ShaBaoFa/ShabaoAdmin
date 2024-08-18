@@ -35,7 +35,7 @@ class WsSenderService
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
-    public function sendByUid($uid, $message): void
+    public function sendByUid(int $uid, string $message): array
     {
         $redis = di()->get(Redis::class);
         $key = sprintf('%sws:uid:%s:fd:*', config('cache.default.prefix'), $uid);
@@ -50,9 +50,32 @@ class WsSenderService
             unset($fds);
         }
         var_dump($fdIds);
+        $onlineFdIds = [];
         foreach ($fdIds as $fdId) {
             $key = sprintf('%sws:uid:%s:fd:%s', config('cache.default.prefix'), $uid, $fdId);
-            ! $this->sender->push((int) $fdId, $message) && $redis->del($key);
+            if (! $this->sender->push((int) $fdId, $message) && $redis->del($key)) {
+                continue;
+            }
+            $onlineFdIds[] = $fdId;
+        }
+        return $onlineFdIds;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     */
+    public function kickAndSendByUid(int $uid, string $message): void
+    {
+        $fdIds = $this->sendByUid($uid, $message);
+        foreach ($fdIds as $fdId) {
+            go(function () use ($fdId) {
+                sleep(1);
+                var_dump('before disconnect:' . $fdId);
+                $this->sender->disconnect((int) $fdId);
+                var_dump('after disconnect:' . $fdId);
+            });
         }
     }
 

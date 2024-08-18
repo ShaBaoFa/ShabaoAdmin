@@ -92,6 +92,9 @@ return [
     'message_cannot_send_to_yourself' => '不能发送给自己',
     'message_read' => '已读',
     'message_unread' => '未读',
-    'new_message' => '您有新的消息',
-    'new_private_message' => '您有新的私信',
+
+    // ws_event
+    'ev_new_message' => '您有新的消息',
+    'ev_new_private_message' => '您有新的私信',
+    'ev_user_kick_out' => '用户被踢出',
 ];
