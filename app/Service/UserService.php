@@ -17,11 +17,13 @@ use App\Constants\ErrorCode;
 use App\Dao\MenuDao;
 use App\Dao\RoleDao;
 use App\Dao\UserDao;
+use App\Events\AfterKickUser;
 use App\Exception\BusinessException;
 use App\Model\User;
 use Hyperf\Cache\Annotation\Cacheable;
 use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Collection\Arr;
+use Hyperf\Event\EventDispatcher;
 use Hyperf\Redis\Redis;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -133,7 +135,8 @@ class UserService extends BaseService
             }
             unset($users);
         }
-        # todo::踢用户下线时应ws也全部踢掉,可以通过ws通知用户被踢了.
+        $evDispatcher = di()->get(EventDispatcher::class);
+        $evDispatcher->dispatch(new AfterKickUser(['uid' => $id]));
         return true;
     }
 

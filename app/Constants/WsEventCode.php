@@ -23,9 +23,12 @@ enum WsEventCode: string
 
     case GET_UNREAD_MESSAGE = 'get_unread_message';
 
-    #[Message('common.new_message')]
+    #[Message('common.ev_new_message')]
     case EV_NEW_MESSAGE = 'ev_new_message';
 
-    #[Message('common.new_private_message')]
+    #[Message('common.ev_new_private_message')]
     case EV_NEW_PRIVATE_MESSAGE = 'ev_new_private_message';
+
+    #[Message('common.ev_user_kick_out')]
+    case EV_USER_KICK_OUT = 'ev_user_kick_out';
 }

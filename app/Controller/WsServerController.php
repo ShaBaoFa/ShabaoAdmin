@@ -17,7 +17,6 @@ use App\Service\MessageService;
 use Hyperf\Contract\OnCloseInterface;
 use Hyperf\Contract\OnMessageInterface;
 use Hyperf\Contract\OnOpenInterface;
-use Hyperf\WebSocketServer\Constant\Opcode;
 use Hyperf\WebSocketServer\Context;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -71,9 +70,6 @@ class WsServerController implements OnMessageInterface, OnOpenInterface, OnClose
     {
         $data = json_decode($frame->data, true);
         switch ($data['event']) {
-            case Opcode::PING:
-                $server->push(Opcode::PONG);
-                break;
             case WsEventCode::GET_UNREAD_MESSAGE->value:
                 $service = di()->get(MessageService::class);
                 $data = json_encode([
@@ -82,7 +78,7 @@ class WsServerController implements OnMessageInterface, OnOpenInterface, OnClose
                     'message' => WsEventCode::EV_NEW_MESSAGE->getMessage(),
                     'data' => $service->getUnreadMessages(Context::get('uid'))['items'],
                 ]);
-                $server->push($data);
+                $this->send($server, $frame, $data);
                 break;
         }
     }
@@ -102,5 +98,15 @@ class WsServerController implements OnMessageInterface, OnOpenInterface, OnClose
             'WebSocket [ user close connect for message server: id > ' . Context::get('uid') . ', ' .
             "fd > {$fd}, time > " . date('Y-m-d H:i:s') . ' ]'
         );
+    }
+
+    private function send($server, $frame, $data): void
+    {
+        if ($server instanceof Server) {
+            $server->push($frame->fd, $data);
+        }
+        if ($server instanceof Response) {
+            $server->push($data);
+        }
     }
 }

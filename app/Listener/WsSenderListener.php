@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Listener;
 
 use App\Constants\WsEventCode;
+use App\Events\AfterKickUser;
 use App\Events\PrivateMessageSent;
 use App\Model\User;
 use App\Service\WsSenderService;
@@ -24,16 +25,20 @@ use Psr\Container\NotFoundExceptionInterface;
 use RedisException;
 
 #[Listener]
-class MessageSentListener implements ListenerInterface
+class WsSenderListener implements ListenerInterface
 {
+    private WsSenderService $sender;
+
     public function __construct(protected ContainerInterface $container)
     {
+        $this->sender = $container->get(WsSenderService::class);
     }
 
     public function listen(): array
     {
         return [
             PrivateMessageSent::class,
+            AfterKickUser::class,
         ];
     }
 
@@ -49,12 +54,15 @@ class MessageSentListener implements ListenerInterface
             $sendBy = $event->getSendBy();
             $sendByUsername = User::find($event->getSendBy())->value('username');
             $content = $event->getContent();
-            $sender = di()->get(WsSenderService::class);
-            $sender->sendByUid($uid, $sender->handleData(WsEventCode::EV_NEW_PRIVATE_MESSAGE, [
+            $this->sender->sendByUid($uid, $this->sender->handleData(WsEventCode::EV_NEW_PRIVATE_MESSAGE, [
                 'send_by' => $sendBy,
                 'send_by_username' => $sendByUsername,
                 'content' => $content,
             ]));
+        }
+        if ($event instanceof AfterKickUser) {
+            $uid = $event->getUid();
+            $this->sender->kickAndSendByUid($uid, $this->sender->handleData(WsEventCode::EV_USER_KICK_OUT, []));
         }
     }
 }

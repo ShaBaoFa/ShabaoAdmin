@@ -23,6 +23,7 @@ use App\Service\WsSenderService;
 use App\Vo\QueueMessageVo;
 use Carbon\Carbon;
 use Hyperf\Amqp\Producer;
+use Hyperf\Collection\Arr;
 use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
 use Hyperf\Contract\ConfigInterface;
@@ -63,6 +64,15 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
+        $ids = [];
+        for ($i = 0; $i < 10; ++$i) {
+            $ids[] = $i * 5 + 1;
+        }
+        foreach ($ids as $id) {
+            var_dump($id);
+            Arr::forget($ids, $id);
+            var_dump($ids);
+        }
         //        di()->get(WsSenderService::class)->sendByUid(1, 'test');
         //        $key = sprintf('%sws:uid:%s:fd:%s', config('cache.default.prefix'), '1', '20');
         //        redis()->setex($key, config('jwt.ttl'), 1);
