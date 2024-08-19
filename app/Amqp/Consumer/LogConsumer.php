@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace App\Amqp\Consumer;
 
-use App\Base\BaseConsumer;
 use App\Constants\ConsumerStatusCode;
 use App\Events\PrivateMessageSent;
 use App\Interfaces\QueueLogServiceInterface;
@@ -29,15 +28,13 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
-#[Consumer(exchange: 'web-api', routingKey: 'message.routing', queue: 'message.queue', name: 'MessageConsumer', nums: 1)]
-class MessageConsumer extends BaseConsumer
+#[Consumer(exchange: 'web-api', routingKey: 'log.routing', queue: 'log.queue', name: 'LogConsumer', nums: 1)]
+class LogConsumer extends ConsumerMessage
 {
     public function __construct(
         private readonly QueueLogServiceInterface $service,
         private readonly EventDispatcherInterface $eventDispatcher,
-        private readonly MessageService $consumeService
     ) {
-        parent::__construct($service,$consumeService);
     }
 
     /**
@@ -53,8 +50,8 @@ class MessageConsumer extends BaseConsumer
         }
         $queueId = Arr::get($data, 'queue_id');
         try {
-            $consumeStatus = ['consume_status' => ConsumerStatusCode::CONSUME_STATUS_FAIL->value];;
-            if ($this->consumeService->dao->saveByQueue($this->handleData($data))) {
+            $consumeStatus = ['consume_status' => ConsumerStatusCode::CONSUME_STATUS_FAIL->value];
+            if (di()->get(MessageService::class)->dao->saveByQueue(Arr::get($data, 'data'))) {
                 Arr::set($consumeStatus, 'consume_status', ConsumerStatusCode::CONSUME_STATUS_SUCCESS->value);
                 $this->eventDispatcher->dispatch(new PrivateMessageSent(Arr::get($data, 'data')));
                 $result = Result::ACK;

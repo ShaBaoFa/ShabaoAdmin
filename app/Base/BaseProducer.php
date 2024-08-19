@@ -13,11 +13,13 @@ declare(strict_types=1);
 namespace App\Base;
 
 use Hyperf\Amqp\Message\ProducerMessage;
+use Hyperf\Collection\Arr;
 use Hyperf\Stringable\Str;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
 use function App\Helper\console;
+use function App\Helper\user;
 use function Hyperf\Config\config;
 
 class BaseProducer extends ProducerMessage
@@ -38,7 +40,6 @@ class BaseProducer extends ProducerMessage
         );
         $this->payload = $data;
     }
-
     /**
      * 生成RoutingKey.
      */
