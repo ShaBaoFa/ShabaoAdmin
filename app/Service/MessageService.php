@@ -63,12 +63,6 @@ class MessageService extends BaseService
          * 解决了(队列用 insert 不用 save).
          */
         if (config('amqp.enable') && di()->get(MessageConsumer::class)->isEnable()) {
-            $data = Arr::merge($data, [
-                'created_at' => Carbon::now()->toDateTimeString(),
-                'updated_at' => Carbon::now()->toDateTimeString(),
-                $this->dao->getModel()->getDataScopeField() => user()->getId(),
-                'updated_by' => user()->getId(),
-            ]);
             $amqpQueueVo = new AmqpQueueVo();
             $amqpQueueVo->setProducer(MessageProducer::class);
             $amqpQueueVo->setData($data);
