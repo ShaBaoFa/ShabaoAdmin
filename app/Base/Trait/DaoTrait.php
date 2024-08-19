@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace App\Base\Trait;
 
+use App\Base\BaseCollection;
 use App\Base\BaseModel;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
@@ -230,6 +231,9 @@ trait DaoTrait
         $params['_tree'] = true;
         $params['_tree_pid'] = $parentField;
         $data = $this->listQuerySetting($params, $isScope)->get();
+        /**
+         * @var BaseCollection $data
+         */
         return $data->toTree([], $data[0]->{$parentField} ?? 0, $id, $parentField, $children);
     }
 
