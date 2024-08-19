@@ -12,29 +12,28 @@ declare(strict_types=1);
 
 namespace App\Amqp\Consumer;
 
+use App\Base\BaseConsumer;
 use App\Constants\ConsumerStatusCode;
-use App\Events\PrivateMessageSent;
 use App\Interfaces\QueueLogServiceInterface;
-use App\Service\MessageService;
+use App\Service\OperationLogService;
 use Exception;
 use Hyperf\Amqp\Annotation\Consumer;
 use Hyperf\Amqp\Builder\QueueBuilder;
-use Hyperf\Amqp\Message\ConsumerMessage;
 use Hyperf\Amqp\Result;
 use Hyperf\Collection\Arr;
 use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Psr\EventDispatcher\EventDispatcherInterface;
 
-#[Consumer(exchange: 'web-api', routingKey: 'log.routing', queue: 'log.queue', name: 'LogConsumer', nums: 1)]
-class LogConsumer extends ConsumerMessage
+#[Consumer(exchange: 'web-api', routingKey: 'operation.log.routing', queue: 'operation.log.queue', name: 'OperationLogConsumer', nums: 1)]
+class OperationLogConsumer extends BaseConsumer
 {
     public function __construct(
         private readonly QueueLogServiceInterface $service,
-        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly OperationLogService $consumeService
     ) {
+        parent::__construct($service, $consumeService);
     }
 
     /**
@@ -51,9 +50,8 @@ class LogConsumer extends ConsumerMessage
         $queueId = Arr::get($data, 'queue_id');
         try {
             $consumeStatus = ['consume_status' => ConsumerStatusCode::CONSUME_STATUS_FAIL->value];
-            if (di()->get(MessageService::class)->dao->saveByQueue(Arr::get($data, 'data'))) {
+            if ($this->consumeService->dao->insertByQueue($this->handleData($data))) {
                 Arr::set($consumeStatus, 'consume_status', ConsumerStatusCode::CONSUME_STATUS_SUCCESS->value);
-                $this->eventDispatcher->dispatch(new PrivateMessageSent(Arr::get($data, 'data')));
                 $result = Result::ACK;
             }
             $this->service->update(

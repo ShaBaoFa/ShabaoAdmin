@@ -46,6 +46,15 @@ trait DaoTrait
     }
 
     /**
+     * 新增数据(通过队列).
+     */
+    public function insertByQueue(array $data): bool
+    {
+        $this->filterExecuteAttributes($data, $this->getModel()->incrementing);
+        return $this->model::insert($data);
+    }
+
+    /**
      * 新增数据.
      */
     public function save(array $data): mixed

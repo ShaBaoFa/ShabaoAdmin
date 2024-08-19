@@ -21,6 +21,7 @@ use App\Interfaces\QueueLogServiceInterface;
 use App\Vo\AmqpQueueVo;
 use Hyperf\Amqp\Producer;
 use Hyperf\Codec\Json;
+use Hyperf\Stringable\Str;
 use Throwable;
 
 use function Hyperf\Config\config;
@@ -54,7 +55,7 @@ class QueueLogService extends BaseService implements QueueLogServiceInterface
         $class = $amqpQueueVo->getProducer();
         // 通过反射获取实例
         $producer = make($class, [$amqpQueueVo->getData()]);
-        $queueName = strchr($producer->getRoutingKey(), '.', true) . '.queue';
+        $queueName = Str::beforeLast($producer->getRoutingKey(), '.') . '.queue';
         $id = $this->save([
             'exchange_name' => $producer->getExchange(),
             'routing_key_name' => $producer->getRoutingKey(),
