@@ -14,7 +14,6 @@ namespace App\Base\Trait;
 
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
-use App\Model\Department;
 use App\Model\Role;
 use App\Model\User;
 use Hyperf\Database\Model\Builder;
@@ -101,7 +100,7 @@ trait ModelMacroTrait
                                 // 如果是所有权限，跳出所有循环
                                 break 2;
                             case Role::CUSTOM_SCOPE:
-                                // 自定义数据权限
+                                // 自定义数据权限(暂时废弃)
                                 $deptIds = $role->depts()->pluck('id')->toArray();
                                 $this->userIds = array_merge(
                                     $this->userIds,
@@ -109,36 +108,28 @@ trait ModelMacroTrait
                                 );
                                 $this->userIds[] = $this->userid;
                                 break;
-                            case Role::SELF_DEPT_SCOPE:
-                                // 本部门数据权限
-                                $deptIds = Db::table('department_user')->where('user_id', $userModel->id)->pluck('department_id')->toArray();
+                            case Role::SELF_ORGANIZATION_SCOPE:
+                                // 本组织数据权限
+                                $orgIds = Db::table('organization_user')->where('user_id', $userModel->id)->pluck('organization_id')->toArray();
                                 $this->userIds = array_merge(
                                     $this->userIds,
-                                    Db::table('department_user')->whereIn('department_id', $deptIds)->pluck('user_id')->toArray()
+                                    Db::table('organization_user')->whereIn('organization_id', $orgIds)->pluck('user_id')->toArray()
                                 );
                                 $this->userIds[] = $this->userid;
                                 break;
-                            case Role::DEPT_BELOW_SCOPE:
-                                // 本部门及子部门数据权限
-                                $parentDepts = Db::table('department_user')->where('user_id', $userModel->id)->pluck('department_id')->toArray();
-                                $ids = [];
-                                foreach ($parentDepts as $deptId) {
-                                    $ids[] = Department::query()
-                                        ->where(function ($query) use ($deptId) {
-                                            $query->where('id', '=', $deptId)
-                                                ->orWhere('level', 'like', $deptId . ',%')
-                                                ->orWhere('level', 'like', '%,' . $deptId)
-                                                ->orWhere('level', 'like', '%,' . $deptId . ',%');
-                                        })
-                                        ->pluck('id')
-                                        ->toArray();
+                            case Role::ORGANIZATION_AUDIT_SCOPE:
+                                // 需要本组织审核数据
+                                // 判断是否是审核表
+                                if (! $this->model->isAuditAble()) {
+                                    break;
                                 }
-                                $deptIds = array_merge($parentDepts, ...$ids);
+                                $orgIds = Db::table('organization_user')->where('user_id', $userModel->id)->pluck('organization_id')->toArray();
                                 $this->userIds = array_merge(
                                     $this->userIds,
-                                    Db::table('department_user')->whereIn('department_id', $deptIds)->pluck('user_id')->toArray()
+                                    $this->model->whereIn('approving_id', $orgIds)->pluck($this->model->getDataScopeField())->toArray()
                                 );
                                 $this->userIds[] = $this->userid;
+                                break;
                                 break;
                             case Role::SELF_SCOPE:
                                 $this->userIds[] = $this->userid;
