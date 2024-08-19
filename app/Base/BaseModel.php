@@ -43,6 +43,8 @@ class BaseModel extends Model
 
     protected string $dataScopeField = 'created_by';
 
+    protected bool $auditAble = false;
+
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
@@ -83,6 +85,19 @@ class BaseModel extends Model
         $this->dataScopeField = $name;
         return $this;
     }
+
+    public function isAuditAble(): bool
+    {
+        return $this->auditAble;
+    }
+
+    public function setAuditAble(bool $auditAble): self
+    {
+        $this->auditAble = $auditAble;
+        return $this;
+    }
+
+
 
     /**
      * Create a new Model Collection instance.

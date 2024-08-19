@@ -42,23 +42,14 @@ class Role extends BaseModel
     // 自定义
     public const CUSTOM_SCOPE = 2;
 
-    // 本部门
-    public const SELF_DEPT_SCOPE = 3;
+    // 本组织
+    public const SELF_ORGANIZATION_SCOPE = 3;
 
-    // 本部门及子部门
-    public const DEPT_BELOW_SCOPE = 4;
+    // 需组织审核
+    public const ORGANIZATION_AUDIT_SCOPE = 4;
 
     // 本人
     public const SELF_SCOPE = 5;
-
-    // 平台方
-    public const PLATFORM_SCOPE = 6;
-
-    // 主办方
-    public const ORGANIZER_SCOPE = 7;
-
-    // 参展商
-    public const EXHIBITOR_SCOPE = 8;
 
     /**
      * The table associated with the model.
