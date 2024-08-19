@@ -12,13 +12,20 @@ declare(strict_types=1);
 
 namespace App\Listener;
 
+use App\Amqp\Consumer\OperationLogConsumer;
+use App\Amqp\Producer\OperationLogProducer;
 use App\Events\Operation;
 use App\Service\OperationLogService;
+use App\Service\QueueLogService;
+use App\Vo\AmqpQueueVo;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Log\LoggerInterface;
+
+use function Hyperf\Config\config;
 
 #[Listener]
 class OperationListener implements ListenerInterface
@@ -52,7 +59,17 @@ class OperationListener implements ListenerInterface
         if (! in_array($requestInfo['router'], $this->ignoreRouter)) {
             $service = $this->container->get(OperationLogService::class);
             $requestInfo['request_data'] = json_encode($requestInfo['request_data'], JSON_UNESCAPED_UNICODE);
-            $service->save($requestInfo);
+            if (config('amqp.enable') && $this->container->get(OperationLogConsumer::class)->isEnable()) {
+                $amqpQueueVo = new AmqpQueueVo();
+                $amqpQueueVo->setProducer(OperationLogProducer::class);
+                $amqpQueueVo->setData($requestInfo);
+                if (! $this->container->get(QueueLogService::class)->addQueue($amqpQueueVo)) {
+                    $this->container->get(LoggerInterface::class)->warning(printf('%s queue log add failed', __METHOD__));
+                    $service->save($requestInfo);
+                }
+            } else {
+                $service->save($requestInfo);
+            }
         }
     }
 }

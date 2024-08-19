@@ -66,7 +66,7 @@ class LoginListener implements ListenerInterface
         } catch (Exception $e) {
             $ipLocation = '未知';
         }
-        $service->save([
+        $loginLog = [
             'username' => $event->userinfo['username'],
             'ip' => $ip,
             'ip_location' => $ipLocation,
@@ -75,7 +75,9 @@ class LoginListener implements ListenerInterface
             'status' => $event->loginStatus ? LoginLog::SUCCESS : LoginLog::FAIL,
             'message' => $event->message,
             'login_time' => date('Y-m-d H:i:s'),
-        ]);
+        ];
+
+        $service->save($loginLog);
 
         if ($event->loginStatus && $event->token) {
             # 多点登录情况下，只保存一个key会导致最近时刻登录的用户如果登出之后,则该用户不会出现在在线用户监控列表中

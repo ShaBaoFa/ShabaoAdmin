@@ -50,9 +50,9 @@ class MessageDao extends BaseDao
     }
 
     #[Transactional]
-    public function saveByQueue($data): int
+    public function insertByQueue($data): bool
     {
-        $receiveBy = Arr::get($data,'receive_by');
+        $receiveBy = Arr::get($data, 'receive_by');
         $this->filterExecuteAttributes($data);
         Arr::get($data, 'content_type') != MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value && Arr::forget($data, 'receive_by');
         $modelId = $this->model::insertGetId($data);
@@ -60,7 +60,7 @@ class MessageDao extends BaseDao
             $receiveBy = [$receiveBy];
         }
         Message::find($modelId)->receiveUsers()->sync($receiveBy);
-        return $modelId;
+        return $modelId > 0;
     }
 
     /**

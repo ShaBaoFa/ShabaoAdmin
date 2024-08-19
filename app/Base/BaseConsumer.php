@@ -24,7 +24,7 @@ class BaseConsumer extends ConsumerMessage
     ) {
     }
 
-    protected function handleData(array $data):array
+    protected function handleData(array $data): array
     {
         $queue = $this->service->find(Arr::get($data, 'queue_id'));
         $createdAt = $queue->value('created_at');

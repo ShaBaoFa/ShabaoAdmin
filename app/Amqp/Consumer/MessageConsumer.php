@@ -20,7 +20,6 @@ use App\Service\MessageService;
 use Exception;
 use Hyperf\Amqp\Annotation\Consumer;
 use Hyperf\Amqp\Builder\QueueBuilder;
-use Hyperf\Amqp\Message\ConsumerMessage;
 use Hyperf\Amqp\Result;
 use Hyperf\Collection\Arr;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -37,7 +36,7 @@ class MessageConsumer extends BaseConsumer
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly MessageService $consumeService
     ) {
-        parent::__construct($service,$consumeService);
+        parent::__construct($service, $consumeService);
     }
 
     /**
@@ -53,8 +52,8 @@ class MessageConsumer extends BaseConsumer
         }
         $queueId = Arr::get($data, 'queue_id');
         try {
-            $consumeStatus = ['consume_status' => ConsumerStatusCode::CONSUME_STATUS_FAIL->value];;
-            if ($this->consumeService->dao->saveByQueue($this->handleData($data))) {
+            $consumeStatus = ['consume_status' => ConsumerStatusCode::CONSUME_STATUS_FAIL->value];
+            if ($this->consumeService->dao->insertByQueue($this->handleData($data))) {
                 Arr::set($consumeStatus, 'consume_status', ConsumerStatusCode::CONSUME_STATUS_SUCCESS->value);
                 $this->eventDispatcher->dispatch(new PrivateMessageSent(Arr::get($data, 'data')));
                 $result = Result::ACK;
