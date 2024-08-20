@@ -28,6 +28,7 @@ use Carbon\Carbon;
  * @property int $created_by 创建者
  * @property Carbon $created_at 创建时间
  * @property Carbon $updated_at 更新时间
+ * @property string $deleted_at 删除时间
  */
 class QueueLog extends BaseModel
 {
@@ -39,7 +40,7 @@ class QueueLog extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'exchange_name', 'routing_key_name', 'queue_name', 'queue_content', 'log_content', 'produce_status', 'consume_status', 'delay_time', 'created_by', 'created_at', 'updated_at'];
+    protected array $fillable = ['id', 'exchange_name', 'routing_key_name', 'queue_name', 'queue_content', 'log_content', 'produce_status', 'consume_status', 'delay_time', 'created_by', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
