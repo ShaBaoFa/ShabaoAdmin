@@ -12,7 +12,7 @@
     "description": "通用型框架",
     "license": "MIT",
     "require": {
-        "php": ">=8.1",
+        "php": "=8.1",
         "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
@@ -94,12 +94,6 @@
         "sort-packages": true
     },
     "extra": [],
-    "repositories": {
-        "wlfpanda1012/aliyun-sts": {
-            "type": "path",
-            "url": "/Users/weilingfeng/Documents/GitHub/aliyun-sts"
-        }
-    },
     "scripts": {
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
