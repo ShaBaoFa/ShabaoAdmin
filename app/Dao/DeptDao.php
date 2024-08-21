@@ -96,23 +96,6 @@ class DeptDao extends BaseDao
     }
 
     /**
-     * 判断是否存在子部门.
-     */
-    public function checkChildrenExists(int $id): bool
-    {
-        return $this->model::withTrashed()->where('parent_id', $id)->exists();
-    }
-
-    /**
-     * 获取子孙部门.
-     */
-    public function getDescendantsDepts(int $id): array
-    {
-        $params = ['level' => $id];
-        return $this->handleSearch($this->model::query(), $params)->get()->toArray();
-    }
-
-    /**
      * 搜索处理器.
      */
     public function handleSearch(Builder $query, array $params): Builder

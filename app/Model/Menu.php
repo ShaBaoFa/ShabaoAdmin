@@ -33,11 +33,11 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property int $sort 排序
  * @property int $created_by 创建者
  * @property int $updated_by 更新者
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property Carbon $created_at 
+ * @property Carbon $updated_at 
  * @property string $deleted_at 删除时间
  * @property string $remark 备注
- * @property null|Collection|Role[] $roles
+ * @property-read null|Collection|Role[] $roles 
  */
 class Menu extends BaseModel
 {
