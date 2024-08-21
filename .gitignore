@@ -13,3 +13,4 @@ vendor/
 *.cache
 *.lock
 .storage/
+.env.docker
