@@ -126,9 +126,9 @@ class MenuService extends BaseService
             'id' => $id,
             'data' => $handleData,
         ];
-        $descendants = $this->dao->getDescendantsMenus((int) $id);
+        $descendants = $this->getDescendants((int) $id);
         foreach ($descendants as $descendant) {
-            $handleDescendantMenuLevelData = $this->handleDescendantMenuLevels($descendant['level'], $handleData['level'], $id);
+            $handleDescendantMenuLevelData = $this->handleDescendantLevels($descendant['level'], $handleData['level'], $id);
             $update[] = [
                 'id' => $descendant['id'],
                 'data' => ['level' => $handleDescendantMenuLevelData],
@@ -157,14 +157,6 @@ class MenuService extends BaseService
     }
 
     /**
-     * 检查子菜单是否存在.
-     */
-    public function checkChildrenExists(int $id): bool
-    {
-        return $this->dao->checkChildrenExists($id);
-    }
-
-    /**
      * 处理数据.
      */
     protected function handleData(array $data): array
@@ -178,17 +170,5 @@ class MenuService extends BaseService
             $data['level'] = $parentMenu['level'] . ',' . $parentMenu['id'];
         }
         return $data;
-    }
-
-    /**
-     * 处理子孙menu.
-     */
-    protected function handleDescendantMenuLevels(string $descendantLevel, string $handleDataLevel, int $id): string
-    {
-        $descendantLevelArr = explode(',', $descendantLevel);
-        $handleDataLevelArr = explode(',', $handleDataLevel);
-        $position = array_search($id, $descendantLevelArr);
-        array_splice($descendantLevelArr, 0, $position, $handleDataLevelArr);
-        return implode(',', $descendantLevelArr);
     }
 }

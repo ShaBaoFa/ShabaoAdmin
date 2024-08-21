@@ -313,4 +313,23 @@ trait DaoTrait
     {
         return $this->find($id)->increment($field, $value) > 0;
     }
+
+    /**
+     * 检查是否有子节点
+     * @param int $id
+     * @return bool
+     */
+    public function checkChildrenExists(int $id): bool
+    {
+        return $this->model::withTrashed()->where('parent_id', $id)->exists();
+    }
+
+    /**
+     * 获取子孙节点
+     */
+    public function getDescendants(int $parentId): array
+    {
+        $params = ['level' => $parentId];
+        return $this->handleSearch($this->model::query(), $params)->get()->toArray();
+    }
 }

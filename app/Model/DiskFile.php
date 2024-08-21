@@ -18,7 +18,7 @@ use Carbon\Carbon;
 /**
  * @property int $id 主键
  * @property string $name 文件(文件夹)名
- * @property string $path 文件(文件夹)路径
+ * @property string $level 文件(文件夹)路径
  * @property string $hash 文件hash
  * @property string $suffix 文件后缀
  * @property int $parent_id 父ID
@@ -42,7 +42,7 @@ class DiskFile extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'name', 'path', 'hash', 'suffix', 'parent_id', 'size_byte', 'size_info', 'is_folder', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected array $fillable = ['id', 'name', 'level', 'hash', 'suffix', 'parent_id', 'size_byte', 'size_info', 'is_folder', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
 
     /**
      * The attributes that should be cast to native types.

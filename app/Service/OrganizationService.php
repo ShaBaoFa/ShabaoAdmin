@@ -119,14 +119,6 @@ class OrganizationService extends BaseService
     }
 
     /**
-     * 检查子组织是否存在.
-     */
-    public function checkChildrenExists(int $id): bool
-    {
-        return $this->dao->checkChildrenExists($id);
-    }
-
-    /**
      * 处理数据.
      */
     protected function handleData(array $data): array
@@ -149,17 +141,5 @@ class OrganizationService extends BaseService
         }
 
         return $data;
-    }
-
-    /**
-     * 处理下级部门.
-     */
-    protected function handleDescendantOrganizationLevels(string $descendantLevel, string $handleDataLevel, int $id): string
-    {
-        $descendantLevelArr = explode(',', $descendantLevel);
-        $handleDataLevelArr = explode(',', $handleDataLevel);
-        $position = array_search($id, $descendantLevelArr);
-        array_splice($descendantLevelArr, 0, $position, $handleDataLevelArr);
-        return implode(',', $descendantLevelArr);
     }
 }

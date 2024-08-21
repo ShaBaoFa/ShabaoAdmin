@@ -220,4 +220,32 @@ trait ServiceTrait
     {
         return $this->dao->numberOperation($id, $field, $value);
     }
+
+    /**
+     * 检查子节点是否存在.
+     */
+    public function checkChildrenExists(int $id): bool
+    {
+        return $this->dao->checkChildrenExists($id);
+    }
+
+    /**
+     * 获取子孙节点.
+     */
+    public function getDescendants(int $parentId): array
+    {
+        return $this->dao->getDescendants($parentId);
+    }
+
+    /**
+     * 处理子孙节点.
+     */
+    public function handleDescendantLevels(string $descendantLevel, string $handleDataLevel, int $id): string
+    {
+        $descendantLevelArr = explode(',', $descendantLevel);
+        $handleDataLevelArr = explode(',', $handleDataLevel);
+        $position = array_search($id, $descendantLevelArr);
+        array_splice($descendantLevelArr, 0, $position, $handleDataLevelArr);
+        return implode(',', $descendantLevelArr);
+    }
 }

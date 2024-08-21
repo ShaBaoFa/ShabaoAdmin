@@ -25,7 +25,7 @@ class CreateDiskFilesTable extends Migration
             $table->comment('云盘表');
             $table->bigIncrements('id')->comment('主键');
             $table->addColumn('string', 'name', ['length' => 255, 'comment' => '文件(文件夹)名'])->nullable();
-            $table->addColumn('string', 'path', ['length' => 255, 'comment' => '文件(文件夹)路径'])->nullable();
+            $table->addColumn('string', 'level', ['length' => 500, 'comment' => '文件(文件夹)路径'])->nullable();
             $table->addColumn('string', 'hash', ['length' => 64, 'comment' => '文件hash'])->nullable();
             $table->addColumn('string', 'suffix', ['length' => 10, 'comment' => '文件后缀'])->nullable();
             $table->addColumn('bigInteger', 'parent_id', ['default' => 0, 'unsigned' => true, 'comment' => '父ID'])->index();

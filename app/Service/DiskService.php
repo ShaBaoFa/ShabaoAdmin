@@ -102,14 +102,6 @@ class DiskService extends BaseService
     }
 
     /**
-     * 检查子部门是否存在.
-     */
-    public function checkChildrenExists(int $id): bool
-    {
-        return $this->dao->checkChildrenExists($id);
-    }
-
-    /**
      * 处理数据.
      */
     protected function handleData(array $data): array
@@ -129,17 +121,5 @@ class DiskService extends BaseService
         }
 
         return $data;
-    }
-
-    /**
-     * 处理下级部门.
-     */
-    protected function handleDescendantDeptLevels(string $descendantLevel, string $handleDataLevel, int $id): string
-    {
-        $descendantLevelArr = explode(',', $descendantLevel);
-        $handleDataLevelArr = explode(',', $handleDataLevel);
-        $position = array_search($id, $descendantLevelArr);
-        array_splice($descendantLevelArr, 0, $position, $handleDataLevelArr);
-        return implode(',', $descendantLevelArr);
     }
 }
