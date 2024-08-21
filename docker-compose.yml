@@ -10,7 +10,7 @@ services:
     networks:
       - net
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ./.storage/mysql:/var/lib/mysql
       - ./.github/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: "always"
   redis:
@@ -21,7 +21,7 @@ services:
     networks:
       - net
     volumes:
-      - redis-data:/data
+      - ./.storage/redis:/data
     restart: "always"
   shabao-admin:
     image: "wlfpanda1012/shabao-admin:latest"
@@ -46,6 +46,9 @@ services:
       replicas: 1
 networks:
   net:
+    driver: bridge
 volumes:
   mysql-data:
+    driver: local
   redis-data:
+    driver: local
