@@ -64,15 +64,16 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        $ids = [];
-        for ($i = 0; $i < 10; ++$i) {
-            $ids[] = $i * 5 + 1;
-        }
-        foreach ($ids as $id) {
-            var_dump($id);
-            Arr::forget($ids, $id);
-            var_dump($ids);
-        }
+        var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
+        //        $ids = [];
+        //        for ($i = 0; $i < 10; ++$i) {
+        //            $ids[] = $i * 5 + 1;
+        //        }
+        //        foreach ($ids as $id) {
+        //            var_dump($id);
+        //            Arr::forget($ids, $id);
+        //            var_dump($ids);
+        //        }
         //        di()->get(WsSenderService::class)->sendByUid(1, 'test');
         //        $key = sprintf('%sws:uid:%s:fd:%s', config('cache.default.prefix'), '1', '20');
         //        redis()->setex($key, config('jwt.ttl'), 1);

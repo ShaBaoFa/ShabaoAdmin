@@ -66,6 +66,7 @@ class DiskRequest extends BaseFormRequest
             'name' => 'required|string|max:30',
         ];
     }
+
     public function listRules(): array
     {
         return [

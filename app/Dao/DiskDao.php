@@ -83,8 +83,8 @@ class DiskDao extends BaseDao
             fn (Builder $query) => $query->where('name', 'like', '%' . $name . '%')
         );
         $query->when(
-            !is_null($parent_id = Arr::get($params, 'parent_id')),
-            fn (Builder $query) => $query->where('parent_id',  $parent_id)
+            ! is_null($parent_id = Arr::get($params, 'parent_id')),
+            fn (Builder $query) => $query->where('parent_id', $parent_id)
         );
 
         $query->when(
