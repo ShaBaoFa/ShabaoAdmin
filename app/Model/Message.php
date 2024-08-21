@@ -32,9 +32,9 @@ use Hyperf\Database\Model\Relations\HasOneThrough;
  * @property Carbon $updated_at 更新时间
  * @property string $deleted_at 删除时间
  * @property string $remark 备注
- * @property-read null|User $receiveUser 
- * @property-read null|User $sendUser 
- * @property-read null|Collection|User[] $receiveUsers 
+ * @property null|User $receiveUser
+ * @property null|User $sendUser
+ * @property null|Collection|User[] $receiveUsers
  */
 class Message extends BaseModel
 {

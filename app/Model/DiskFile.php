@@ -24,7 +24,8 @@ use Carbon\Carbon;
  * @property int $parent_id 父ID
  * @property int $size_byte 字节数
  * @property string $size_info 文件大小
- * @property int $is_folder 是否文件夹
+ * @property int $type (1: 文件夹 2: 文件)
+ * @property int $file_type (21: 图片 22: 视频 23: 音频 24: 文档 25: 其他)
  * @property int $created_by 创建者
  * @property int $updated_by 更新者
  * @property Carbon $created_at 创建时间
@@ -39,13 +40,58 @@ class DiskFile extends BaseModel
      */
     protected ?string $table = 'disk_files';
 
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    public function getLevel(): string
+    {
+        return $this->level;
+    }
+
+    public function getHash(): string
+    {
+        return $this->hash;
+    }
+
+    public function getSuffix(): string
+    {
+        return $this->suffix;
+    }
+
+    public function getParentId(): int
+    {
+        return $this->parent_id;
+    }
+
+    public function getSizeByte(): int
+    {
+        return $this->size_byte;
+    }
+
+    public function getSizeInfo(): string
+    {
+        return $this->size_info;
+    }
+
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    public function getFileType(): int
+    {
+        return $this->file_type;
+    }
+
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'name', 'level', 'hash', 'suffix', 'parent_id', 'size_byte', 'size_info', 'is_folder', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected array $fillable = ['id', 'name', 'level', 'hash', 'suffix', 'parent_id', 'size_byte', 'size_info', 'type', 'file_type', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'int', 'parent_id' => 'integer', 'size_byte' => 'integer', 'is_folder' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'int', 'parent_id' => 'integer', 'size_byte' => 'integer', 'is_folder' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'type' => 'integer', 'file_type' => 'integer'];
 }

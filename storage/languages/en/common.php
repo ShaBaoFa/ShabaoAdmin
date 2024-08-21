@@ -96,4 +96,7 @@ return [
     'ev_new_message' => 'you have new message',
     'ev_new_private_message' => 'you have new private message',
     'ev_user_kick_out' => 'you have been kicked out',
+    // disk
+    'disk_file_not_exist' => 'disk_file_not_exist',
+    'disk_folder_not_exist' => 'disk_folder_not_exist',
 ];

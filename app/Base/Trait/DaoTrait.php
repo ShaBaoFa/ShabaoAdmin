@@ -315,9 +315,7 @@ trait DaoTrait
     }
 
     /**
-     * 检查是否有子节点
-     * @param int $id
-     * @return bool
+     * 检查是否有子节点.
      */
     public function checkChildrenExists(int $id): bool
     {
@@ -325,11 +323,16 @@ trait DaoTrait
     }
 
     /**
-     * 获取子孙节点
+     * 获取子孙节点.
      */
     public function getDescendants(int $parentId): array
     {
         $params = ['level' => $parentId];
         return $this->handleSearch($this->model::query(), $params)->get()->toArray();
+    }
+
+    public function checkExists(?array $params = null): bool
+    {
+        return $this->model::query()->where($params)->exists();
     }
 }

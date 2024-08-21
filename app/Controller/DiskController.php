@@ -18,12 +18,15 @@ use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Request\DiskRequest;
 use App\Service\DiskService;
+use Hyperf\Collection\Arr;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\PostMapping;
 use Hyperf\HttpServer\Annotation\PutMapping;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
 #[Controller(prefix: 'api/v1/disks'), Auth]
@@ -33,12 +36,40 @@ class DiskController extends BaseController
     protected DiskService $service;
 
     /**
-     * 列出指定文件夹下的所有文件和子文件夹.
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * 列出指定文件夹下的所有文件和子文件夹
      */
-    #[GetMapping('list/{folder_id}'), Permission('disks:list')]
-    public function list(int $folder_id): ResponseInterface
+    #[GetMapping('folder/list'), Permission('disks:list')]
+    public function list(DiskRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->listContents($folder_id));
+        return $this->response->success($this->service->listContents((int)$request->input('parent_id')??0));
+    }
+
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * 文件夹meta
+     */
+    #[GetMapping('folder/{folder_id:\d+}'), Permission('disks:folder')]
+    public function folderMeta(int $folder_id): ResponseInterface
+    {
+        return $this->response->success($this->service->getFolderMeta($folder_id));
+    }
+
+    /**
+     * 创建新文件夹.
+     */
+    #[PostMapping('folder/save'), Permission('disks:folder:save')]
+    public function saveFolder(DiskRequest $request): ResponseInterface
+    {
+        $name = $request->input('name');
+        $parentId = $request->input('parent_id', 0);
+        $data = [
+            'name' => $name,
+            'parent_id' => (int)$parentId,
+        ];
+        return $this->service->saveFolder($data) ? $this->response->success():$this->response->fail();
     }
 
     /**
@@ -49,7 +80,7 @@ class DiskController extends BaseController
     public function saveFile(DiskRequest $request): ResponseInterface
     {
         $filesData = $request->input('files'); // 传入文件数组，每个元素包含 file_hash, name, folder_id 等
-        return $this->response->success($this->service->saveFiles($filesData));
+        return $this->service->saveFiles((array) $filesData) ? $this->response->success() : $this->response->fail();
     }
 
     /**
