@@ -18,7 +18,6 @@ use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Request\DiskRequest;
 use App\Service\DiskService;
-use Hyperf\Collection\Arr;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
@@ -38,18 +37,18 @@ class DiskController extends BaseController
     /**
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
-     * 列出指定文件夹下的所有文件和子文件夹
+     *                                     列出指定文件夹下的所有文件和子文件夹
      */
     #[GetMapping('folder/list'), Permission('disks:list')]
     public function list(DiskRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->listContents((int)$request->input('parent_id')??0));
+        return $this->response->success($this->service->listContents((int) $request->input('parent_id') ?? 0));
     }
 
     /**
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
-     * 文件夹meta
+     *                                     文件夹meta
      */
     #[GetMapping('folder/{folder_id:\d+}'), Permission('disks:folder')]
     public function folderMeta(int $folder_id): ResponseInterface
@@ -67,9 +66,9 @@ class DiskController extends BaseController
         $parentId = $request->input('parent_id', 0);
         $data = [
             'name' => $name,
-            'parent_id' => (int)$parentId,
+            'parent_id' => (int) $parentId,
         ];
-        return $this->service->saveFolder($data) ? $this->response->success():$this->response->fail();
+        return $this->service->saveFolder($data) ? $this->response->success() : $this->response->fail();
     }
 
     /**

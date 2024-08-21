@@ -116,14 +116,14 @@ class DiskService extends BaseService
         if ($folder_id > 0) {
             (! $this->dao->isFolder($folder_id)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
-        $currentFolder = $this->find($folder_id,['id','name','level','parent_id','type','size_byte','size_info']);
+        $currentFolder = $this->find($folder_id, ['id', 'name', 'level', 'parent_id', 'type', 'size_byte', 'size_info']);
         /**
          * @var DiskFile $currentFolder
          */
         $folders = explode(',', $currentFolder->level);
         $ancestor = [];
         foreach ($folders as $key => $folderId) {
-            if ((int)$folderId == 0) {
+            if ((int) $folderId == 0) {
                 Arr::set($ancestor, $folderId, '根目录');
                 continue;
             }
@@ -144,7 +144,7 @@ class DiskService extends BaseService
             (! $this->dao->isFolder($folder_id)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
         return $this->getList([
-            'parent_id' => $folder_id
+            'parent_id' => $folder_id,
         ]);
     }
 
@@ -180,7 +180,7 @@ class DiskService extends BaseService
             (! $this->dao->isFolder($pid)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
         while ($this->dao->checkNameExists($pid, Arr::get($data, 'name'))) {
-            if (Arr::get($data,'type') == DiskFileCode::TYPE_FOLDER) {
+            if (Arr::get($data, 'type') == DiskFileCode::TYPE_FOLDER) {
                 Arr::set($data, 'name', str(Arr::get($data, 'name')) . '_' . Str::random(6));
                 continue;
             }
@@ -197,7 +197,7 @@ class DiskService extends BaseService
     private function handleLevel(array $data): array
     {
         if (Arr::get($data, 'parent_id', 0) === 0) {
-            Arr::set($data, 'level', (string) Arr::get($data, 'parent_id','0'));
+            Arr::set($data, 'level', (string) Arr::get($data, 'parent_id', '0'));
         } else {
             $parent = $this->find((int) Arr::get($data, 'parent_id'));
             /**

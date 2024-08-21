@@ -40,6 +40,16 @@ class DiskFile extends BaseModel
      */
     protected ?string $table = 'disk_files';
 
+    /**
+     * The attributes that are mass assignable.
+     */
+    protected array $fillable = ['id', 'name', 'level', 'hash', 'suffix', 'parent_id', 'size_byte', 'size_info', 'type', 'file_type', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+
+    /**
+     * The attributes that should be cast to native types.
+     */
+    protected array $casts = ['id' => 'int', 'parent_id' => 'integer', 'size_byte' => 'integer', 'is_folder' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'type' => 'integer', 'file_type' => 'integer'];
+
     public function getName(): string
     {
         return $this->name;
@@ -84,14 +94,4 @@ class DiskFile extends BaseModel
     {
         return $this->file_type;
     }
-
-    /**
-     * The attributes that are mass assignable.
-     */
-    protected array $fillable = ['id', 'name', 'level', 'hash', 'suffix', 'parent_id', 'size_byte', 'size_info', 'type', 'file_type', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
-
-    /**
-     * The attributes that should be cast to native types.
-     */
-    protected array $casts = ['id' => 'int', 'parent_id' => 'integer', 'size_byte' => 'integer', 'is_folder' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'type' => 'integer', 'file_type' => 'integer'];
 }
