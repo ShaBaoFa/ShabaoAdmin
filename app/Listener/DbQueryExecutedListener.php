@@ -17,7 +17,9 @@ use Hyperf\Database\Events\QueryExecuted;
 use Hyperf\Event\Annotation\Listener;
 use Hyperf\Event\Contract\ListenerInterface;
 use Hyperf\Logger\LoggerFactory;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 use function Hyperf\Config\config;
@@ -28,9 +30,13 @@ class DbQueryExecutedListener implements ListenerInterface
 {
     private LoggerInterface $logger;
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function __construct(ContainerInterface $container)
     {
-        $this->logger = $container->get(LoggerFactory::class)->get(env('APP_NAME'), 'sql');
+        $this->logger = $container->get(LoggerFactory::class)->get('sql', 'sql');
     }
 
     public function listen(): array
