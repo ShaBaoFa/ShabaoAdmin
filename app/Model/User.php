@@ -18,7 +18,7 @@ use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
- * @property int $id 
+ * @property int $id
  * @property string $username 账号
  * @property int $status 状态 (1正常 2停用)
  * @property string $phone 手机
@@ -27,14 +27,14 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property int $created_by 创建者
  * @property int $updated_by 更新者
  * @property string $remark 备注
- * @property Carbon $created_at 
- * @property Carbon $updated_at 
- * @property Carbon $deleted_at 
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon $deleted_at
  * @property string $user_type 用户类型：(100系统用户)
- * @property-read null|Collection|Role[] $roles 
- * @property-read null|Collection|Department[] $depts 
- * @property-read null|Collection|Organization[] $organizations 
- * @property-write mixed $password 密码
+ * @property null|Collection|Role[] $roles
+ * @property null|Collection|Department[] $depts
+ * @property null|Collection|Organization[] $organizations
+ * @property mixed $password 密码
  */
 class User extends BaseModel
 {

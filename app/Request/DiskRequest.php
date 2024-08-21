@@ -34,11 +34,13 @@ class DiskRequest extends BaseFormRequest
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
-    public function uploadFilesRules(): array
+    public function saveFileRules(): array
     {
         return [
-            'files' => 'required|mimes:' . $this->getFilesMines(),
-            'path' => 'max:30',
+            'files' => 'required|array',
+            'files.*.hash' => 'required|string|min:32|max:32|exists:upload_files,hash',
+            'files.*.parent_id' => 'nullable|int|exists:disk_files,id',
+            'files.*.name' => 'required|string|max:30',
         ];
     }
 
@@ -49,18 +51,25 @@ class DiskRequest extends BaseFormRequest
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
-    public function uploadImagesRules(): array
+    public function getDownloadTokenRules(): array
     {
         return [
-            'images' => 'required|mimes:' . $this->getImagesMimes(),
-            'path' => 'max:30',
+            'file_hashes' => 'required|array',
+            'file_hashes.*' => 'required|string|min:32|max:32|exists:upload_files,hash',
         ];
     }
 
-    public function getFilesByHashRules(): array
+    public function saveFolderRules(): array
     {
         return [
-            'hash' => 'required|string|min:32|max:32|exists:upload_files,hash',
+            'parent_id' => 'nullable|int|exists:disk_files,id',
+            'name' => 'required|string|max:30',
+        ];
+    }
+    public function listRules(): array
+    {
+        return [
+            'parent_id' => 'nullable|int|exists:disk_files,id',
         ];
     }
 

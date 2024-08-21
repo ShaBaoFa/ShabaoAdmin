@@ -110,6 +110,7 @@ class MenuDao extends BaseDao
 
         return $query->get()->toTree();
     }
+
     /**
      * 查询菜单code.
      */
@@ -199,6 +200,7 @@ class MenuDao extends BaseDao
     {
         return $this->model::withTrashed()->whereIn('id', $ids)->pluck('name')->toArray();
     }
+
     /**
      * 搜索处理器.
      */
@@ -212,6 +214,11 @@ class MenuDao extends BaseDao
         $query->when(
             $name = Arr::get($params, 'name'),
             fn (Builder $query) => $query->where('name', 'like', '%' . $name . '%')
+        );
+
+        $query->when(
+            $level = Arr::get($params, 'level'),
+            fn (Builder $query) => $query->where('level', 'like', '%' . $level . '%')
         );
 
         $query->when(

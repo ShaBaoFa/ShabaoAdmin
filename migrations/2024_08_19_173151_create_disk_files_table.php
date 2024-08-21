@@ -31,7 +31,8 @@ class CreateDiskFilesTable extends Migration
             $table->addColumn('bigInteger', 'parent_id', ['default' => 0, 'unsigned' => true, 'comment' => '父ID'])->index();
             $table->addColumn('bigInteger', 'size_byte', ['length' => 20, 'comment' => '字节数'])->nullable();
             $table->addColumn('string', 'size_info', ['length' => 50, 'comment' => '文件大小'])->nullable();
-            $table->addColumn('smallInteger', 'is_folder', ['default' => 0, 'comment' => '是否文件夹'])->index()->nullable();
+            $table->addColumn('smallInteger', 'type', ['default' => 2, 'comment' => '(1: 文件夹 2: 文件)'])->index()->nullable();
+            $table->addColumn('smallInteger', 'file_type', ['default' => 0, 'comment' => '(21: 图片 22: 视频 23: 音频 24: 文档 25: 其他)'])->index()->nullable();
             $table->addColumn('bigInteger', 'created_by', ['comment' => '创建者'])->nullable();
             $table->addColumn('bigInteger', 'updated_by', ['comment' => '更新者'])->nullable();
             $table->addColumn('timestamp', 'created_at', ['precision' => 0, 'comment' => '创建时间'])->nullable();

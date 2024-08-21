@@ -122,6 +122,13 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.message_cannot_send_to_yourself')]
     case MESSAGE_CANNOT_SEND_TO_YOURSELF = 90001;
 
+    // disk
+    #[Message('common.disk_file_not_exist')]
+    case DISK_FILE_NOT_EXIST = 100001;
+
+    #[Message('common.disk_folder_not_exist')]
+    case DISK_FOLDER_NOT_EXIST = 100002;
+
     public function getMessage(?array $translate = null): string
     {
         $arguments = [];
