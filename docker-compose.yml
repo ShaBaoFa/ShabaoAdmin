@@ -23,8 +23,8 @@ services:
     volumes:
       - redis-data:/data
     restart: "always"
-  hyperf:
-    image: "hyperf/biz-skeleton:latest"
+  shabao-admin:
+    image: "wlfpanda1012/shabao-admin:latest"
     build:
       context: "."
     depends_on:
@@ -35,7 +35,8 @@ services:
       DB_HOST: "mysql"
       REDIS_HOST: "redis"
     ports:
-      - "9501:9501"
+      - "9505:9505"
+      - "9506:9506"
     volumes:
       - "./.env.example:/opt/www/.env"
     networks:
