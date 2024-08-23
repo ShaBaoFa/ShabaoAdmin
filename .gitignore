@@ -12,5 +12,5 @@ vendor/
 .DS_Store
 *.cache
 *.lock
-.docker/
 .env.docker
+/.docker/
