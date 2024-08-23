@@ -40,6 +40,7 @@ use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 
 use function App\Helper\redis;
 use function Hyperf\Config\config;
+use function Hyperf\Support\make;
 
 #[Command]
 class TestCommand extends HyperfCommand
@@ -64,6 +65,7 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
+        make(OssRamService::class, ['a' => 'b']);
         var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
         //        $ids = [];
         //        for ($i = 0; $i < 10; ++$i) {

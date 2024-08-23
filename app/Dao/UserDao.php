@@ -188,7 +188,7 @@ class UserDao extends BaseDao
         );
 
         $query->when(
-            trim(Arr::get($params, 'username')),
+            Arr::has($params, 'username') && trim(Arr::get($params, 'username')),
             fn (Builder $query, $username) => $query->where('username', 'like', '%' . $username . '%')
         );
 

@@ -1,17 +1,18 @@
 version: '3.7'
 services:
   mysql:
-    image: "mysql/mysql-server:5.7"
+    image: "mysql:8.0"
     environment:
       TZ: "Asia/Shanghai"
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
       MYSQL_ROOT_HOST: "%"
-      MYSQL_DATABASE: "hyperf"
     networks:
       - net
     volumes:
-      - ./.storage/mysql:/var/lib/mysql
+      - ./.docker/mysql:/var/lib/mysql
       - ./.github/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "13306:3306"
     restart: "always"
   redis:
     image: "redis"
@@ -21,12 +22,11 @@ services:
     networks:
       - net
     volumes:
-      - ./.storage/redis:/data
+      - ./.docker/redis:/data
     restart: "always"
   shabao-admin:
-    image: "wlfpanda1012/shabao-admin:latest"
-    build:
-      context: "."
+    image: "wlfpanda1012/web-api:8.1-alpine-v3.18-swoole-xlswriter"
+    restart: always
     depends_on:
       - mysql
       - redis
@@ -34,21 +34,19 @@ services:
       APP_ENV: "${APP_ENV:-prod}"
       DB_HOST: "mysql"
       REDIS_HOST: "redis"
+    working_dir: "/opt/www"
     ports:
       - "9505:9505"
       - "9506:9506"
     volumes:
-      - "./.env.example:/opt/www/.env"
+      - "./:/opt/www"
+      - "./.env.docker:/opt/www/.env"
     networks:
       - net
-    restart: "always"
-    deploy:
-      replicas: 1
+    entrypoint: ["php", "watch", "-c"]
 networks:
   net:
     driver: bridge
 volumes:
   mysql-data:
-    driver: local
   redis-data:
-    driver: local
