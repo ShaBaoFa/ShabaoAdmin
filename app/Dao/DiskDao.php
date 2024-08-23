@@ -82,6 +82,12 @@ class DiskDao extends BaseDao
             $name = Arr::get($params, 'name'),
             fn (Builder $query) => $query->where('name', 'like', '%' . $name . '%')
         );
+
+        $query->when(
+            Arr::accessible($hashes = Arr::get($params, 'hashes')),
+            fn (Builder $query) => $query->whereIn('hash', $hashes)
+        );
+
         $query->when(
             ! is_null($parent_id = Arr::get($params, 'parent_id')),
             fn (Builder $query) => $query->where('parent_id', $parent_id)
@@ -123,5 +129,13 @@ class DiskDao extends BaseDao
     public function checkNameExists(int $parentId, string $name): bool
     {
         return $this->checkExists(['parent_id' => $parentId, 'name' => $name, $this->getModel()->getDataScopeField() => user()->getId()]);
+    }
+
+    /**
+     * 文件归属.
+     */
+    public function belongMe(string $hash): bool
+    {
+        return $this->checkExists(Arr::merge(['hash' => $hash], [$this->getModel()->getDataScopeField() => user()->getId()]));
     }
 }

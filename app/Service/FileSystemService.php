@@ -16,11 +16,13 @@ use App\Base\BaseService;
 use App\Base\BaseUpload;
 use App\Constants\ErrorCode;
 use App\Constants\FileSystemCode;
+use App\Constants\UploadStatusCode;
 use App\Dao\UploadFileDao;
 use App\Exception\BusinessException;
 use Carbon\Carbon;
 use Exception;
 use Hyperf\Cache\Annotation\Cacheable;
+use Hyperf\Collection\Arr;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\Filesystem\FilesystemFactory;
@@ -36,6 +38,7 @@ use Wlfpanda1012\AliyunSts\Constants\OSSClientCode;
 use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 
 use function App\Helper\user;
+use function Hyperf\Support\make;
 
 class FileSystemService extends BaseService
 {
@@ -150,33 +153,38 @@ class FileSystemService extends BaseService
         $fileInfo = $this->dao->getFileInfoByHash($hash);
         try {
             $sts = $this->config->get('sts');
-            $ossRamService = new OssRamService($sts);
+            $ossRamService = make(OssRamService::class, ['option' => $sts]);
             $customParams = ['hash' => $hash];
-            $this->generateOssCallback(['hash' => $hash]);
+            $this->generateOssCallback($customParams);
             return ['callback_custom_params' => $customParams, 'credentials' => $ossRamService->allowPutObject($fileInfo['url'])];
         } catch (Exception $e) {
             throw new BusinessException(ErrorCode::GET_STS_TOKEN_FAIL);
         }
     }
 
-    public function getDownloaderStsToken(string $hash): array
+    public function getDownloaderStsToken(array|string $hash): array
     {
-        if (! $this->dao->isUploaded($hash)) {
+        if (! Arr::accessible($hash)) {
+            $hash = [$hash];
+        }
+        if (! $this->dao->areUploaded($hash)) {
             throw new BusinessException(ErrorCode::FILE_HAS_NOT_BEEN_UPLOADED);
         }
-        $fileInfo = $this->dao->getFileInfoByHash($hash);
+        $hashesToUrls = $this->dao->getFilesUrlByHash($hash);
+        // 获取数组所有value
+        $urls = array_values($hashesToUrls);
         try {
-            $sts = $this->config->get('sts');
-            $ossRamService = new OssRamService($sts);
-            return $ossRamService->allowGetObject($fileInfo['url']);
+            $ossRamService = make(OssRamService::class, ['option' => $this->config->get('sts')]);
+            return Arr::merge(['objects' => $hashesToUrls], $ossRamService->allowGetObject((array) $urls));
         } catch (Exception $e) {
+            var_dump($e->getMessage());
             throw new BusinessException(ErrorCode::GET_STS_TOKEN_FAIL);
         }
     }
 
     public function uploaderCallback(string $hash): bool
     {
-        return $this->dao->isUploaded($hash) ? true : $this->dao->changeStatusByHash($hash);
+        return $this->dao->changeStatusByHash($hash, UploadStatusCode::UPLOAD_FINISHED);
     }
 
     /**
@@ -198,7 +206,7 @@ class FileSystemService extends BaseService
         if ($data['is_uploaded']) {
             return $data;
         }
-        $fileInfo = $this->uploadTool->handlePreparation($metadata, [$config, ['hash' => $hash]]);
+        $fileInfo = $this->uploadTool->handlePreparation($metadata, Arr::merge($config, ['hash' => $hash]));
         $this->save($fileInfo) ?? throw new BusinessException(ErrorCode::UPLOAD_FAILED);
         return $data;
     }

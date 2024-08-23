@@ -1,4 +1,6 @@
-create table department_organization
+create database if not exists `hyperf` default character set utf8mb4 collate utf8mb4_unicode_ci;
+use `hyperf`;
+create table if not exists department_organization
 (
     department_id   bigint unsigned not null comment '部门主键',
     organization_id bigint unsigned not null comment '组织主键',
@@ -6,7 +8,7 @@ create table department_organization
 )
     comment '部门与组织关联表';
 
-create table department_role
+create table if not exists department_role
 (
     role_id       bigint unsigned not null comment '角色主键',
     department_id bigint unsigned not null comment '部门主键',
@@ -14,7 +16,7 @@ create table department_role
 )
     comment '角色与部门关联表';
 
-create table department_user
+create table if not exists department_user
 (
     user_id       bigint unsigned not null comment '用户主键',
     department_id bigint unsigned not null comment '部门主键',
@@ -22,7 +24,7 @@ create table department_user
 )
     comment '用户与部门关联表';
 
-create table departments
+create table if not exists departments
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -41,7 +43,7 @@ create table departments
     deleted_at timestamp                     null
 );
 
-create index departments_created_by_index
+create index  departments_created_by_index
     on departments (created_by);
 
 create index departments_parent_id_index
@@ -53,7 +55,7 @@ create index departments_status_index
 create index departments_updated_by_index
     on departments (updated_by);
 
-create table disk_files
+create table if not exists disk_files
 (
     id         bigint unsigned auto_increment comment '主键'
         primary key,
@@ -84,7 +86,7 @@ create index disk_files_parent_id_index
 create index disk_files_type_index
     on disk_files (type);
 
-create table exhibition_hall
+create table if not exists exhibition_hall
 (
     exhibition_id bigint unsigned not null comment '展会主键',
     hall_id       bigint unsigned not null comment '展馆主键',
@@ -92,7 +94,7 @@ create table exhibition_hall
 )
     comment '展馆与展会关联表';
 
-create table exhibitions
+create table if not exists exhibitions
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -106,7 +108,7 @@ create table exhibitions
     remark     varchar(255)                  null comment '备注'
 );
 
-create table halls
+create table if not exists halls
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -120,7 +122,7 @@ create table halls
     remark     varchar(255)                  null comment '备注'
 );
 
-create table login_logs
+create table if not exists login_logs
 (
     id          bigint unsigned auto_increment comment '主键'
         primary key,
@@ -139,7 +141,7 @@ create table login_logs
 create index login_logs_username_index
     on login_logs (username);
 
-create table menu_role
+create table if not exists menu_role
 (
     role_id bigint unsigned not null comment '角色主键',
     menu_id bigint unsigned not null comment '菜单主键',
@@ -147,7 +149,7 @@ create table menu_role
 )
     comment '角色与菜单关联表';
 
-create table menus
+create table if not exists menus
 (
     id         bigint unsigned auto_increment comment '主键'
         primary key,
@@ -172,7 +174,7 @@ create table menus
 )
     comment '菜单信息表';
 
-create table message_receivers
+create table if not exists message_receivers
 (
     message_id  bigint unsigned    not null comment '队列消息主键',
     receiver_id bigint unsigned    not null comment '接收用户主键',
@@ -181,7 +183,7 @@ create table message_receivers
 )
     comment '队列消息发送接收人表';
 
-create table messages
+create table if not exists messages
 (
     id           bigint unsigned auto_increment comment '主键'
         primary key,
@@ -202,7 +204,7 @@ create table messages
 create index messages_content_type_index
     on messages (content_type);
 
-create table migrations
+create table if not exists migrations
 (
     id        int unsigned auto_increment
         primary key,
@@ -210,7 +212,7 @@ create table migrations
     batch     int          not null
 );
 
-create table operation_logs
+create table if not exists operation_logs
 (
     id            bigint unsigned auto_increment comment '主键'
         primary key,
@@ -235,7 +237,7 @@ create table operation_logs
 create index operation_logs_username_index
     on operation_logs (username);
 
-create table organization_user
+create table if not exists organization_user
 (
     user_id         bigint unsigned not null comment '用户主键',
     organization_id bigint unsigned not null comment '组织主键',
@@ -243,25 +245,25 @@ create table organization_user
 )
     comment '部门与用户关联表';
 
-create table organizations
+create table if not exists organizations
 (
     id             bigint unsigned auto_increment
         primary key,
-    parent_id      bigint unsigned               not null comment '父ID',
-    super_admin_id bigint unsigned               null comment '企业超管ID',
-    level          varchar(500)                  not null comment '组级集合',
-    name           varchar(30)                   not null comment '组织名称',
-    address        varchar(128)                  null comment '组织地址',
-    legal_person   varchar(20)                   null comment '法人',
-    phone          varchar(11)                   null comment '组织电话',
-    status         smallint          default 1   null comment '状态 (1正常 2停用)',
-    sort           smallint unsigned default '0' null comment '排序',
-    created_by     bigint                        null comment '创建者',
-    updated_by     bigint                        null comment '更新者',
-    remark         varchar(255)                  null comment '备注',
-    created_at     datetime                      null,
-    updated_at     datetime                      null,
-    deleted_at     timestamp                     null
+    parent_id      bigint unsigned    not null comment '父ID',
+    super_admin_id bigint unsigned    null comment '企业超管ID',
+    level          varchar(500)       not null comment '组级集合',
+    name           varchar(30)        not null comment '组织名称',
+    address        varchar(128)       null comment '组织地址',
+    legal_person   varchar(20)        null comment '法人',
+    phone          varchar(11)        null comment '组织电话',
+    status         smallint default 1 null comment '状态 (1正常 2停用)',
+    sort           smallint default 0 null comment '排序',
+    created_by     bigint             null comment '创建者',
+    updated_by     bigint             null comment '更新者',
+    remark         varchar(255)       null comment '备注',
+    created_at     datetime           null,
+    updated_at     datetime           null,
+    deleted_at     timestamp          null
 );
 
 create index organizations_created_by_index
@@ -279,7 +281,7 @@ create index organizations_super_admin_id_index
 create index organizations_updated_by_index
     on organizations (updated_by);
 
-create table post_user
+create table if not exists post_user
 (
     user_id bigint unsigned not null comment '用户主键',
     post_id bigint unsigned not null comment '岗位主键',
@@ -287,7 +289,7 @@ create table post_user
 )
     comment '用户与岗位关联表';
 
-create table posts
+create table if not exists posts
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -311,7 +313,7 @@ create index posts_status_index
 create index posts_updated_by_index
     on posts (updated_by);
 
-create table queue_logs
+create table if not exists queue_logs
 (
     id               bigint unsigned auto_increment comment '主键'
         primary key,
@@ -330,7 +332,7 @@ create table queue_logs
 )
     comment '队列日志表';
 
-create table role_organization
+create table if not exists role_organization
 (
     organization_id bigint unsigned not null comment '组织主键',
     role_id         bigint unsigned not null comment '角色主键',
@@ -338,7 +340,7 @@ create table role_organization
 )
     comment '组织与角色关联表';
 
-create table role_user
+create table if not exists role_user
 (
     user_id bigint unsigned not null comment '用户主键',
     role_id bigint unsigned not null comment '角色主键',
@@ -346,7 +348,7 @@ create table role_user
 )
     comment '用户与角色关联表';
 
-create table roles
+create table if not exists roles
 (
     id         bigint unsigned auto_increment
         primary key,
@@ -372,7 +374,7 @@ create index roles_status_index
 create index roles_updated_by_index
     on roles (updated_by);
 
-create table upload_files
+create table if not exists upload_files
 (
     id           bigint unsigned auto_increment comment '主键'
         primary key,
@@ -404,7 +406,7 @@ create index upload_files_status_index
 create index upload_files_storage_path_index
     on upload_files (storage_path);
 
-create table users
+create table if not exists users
 (
     id         bigint unsigned auto_increment
         primary key,

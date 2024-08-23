@@ -106,9 +106,18 @@ class DiskService extends BaseService
         return true;
     }
 
-    public function saveFolder(array $data): bool
+    public function saveFolder(array $data): int
     {
-        return $this->dao->save($this->handleFolderData($data)) > 0;
+        return $this->dao->save($this->handleFolderData($data));
+    }
+
+    public function getDownloadTokens(array $hashes): array
+    {
+        if (! $this->belongMe($hashes)) {
+            throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
+        }
+        $fs = di()->get(FileSystemService::class);
+        return $fs->getDownloaderStsToken($hashes);
     }
 
     public function getFolderMeta(int $folder_id = 0): array
@@ -228,5 +237,15 @@ class DiskService extends BaseService
     {
         Arr::set($data, 'type', DiskFileCode::TYPE_FOLDER->value);
         return $this->handleData($data);
+    }
+
+    private function belongMe(array $hashes): bool
+    {
+        foreach ($hashes as $hash) {
+            if (! $this->dao->belongMe($hash)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -54,8 +54,8 @@ class DiskRequest extends BaseFormRequest
     public function getDownloadTokenRules(): array
     {
         return [
-            'file_hashes' => 'required|array',
-            'file_hashes.*' => 'required|string|min:32|max:32|exists:upload_files,hash',
+            'hashes' => 'required|array',
+            'hashes.*' => 'required|string',
         ];
     }
 
@@ -74,39 +74,6 @@ class DiskRequest extends BaseFormRequest
         ];
     }
 
-    public function getUploaderStsTokenRules(): array
-    {
-        return [
-            'hash' => 'required|string|min:32|max:32|exists:upload_files,hash',
-        ];
-    }
-
-    public function uploaderCallbackRules(): array
-    {
-        return [
-            'hash' => 'required|string|min:32|max:32|exists:upload_files,hash',
-        ];
-    }
-
-    public function uploaderPreparationRules(): array
-    {
-        return [
-            'metadata' => 'required|array',
-            'metadata.origin_name' => 'required|string|max:255',
-            'metadata.size_byte' => 'required|int',
-            'metadata.mime_type' => 'required|string|max:255',
-            'metadata.last_modified' => 'required|string|max:255',
-            'path' => 'max:30',
-        ];
-    }
-
-    public function getDownLoaderStsTokenRules(): array
-    {
-        return [
-            'hash' => 'required|string|min:32|max:32|exists:upload_files,hash',
-        ];
-    }
-
     /**
      * 字段映射名称
      * return array.
@@ -117,6 +84,10 @@ class DiskRequest extends BaseFormRequest
             'images' => '图片',
             'files' => '文件',
             'path' => '地址',
+            'files.*.hash' => '文件hash',
+            'hashes.*' => '文件hash',
+            'files.*.parent_id' => '文件夹id',
+            'files.*.name' => '文件名',
         ];
     }
 

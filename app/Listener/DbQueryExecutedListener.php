@@ -23,7 +23,6 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Log\LoggerInterface;
 
 use function Hyperf\Config\config;
-use function Hyperf\Support\env;
 
 #[Listener]
 class DbQueryExecutedListener implements ListenerInterface

@@ -68,7 +68,7 @@ class DiskController extends BaseController
             'name' => $name,
             'parent_id' => (int) $parentId,
         ];
-        return $this->service->saveFolder($data) ? $this->response->success() : $this->response->fail();
+        return $this->response->success(['id' => $this->service->saveFolder($data)]);
     }
 
     /**
@@ -86,11 +86,11 @@ class DiskController extends BaseController
      * 通过文件 hash 获取下载所需的 STS token
      * 批量操作：接受多个文件 hash.
      */
-    #[PostMapping('file/download-token'), Permission('disks:download')]
+    #[GetMapping('files/download-token'), Permission('disks:download')]
     public function getDownloadToken(DiskRequest $request): ResponseInterface
     {
-        $fileHashes = $request->input('file_hashes'); // 传入文件 hash 数组
-        return $this->response->success($this->service->getDownloadTokens($fileHashes));
+        $hashes = $request->input('hashes'); // 传入文件 hash 数组
+        return $this->response->success($this->service->getDownloadTokens($hashes));
     }
 
     /**
