@@ -37,7 +37,7 @@ class DiskController extends BaseController
     /**
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
-     *                                     列出指定文件夹下的所有文件和子文件夹
+     * @description 列出指定文件夹下的所有文件和子文件夹
      */
     #[GetMapping('folder/list'), Permission('disks:list')]
     public function list(DiskRequest $request): ResponseInterface
@@ -48,7 +48,7 @@ class DiskController extends BaseController
     /**
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
-     *                                     文件夹meta
+     * @description 文件夹meta
      */
     #[GetMapping('folder/{folder_id:\d+}'), Permission('disks:folder')]
     public function folderMeta(int $folder_id): ResponseInterface
@@ -57,7 +57,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 创建新文件夹.
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 创建新文件夹.
      */
     #[PostMapping('folder/save'), Permission('disks:folder:save')]
     public function saveFolder(DiskRequest $request): ResponseInterface
@@ -72,7 +74,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 保存上传完成的文件信息
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 保存上传完成的文件信息
      * 批量操作：接受多个文件的 hash 和相关元数据.
      */
     #[PostMapping('file/save'), Permission('disks:file:save')]
@@ -83,7 +87,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 通过文件 hash 获取下载所需的 STS token
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 通过文件 hash 获取下载所需的 STS token
      * 批量操作：接受多个文件 hash.
      */
     #[GetMapping('files/download-token'), Permission('disks:download')]
@@ -94,7 +100,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 重命名文件或文件夹
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 重命名文件或文件夹
      * 单个对象操作：接受对象的 id 和新的名称.
      */
     #[PutMapping('rename/{item_id}'), Permission('disks:rename')]
@@ -105,7 +113,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 删除文件或文件夹（移动到回收站）
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 删除文件或文件夹（移动到回收站）
      * 批量操作：接受多个对象 id.
      */
     #[DeleteMapping('delete'), Permission('disks:delete')]
@@ -116,7 +126,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 移动文件或文件夹到目标文件夹
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 移动文件或文件夹到目标文件夹
      * 批量操作：接受多个对象 id 和目标文件夹 id.
      */
     #[PutMapping('move'), Permission('disks:move')]
@@ -127,7 +139,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 复制文件或文件夹到目标文件夹
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 复制文件或文件夹到目标文件夹
      * 批量操作：接受多个对象 id 和目标文件夹 id.
      */
     #[PostMapping('copy'), Permission('disks:copy')]
@@ -138,7 +152,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 生成文件或文件夹的分享链接
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 生成文件或文件夹的分享链接
      * 批量操作：接受多个对象 id.
      */
     #[PostMapping('share'), Permission('disks:share'),OperationLog]
@@ -149,7 +165,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 从回收站还原文件或文件夹
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 从回收站还原文件或文件夹
      * 批量操作：接受多个对象 id.
      */
     #[PutMapping('recovery'), Permission('disks:recovery')]
@@ -160,7 +178,9 @@ class DiskController extends BaseController
     }
 
     /**
-     * 从回收站中永久删除文件或文件夹
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 从回收站中永久删除文件或文件夹
      * 批量操作：接受多个对象 id.
      */
     #[DeleteMapping('realDelete'), Permission('disks:realDelete'),OperationLog]
