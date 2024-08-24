@@ -49,7 +49,6 @@ class WsSenderService
             }
             unset($fds);
         }
-        var_dump($fdIds);
         $onlineFdIds = [];
         foreach ($fdIds as $fdId) {
             $key = sprintf('%sws:uid:%s:fd:%s', config('cache.default.prefix'), $uid, $fdId);
@@ -72,9 +71,7 @@ class WsSenderService
         foreach ($fdIds as $fdId) {
             go(function () use ($fdId) {
                 sleep(1);
-                var_dump('before disconnect:' . $fdId);
                 $this->sender->disconnect((int) $fdId);
-                var_dump('after disconnect:' . $fdId);
             });
         }
     }

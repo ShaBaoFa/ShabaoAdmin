@@ -46,7 +46,7 @@ class MessageService extends BaseService
      */
     public function sendPrivateMessage(array $params): bool
     {
-        if ($params['receive_by'] === user()->getId()) {
+        if ((int) $params['receive_by'] === user()->getId()) {
             throw new BusinessException(ErrorCode::MESSAGE_CANNOT_SEND_TO_YOURSELF);
         }
         $data = [
