@@ -23,13 +23,15 @@ services:
       - net
     volumes:
       - ./.docker/redis:/data
+      - ./.docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
     restart: "always"
   shabao-admin:
-    image: "wlfpanda1012/web-api:8.1-alpine-v3.18-swoole-xlswriter"
+    image: "wlfpanda1012/hyperf:8.1-alpine-v3.18-swoole-xlswriter"
     restart: always
     depends_on:
       - mysql
       - redis
+      - rabbitmq
     environment:
       APP_ENV: "${APP_ENV:-prod}"
       DB_HOST: "mysql"
@@ -44,6 +46,22 @@ services:
     networks:
       - net
     entrypoint: ["php", "watch", "-c"]
+  rabbitmq:
+    image: wlfpanda1012/rabbitmq:rabbitmq_delayed_message_exchange-3.13.0
+    restart: always
+    networks:
+      - net
+    ports:
+      - "5369:4369"
+      - "6672:5672"
+      - "25672:15672"
+      - "35672:25672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=shabaoadmin
+      - RABBITMQ_DEFAULT_PASS=12345678
+    volumes:
+      - ./.docker/rabbitmq:/var/lib/rabbitmq
+      - ./.docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
 networks:
   net:
     driver: bridge
