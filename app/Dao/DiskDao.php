@@ -126,9 +126,14 @@ class DiskDao extends BaseDao
     /**
      * 检查重名情况.
      */
-    public function checkNameExists(int $parentId, string $name): bool
+    public function checkNameExists(int $parentId, string $name, ?int $id = null): bool
     {
-        return $this->checkExists(['parent_id' => $parentId, 'name' => $name, $this->getModel()->getDataScopeField() => user()->getId()]);
+        $query = $this->model::query();
+        if (! is_null($id)) {
+            $query->where($this->getModel()->getKeyName(), '<>', $id);
+        }
+        $query->where('parent_id', $parentId)->where('name', $name)->where($this->getModel()->getDataScopeField(), user()->getId());
+        return $query->exists();
     }
 
     /**

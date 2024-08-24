@@ -110,7 +110,7 @@ class BaseUpload
      */
     public function getStorageMode(): int|string
     {
-        return FileSystemCode::OSS->value;
+        return FileSystemCode::LOCAL->value;
     }
 
     /**

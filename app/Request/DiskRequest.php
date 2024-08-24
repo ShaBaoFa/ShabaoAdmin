@@ -74,6 +74,13 @@ class DiskRequest extends BaseFormRequest
         ];
     }
 
+    public function renameRules(): array
+    {
+        return [
+            'new_name' => 'required|string|max:30',
+        ];
+    }
+
     /**
      * 字段映射名称
      * return array.

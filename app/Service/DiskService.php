@@ -70,10 +70,10 @@ class DiskService extends BaseService
         ];
         $descendants = $this->dao->getDescendants((int) $id);
         foreach ($descendants as $descendant) {
-            $handleDescendantDeptLevelData = $this->handleDescendantLevels($descendant['level'], $handleData['level'], $id);
+            $handleDescendantLevelData = $this->handleDescendantLevels($descendant['level'], $handleData['level'], $id);
             $update[] = [
                 'id' => $descendant['id'],
-                'data' => ['level' => $handleDescendantDeptLevelData],
+                'data' => ['level' => $handleDescendantLevelData],
             ];
         }
         return $this->dao->batchUpdate($update);
@@ -157,6 +157,38 @@ class DiskService extends BaseService
         ]);
     }
 
+    public function renameItem(int $item_id, string $newName): bool
+    {
+        /**
+         * @var DiskFile $item
+         */
+        $item = $this->dao->find($item_id);
+        // 1. 检查文件是否存在
+        if (! $item) {
+            throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
+        }
+        if ($item->name == $newName) {
+            return true;
+        }
+        $item = $item->toArray();
+        // 2. 检查文件名是否已存在
+        Arr::set($item, 'name', $newName);
+        while ($this->dao->checkNameExists((int) Arr::get($item, 'parent_id', 0), Arr::get($item, 'name'), $item_id)) {
+            if (Arr::get($item, 'type') == DiskFileCode::TYPE_FOLDER->value) {
+                $item = $this->getNewFolderName($item);
+                continue;
+            }
+            $item = $this->getNewFileName($item);
+        }
+        return $this->dao->update($item_id, $item);
+    }
+
+    private function getNewFolderName(array $data): array
+    {
+        Arr::set($data, 'name', str(Arr::get($data, 'name')) . '_' . Str::random(6));
+        return $data;
+    }
+
     /**
      * 处理文件数据.
      */
@@ -188,16 +220,13 @@ class DiskService extends BaseService
         if ($pid > 0) {
             (! $this->dao->isFolder($pid)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
-        while ($this->dao->checkNameExists($pid, Arr::get($data, 'name'))) {
-            if (Arr::get($data, 'type') == DiskFileCode::TYPE_FOLDER) {
-                Arr::set($data, 'name', str(Arr::get($data, 'name')) . '_' . Str::random(6));
+
+        while ($this->dao->checkNameExists($pid, Arr::get($data, 'name'), Arr::get($data, $this->dao->getModel()->getKeyName()))) {
+            if (Arr::get($data, 'type') == DiskFileCode::TYPE_FOLDER->value) {
+                $data = $this->getNewFolderName($data);
                 continue;
             }
-            // 先根据'.'获取到文件名部分
-            $name = explode('.', Arr::get($data, 'name'));
-            $name = Arr::get($name, 0) . '_' . Str::random(6);
-            // 添加随机字符之后再拼接回去
-            Arr::set($data, 'name', $name . '.' . Arr::get($data, 'suffix'));
+            $data = $this->getNewFileName($data);
         }
         // 文件level
         return $this->handleLevel($data);
@@ -221,13 +250,13 @@ class DiskService extends BaseService
     {
         return match (Arr::get($data, 'suffix')) {
             // FILE_TYPE_IMAGE
-            'jpg','jpeg','png','gif','svg','bmp' => DiskFileCode::FILE_TYPE_IMAGE,
+            'jpg', 'jpeg', 'png', 'gif', 'svg', 'bmp' => DiskFileCode::FILE_TYPE_IMAGE,
             // FILE_TYPE_VIDEO
-            'mp4','avi','mkv','mov','flv','webm' => DiskFileCode::FILE_TYPE_VIDEO,
+            'mp4', 'avi', 'mkv', 'mov', 'flv', 'webm' => DiskFileCode::FILE_TYPE_VIDEO,
             // FILE_TYPE_AUDIO
-            'mp3','wav','wma','m4a' => DiskFileCode::FILE_TYPE_AUDIO,
+            'mp3', 'wav', 'wma', 'm4a' => DiskFileCode::FILE_TYPE_AUDIO,
             // FILE_TYPE_DOCUMENT
-            'pdf','doc','docx','txt','ppt','pptx','xls','xlsx' => DiskFileCode::FILE_TYPE_DOCUMENT,
+            'pdf', 'doc', 'docx', 'txt', 'ppt', 'pptx', 'xls', 'xlsx' => DiskFileCode::FILE_TYPE_DOCUMENT,
             // FILE_TYPE_OTHER
             default => DiskFileCode::FILE_TYPE_OTHER,
         };
@@ -247,5 +276,15 @@ class DiskService extends BaseService
             }
         }
         return true;
+    }
+
+    private function getNewFileName(array $data): array
+    {
+        // 先根据'.'获取到文件名部分
+        $name = explode('.', Arr::get($data, 'name'));
+        $name = Arr::get($name, 0) . '_' . Str::random(6);
+        // 添加随机字符之后再拼接回去
+        Arr::set($data, 'name', $name . '.' . Arr::get($data, 'suffix'));
+        return $data;
     }
 }

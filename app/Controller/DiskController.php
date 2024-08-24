@@ -105,11 +105,11 @@ class DiskController extends BaseController
      * @description 重命名文件或文件夹
      * 单个对象操作：接受对象的 id 和新的名称.
      */
-    #[PutMapping('rename/{item_id}'), Permission('disks:rename')]
+    #[PutMapping('rename/{item_id:\d+}'), Permission('disks:rename')]
     public function rename(int $item_id, DiskRequest $request): ResponseInterface
     {
         $newName = $request->input('new_name');
-        return $this->response->success($this->service->renameItem($item_id, $newName));
+        return $this->service->renameItem($item_id, $newName) ? $this->response->success() : $this->response->fail();
     }
 
     /**
