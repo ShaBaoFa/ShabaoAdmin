@@ -200,7 +200,7 @@ class DiskService extends BaseService
 
     public function moveItems(array $items, int $targetFolderId): bool
     {
-        if (DiskFile::find($targetFolderId)->type != DiskFileCode::TYPE_FOLDER->value) {
+        if ($targetFolderId > 0 && DiskFile::find($targetFolderId)->type != DiskFileCode::TYPE_FOLDER->value) {
             throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
         $pk = $this->dao->getModel()->getKeyName();
