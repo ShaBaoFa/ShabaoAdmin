@@ -136,7 +136,7 @@ class DiskController extends BaseController
     {
         $items = $request->input('items'); // 传入数组，每个元素包含 云盘Id
         $targetFolderId = $request->input('target_folder_id', 0); // 传入 target_folder_id
-        return $this->service->moveItems($items, $targetFolderId) ? $this->response->success() : $this->response->fail();
+        return $this->service->moveItems($items, (int)$targetFolderId) ? $this->response->success() : $this->response->fail();
     }
 
     /**
