@@ -75,7 +75,14 @@ class DiskDao extends BaseDao
     {
         $query->when(
             $level = Arr::get($params, 'level'),
-            fn (Builder $query) => $query->where('level', 'like', '%' . $level . '%')
+            fn (Builder $query) => $query->where(
+                function (Builder $query) use ($level) {
+                    if ($level !== 0) {
+                        $query->where('level', 'like', '%,' . $level)
+                            ->orWhere('level', 'like', '%,' . $level . ',%');
+                    }
+                }
+            )
         );
 
         $query->when(
