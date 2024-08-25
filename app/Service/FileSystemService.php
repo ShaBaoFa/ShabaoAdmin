@@ -22,6 +22,7 @@ use App\Exception\BusinessException;
 use Carbon\Carbon;
 use Exception;
 use Hyperf\Cache\Annotation\Cacheable;
+use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Collection\Arr;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Di\Annotation\Inject;
@@ -93,10 +94,7 @@ class FileSystemService extends BaseService
      */
     public function getFileByHash(string $hash, array $columns = ['*'], bool $returnFs = false): array
     {
-        $file = $this->dao->getFileInfoByHash($hash, $columns);
-        if (empty($file)) {
-            throw new BusinessException(ErrorCode::FILE_NOT_EXIST);
-        }
+        $file = $this->getFileInfoByHash($hash);
         $storageMode = Str::lower(FileSystemCode::tryFrom($file['storage_mode'])->name ?? FileSystemCode::LOCAL->name);
         $filesystem = di()->get(FilesystemFactory::class)->get($storageMode);
         match ($file['storage_mode']) {
@@ -150,7 +148,7 @@ class FileSystemService extends BaseService
         if ($this->dao->isUploaded($hash)) {
             throw new BusinessException(ErrorCode::FILE_HAS_BEEN_UPLOADED);
         }
-        $fileInfo = $this->dao->getFileInfoByHash($hash);
+        $fileInfo = $this->getFileInfoByHash($hash);
         try {
             $sts = $this->config->get('sts');
             $ossRamService = make(OssRamService::class, ['option' => $sts]);
@@ -162,15 +160,19 @@ class FileSystemService extends BaseService
         }
     }
 
-    public function getDownloaderStsToken(array|string $hash): array
+    public function getDownloaderStsToken(array|string $hashes): array
     {
-        if (! Arr::accessible($hash)) {
-            $hash = [$hash];
+        if (! Arr::accessible($hashes)) {
+            $hashes = [$hashes];
         }
-        if (! $this->dao->areUploaded($hash)) {
-            throw new BusinessException(ErrorCode::FILE_HAS_NOT_BEEN_UPLOADED);
+        $hashesToUrls = [];
+        foreach ($hashes as $hash) {
+            if (! $this->dao->isUploaded($hash)) {
+                throw new BusinessException(ErrorCode::FILE_HAS_NOT_BEEN_UPLOADED);
+            }
+            $file = $this->getFileInfoByHash($hash);
+            $hashesToUrls = Arr::merge($hashesToUrls, [$hash => Arr::get($file, 'url')]);
         }
-        $hashesToUrls = $this->dao->getFilesUrlByHash($hash);
         // 获取数组所有value
         $urls = array_values($hashesToUrls);
         try {
@@ -182,6 +184,7 @@ class FileSystemService extends BaseService
         }
     }
 
+    #[CacheEvict(prefix: 'fileInfoByHash', value: 'fileHash_#{hash}')]
     public function uploaderCallback(string $hash): bool
     {
         return $this->dao->changeStatusByHash($hash, UploadStatusCode::UPLOAD_FINISHED);
@@ -209,6 +212,16 @@ class FileSystemService extends BaseService
         $fileInfo = $this->uploadTool->handlePreparation($metadata, Arr::merge($config, ['hash' => $hash]));
         $this->save($fileInfo) ?? throw new BusinessException(ErrorCode::UPLOAD_FAILED);
         return $data;
+    }
+
+    #[Cacheable(prefix: 'fileInfoByHash', value: 'fileHash_#{hash}', ttl: 3600 * 24)]
+    public function getFileInfoByHash(string $hash): array
+    {
+        $file = $this->dao->getFileInfoByHash($hash);
+        if (is_null($file)) {
+            throw new BusinessException(ErrorCode::FILE_NOT_EXIST);
+        }
+        return $file;
     }
 
     private function generateOssCallback(array $customParams = []): array
