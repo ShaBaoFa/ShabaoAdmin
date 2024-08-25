@@ -198,7 +198,7 @@ class DiskService extends BaseService
         return $pid;
     }
 
-    public function moveItems(array $items, int $targetFolderId): void
+    public function moveItems(array $items, int $targetFolderId): bool
     {
         if (DiskFile::find($targetFolderId)->type != DiskFileCode::TYPE_FOLDER->value) {
             throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
@@ -213,8 +213,11 @@ class DiskService extends BaseService
                 continue;
             }
             Arr::set($diskFile, 'parent_id', $targetFolderId);
-            $this->update(Arr::get($diskFile, $pk), $diskFile);
+            if (! $this->update(Arr::get($diskFile, $pk), $diskFile)) {
+                return false;
+            }
         }
+        return true;
     }
 
     private function getNewFolderName(array $data): array
