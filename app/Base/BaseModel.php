@@ -18,7 +18,7 @@ use Hyperf\DbConnection\Model\Model;
 use Hyperf\ModelCache\Cacheable;
 use Hyperf\ModelCache\CacheableInterface;
 
-class BaseModel extends Model implements CacheableInterface
+class BaseModel extends Model
 {
     use Cacheable;
     use ModelMacroTrait;
