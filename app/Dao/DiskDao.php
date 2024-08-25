@@ -110,7 +110,7 @@ class DiskDao extends BaseDao
 
     public function isFolder(int $folderId): bool
     {
-        return $this->model::query()->find($folderId)->value('type') == DiskFileCode::TYPE_FOLDER->value;
+        return $this->model::query()->find($folderId)->type == DiskFileCode::TYPE_FOLDER->value;
     }
 
     public function areFolders(array $folderIds): bool

@@ -173,14 +173,48 @@ class DiskService extends BaseService
         $item = $item->toArray();
         // 2. 检查文件名是否已存在
         Arr::set($item, 'name', $newName);
-        while ($this->dao->checkNameExists((int) Arr::get($item, 'parent_id', 0), Arr::get($item, 'name'), $item_id)) {
-            if (Arr::get($item, 'type') == DiskFileCode::TYPE_FOLDER->value) {
-                $item = $this->getNewFolderName($item);
+        $this->checkNameExists((int) Arr::get($item, 'parent_id', 0), $item);
+        return $this->dao->update($item_id, $item);
+    }
+
+    public function checkNameExists(int $pid, array $data): array
+    {
+        while ($this->dao->checkNameExists($pid, Arr::get($data, 'name'), Arr::get($data, $this->dao->getModel()->getKeyName()))) {
+            if (Arr::get($data, 'type') == DiskFileCode::TYPE_FOLDER->value) {
+                $data = $this->getNewFolderName($data);
                 continue;
             }
-            $item = $this->getNewFileName($item);
+            $data = $this->getNewFileName($data);
         }
-        return $this->dao->update($item_id, $item);
+        return $data;
+    }
+
+    public function getPid(array $data): int
+    {
+        $pid = (int) Arr::get($data, 'parent_id', 0);
+        if ($pid > 0) {
+            (! $this->dao->isFolder($pid)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
+        }
+        return $pid;
+    }
+
+    public function moveItems(array $items, int $targetFolderId): void
+    {
+        if (DiskFile::find($targetFolderId)->type != DiskFileCode::TYPE_FOLDER->value) {
+            throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
+        }
+        $pk = $this->dao->getModel()->getKeyName();
+        foreach ($items as $itemId) {
+            /**
+             * @var int $itemId
+             */
+            $diskFile = DiskFile::find($itemId)->toArray();
+            if (Arr::get($diskFile, $pk) == $targetFolderId || Arr::get($diskFile, 'parent_id') == $targetFolderId) {
+                continue;
+            }
+            Arr::set($diskFile, 'parent_id', $targetFolderId);
+            $this->update(Arr::get($diskFile, $pk), $diskFile);
+        }
     }
 
     private function getNewFolderName(array $data): array
@@ -216,19 +250,8 @@ class DiskService extends BaseService
      */
     private function handleData(array $data): array
     {
-        $pid = (int) Arr::get($data, 'parent_id', 0);
-        if ($pid > 0) {
-            (! $this->dao->isFolder($pid)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
-        }
-
-        while ($this->dao->checkNameExists($pid, Arr::get($data, 'name'), Arr::get($data, $this->dao->getModel()->getKeyName()))) {
-            if (Arr::get($data, 'type') == DiskFileCode::TYPE_FOLDER->value) {
-                $data = $this->getNewFolderName($data);
-                continue;
-            }
-            $data = $this->getNewFileName($data);
-        }
-        // 文件level
+        $pid = $this->getPid($data);
+        $data = $this->checkNameExists($pid, $data);
         return $this->handleLevel($data);
     }
 
