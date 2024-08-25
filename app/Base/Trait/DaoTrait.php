@@ -73,6 +73,21 @@ trait DaoTrait
         return ($model = $this->model::find($id, $column)) ? $model : null;
     }
 
+    public function findMany(array $ids, $columns = []): BaseCollection
+    {
+        return new BaseCollection($this->model::findMany($ids, $columns = [])->toArray());
+    }
+
+    public function findFormCache(mixed $id): ?BaseModel
+    {
+        return $this->model::findFromCache($id);
+    }
+
+    public function findManyFormCache(array $ids): BaseCollection
+    {
+        return new BaseCollection($this->model::findManyFromCache($ids)->toArray());
+    }
+
     /**
      * 按条件读取一行数据.
      * @return mixed

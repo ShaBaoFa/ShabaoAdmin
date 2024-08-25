@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace App\Base\Trait;
 
+use App\Base\BaseCollection;
 use App\Base\BaseDao;
 use App\Base\BaseModel;
 use Hyperf\DbConnection\Db;
@@ -247,5 +248,18 @@ trait ServiceTrait
         $position = array_search($id, $descendantLevelArr);
         array_splice($descendantLevelArr, 0, $position, $handleDataLevelArr);
         return implode(',', $descendantLevelArr);
+    }
+
+    /**
+     * 获取单一模型缓存.
+     */
+    public function findFormCache(mixed $id): ?BaseModel
+    {
+        return $this->dao->findFormCache($id);
+    }
+
+    public function findManyFormCache(array $ids): BaseCollection
+    {
+        return $this->dao->findManyFormCache($ids);
     }
 }

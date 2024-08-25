@@ -35,7 +35,7 @@ return [
         'cache' => [
             'handler' => RedisHandler::class,
             'cache_key' => '{mc:%s:m:%s}:%s:%s',
-            'prefix' => 'default',
+            'prefix' => env('APP_NAME', 'default'),
             'ttl' => 3600 * 24,
             'empty_model_ttl' => 600,
             'load_script' => true,

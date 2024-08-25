@@ -16,8 +16,9 @@ use App\Base\Trait\ModelMacroTrait;
 use Hyperf\Database\Model\SoftDeletes;
 use Hyperf\DbConnection\Model\Model;
 use Hyperf\ModelCache\Cacheable;
+use Hyperf\ModelCache\CacheableInterface;
 
-class BaseModel extends Model
+class BaseModel extends Model implements CacheableInterface
 {
     use Cacheable;
     use ModelMacroTrait;
