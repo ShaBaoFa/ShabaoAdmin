@@ -14,14 +14,11 @@ namespace App\Base\Trait;
 
 use App\Base\BaseCollection;
 use App\Base\BaseModel;
-use Hyperf\Collection\Arr;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Tappable\HigherOrderTapProxy;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-
-use function App\Helper\user;
 
 trait DaoTrait
 {
@@ -349,9 +346,11 @@ trait DaoTrait
         return $this->handleSearch($this->model::query(), $params)->get($columns)->toArray();
     }
 
-    public function checkExists(?array $params = null): bool
+    public function checkExists(?array $condition, bool $isScope): bool
     {
-        return $this->model::query()->where($params)->exists();
+        $query = $this->model::withTrashed()->where($condition);
+        $isScope && $query->userDataScope();
+        return $query->exists();
     }
 
     /**
@@ -359,6 +358,6 @@ trait DaoTrait
      */
     public function belongMe(array $condition): bool
     {
-        return $this->checkExists(Arr::merge($condition, [$this->getModel()->getDataScopeField() => user()->getId()]));
+        return $this->checkExists($condition, true);
     }
 }

@@ -88,9 +88,9 @@ class OrganizationService extends BaseService
             'id' => $id,
             'data' => $handleData,
         ];
-        $descendants = $this->dao->getDescendantsOrgs((int) $id);
+        $descendants = $this->dao->getDescendants((int) $id);
         foreach ($descendants as $descendant) {
-            $handleDescendantOrganizationLevelData = $this->handleDescendantOrganizationLevels($descendant['level'], $handleData['level'], $id);
+            $handleDescendantOrganizationLevelData = $this->handleDescendantLevels($descendant['level'], $handleData['level'], $id);
             $update[] = [
                 'id' => $descendant['id'],
                 'data' => ['level' => $handleDescendantOrganizationLevelData],

@@ -37,18 +37,6 @@ class DiskService extends BaseService
         $this->dao = $dao;
     }
 
-    public function getTreeList(?array $params = null, bool $isScope = true): array
-    {
-        $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc'], $params);
-        return parent::getTreeList($params, $isScope);
-    }
-
-    public function getTreeListByRecycle(?array $params = null, bool $isScope = true): array
-    {
-        $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc'], $params);
-        return parent::getTreeListByRecycle($params, $isScope);
-    }
-
     /**
      * 获取前端选择树.
      */
@@ -160,7 +148,7 @@ class DiskService extends BaseService
         if ($folder_id > 0) {
             (! $this->dao->isFolder($folder_id)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
-        return $this->getList([
+        return $this->getPageList([
             'parent_id' => $folder_id,
         ]);
     }
@@ -256,11 +244,6 @@ class DiskService extends BaseService
         }
         parent::recovery($ids);
         return true;
-    }
-
-    public function getRecycle(): array
-    {
-        return $this->dao->getRecycle();
     }
 
     private function getNewFolderName(array $data): array

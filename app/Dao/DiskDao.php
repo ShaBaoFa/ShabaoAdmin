@@ -112,6 +112,19 @@ class DiskDao extends BaseDao
             }
         );
 
+        $query->when(
+            Arr::get($params, 'recycle'),
+            function (Builder $query) {
+                $query->where('is_deleted', '=', true)
+                    ->where(function (Builder $query) {
+                        $query->where('parent_id', '=', 0) // 顶级目录
+                            ->orWhereDoesntHave('parent', function (Builder $q) {
+                                $q->withoutGlobalScopes()->where('is_deleted', '=', true); // 禁用软删除作用域，避免 deleted_at 条件
+                            }); // 父目录没有被软删除`
+                    });
+            }
+        );
+
         return $query;
     }
 
@@ -160,21 +173,6 @@ class DiskDao extends BaseDao
             }
         }
         return parent::delete(Arr::merge($ids, $deleteIds));
-    }
-
-    public function getRecycle(): array
-    {
-        return $this->model::withTrashed()
-            ->where('is_deleted', '=', true)
-            ->where(function (Builder $query) {
-                $query->where('parent_id', '=', 0) // 顶级目录
-                    ->orWhereDoesntHave('parent', function (Builder $q) {
-                        $q->withoutGlobalScopes()->where('is_deleted', '=', true); // 禁用软删除作用域，避免 deleted_at 条件
-                    }); // 父目录没有被软删除`
-            })
-            ->userDataScope()
-            ->get()
-            ->toArray();
     }
 
     #[Transactional]

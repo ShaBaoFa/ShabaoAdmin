@@ -46,13 +46,24 @@ class DiskController extends BaseController
     }
 
     /**
+     * 前端选择树（不需要权限）.
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[GetMapping('tree')]
+    public function tree(): ResponseInterface
+    {
+        return $this->response->success($this->service->getSelectTree());
+    }
+
+    /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
     #[GetMapping('recycle'), Permission('disks:recycle')]
     public function recycle(DiskRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->getRecycle());
+        return $this->response->success($this->service->getPageListByRecycle());
     }
 
     /**
