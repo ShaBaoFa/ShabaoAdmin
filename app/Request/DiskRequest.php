@@ -98,6 +98,14 @@ class DiskRequest extends BaseFormRequest
         ];
     }
 
+    public function recoveryRules(): array
+    {
+        return [
+            'items' => 'required|array',
+            'items.*' => 'required|int|exists:disk_files,id',
+        ];
+    }
+
     /**
      * 字段映射名称
      * return array.

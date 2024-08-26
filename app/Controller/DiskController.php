@@ -184,8 +184,8 @@ class DiskController extends BaseController
     #[PutMapping('recovery'), Permission('disks:recovery')]
     public function recovery(DiskRequest $request): ResponseInterface
     {
-        $itemIds = $request->input('item_ids'); // 传入文件或文件夹的 id 数组
-        return $this->response->success($this->service->recovery($itemIds));
+        $items = $request->input('items'); // 传入文件或文件夹的 id 数组
+        return $this->service->recovery($items) ? $this->response->success() : $this->response->fail();
     }
 
     /**

@@ -15,10 +15,11 @@ namespace App\Dao;
 use App\Base\BaseDao;
 use App\Constants\DiskFileCode;
 use App\Model\DiskFile;
-use Exception;
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class DiskDao extends BaseDao
 {
@@ -143,7 +144,8 @@ class DiskDao extends BaseDao
     }
 
     /**
-     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     #[Transactional]
     public function delete($ids): bool
@@ -157,8 +159,7 @@ class DiskDao extends BaseDao
                 $deleteIds = Arr::merge($deleteIds, $this->getDescendants($file->id, ['id']));
             }
         }
-        $this->getModel()::destroy(Arr::merge($ids, $deleteIds));
-        return true;
+        return parent::delete(Arr::merge($ids, $deleteIds));
     }
 
     public function getRecycle(): array
@@ -174,5 +175,26 @@ class DiskDao extends BaseDao
             ->userDataScope()
             ->get()
             ->toArray();
+    }
+
+    #[Transactional]
+    public function recovery(array $ids): bool
+    {
+        $recoveryIds = [];
+        foreach ($ids as $id) {
+            $file = $this->model::withTrashed()->find($id);
+            if (is_null($file)) {
+                continue;
+            }
+            // 如果是文件夹，需要递归删除所有子文件和子文件夹
+            if ($file->type == DiskFileCode::TYPE_FOLDER->value) {
+                $recoveryIds = Arr::merge($recoveryIds, $this->getDescendants($file->id, ['id']));
+            }
+        }
+        parent::recovery(Arr::merge($ids, $recoveryIds));
+        foreach ($ids as $id) {
+            $this->update($id, ['is_deleted' => false]);
+        }
+        return true;
     }
 }
