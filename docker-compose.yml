@@ -13,9 +13,13 @@ services:
       - ./.github/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - "13306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      retries: 3
+      timeout: 5s
     restart: "always"
   redis:
-    image: "redis"
+    image: "redis:alpine"
     command:
       - "redis-server"
       - "--databases 256"
@@ -26,14 +30,22 @@ services:
     volumes:
       - ./.docker/redis:/data
       - ./.docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 3
+      timeout: 5s
     restart: "always"
   shabao-admin:
     image: "wlfpanda1012/hyperf:8.1-alpine-v3.18-swoole-xlswriter"
     restart: always
     depends_on:
-      - mysql
-      - redis
-      - rabbitmq
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       APP_ENV: "${APP_ENV:-prod}"
       DB_HOST: "mysql"
@@ -64,6 +76,11 @@ services:
     volumes:
       - ./.docker/rabbitmq:/var/lib/rabbitmq
       - ./.docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 networks:
   net:
     driver: bridge
