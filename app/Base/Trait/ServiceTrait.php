@@ -240,7 +240,7 @@ trait ServiceTrait
      */
     public function getDescendants(int $parentId, array $columns = ['*']): array
     {
-        return $this->dao->getDescendants($parentId,$columns);
+        return $this->dao->getDescendants($parentId, $columns);
     }
 
     /**

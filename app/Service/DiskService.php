@@ -246,6 +246,11 @@ class DiskService extends BaseService
         return true;
     }
 
+    public function getRecycle(): array
+    {
+        return $this->dao->getRecycle();
+    }
+
     private function getNewFolderName(array $data): array
     {
         Arr::set($data, 'name', str(Arr::get($data, 'name')) . '_' . Str::random(6));
@@ -328,10 +333,5 @@ class DiskService extends BaseService
         // 添加随机字符之后再拼接回去
         Arr::set($data, 'name', $name . '.' . Arr::get($data, 'suffix'));
         return $data;
-    }
-
-    public function getRecycle(): array
-    {
-        return $this->dao->getRecycle();
     }
 }
