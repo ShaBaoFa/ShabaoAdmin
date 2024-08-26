@@ -165,7 +165,7 @@ class DiskService extends BaseService
         ]);
     }
 
-    public function renameItem(int $item_id, string $newName): bool
+    public function rename(int $item_id, string $newName): bool
     {
         /**
          * @var DiskFile $item
@@ -206,7 +206,7 @@ class DiskService extends BaseService
         return $pid;
     }
 
-    public function moveItems(array $items, int $targetFolderId): bool
+    public function move(array $items, int $targetFolderId): bool
     {
         if ($targetFolderId > 0 && DiskFile::find($targetFolderId)->type != DiskFileCode::TYPE_FOLDER->value) {
             throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
@@ -234,15 +234,27 @@ class DiskService extends BaseService
         return true;
     }
 
-    public function deleteItems(array $itemIds): bool
+    public function delete(array $ids): bool
     {
         // 判断$items
-        foreach ($itemIds as $id) {
+        foreach ($ids as $id) {
             if (! $this->belongMe(['id' => $id])) {
                 throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
             }
         }
-        $this->delete($itemIds);
+        parent::delete($ids);
+        return true;
+    }
+
+    public function recovery(array $ids): bool
+    {
+        // 判断$items
+        foreach ($ids as $id) {
+            if (! $this->belongMe(['id' => $id])) {
+                throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
+            }
+        }
+        parent::recovery($ids);
         return true;
     }
 

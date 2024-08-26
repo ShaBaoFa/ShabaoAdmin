@@ -119,7 +119,7 @@ class DiskController extends BaseController
     public function rename(int $item_id, DiskRequest $request): ResponseInterface
     {
         $newName = $request->input('new_name');
-        return $this->service->renameItem($item_id, $newName) ? $this->response->success() : $this->response->fail();
+        return $this->service->rename($item_id, $newName) ? $this->response->success() : $this->response->fail();
     }
 
     /**
@@ -131,8 +131,8 @@ class DiskController extends BaseController
     #[DeleteMapping('delete'), Permission('disks:delete')]
     public function delete(DiskRequest $request): ResponseInterface
     {
-        $items = $request->input('items'); // 传入对象 id 数组
-        return $this->service->deleteItems($items) ? $this->response->success() : $this->response->fail();
+        $ids = $request->input('items'); // 传入对象 id 数组
+        return $this->service->delete($ids) ? $this->response->success() : $this->response->fail();
     }
 
     /**
@@ -146,7 +146,7 @@ class DiskController extends BaseController
     {
         $items = $request->input('items'); // 传入数组，每个元素包含 云盘Id
         $targetFolderId = $request->input('target_folder_id', 0); // 传入 target_folder_id
-        return $this->service->moveItems($items, (int) $targetFolderId) ? $this->response->success() : $this->response->fail();
+        return $this->service->move($items, (int) $targetFolderId) ? $this->response->success() : $this->response->fail();
     }
 
     /**
