@@ -99,4 +99,5 @@ return [
     // disk
     'disk_file_not_exist' => 'disk_file_not_exist',
     'disk_folder_not_exist' => 'disk_folder_not_exist',
+    'disk_folder_illegal_move' => 'disk_folder_illegal_move'
 ];

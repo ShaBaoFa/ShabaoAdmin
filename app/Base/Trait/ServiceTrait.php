@@ -125,6 +125,11 @@ trait ServiceTrait
         return $this->dao->find($id, $column);
     }
 
+    public function findMany(array $ids, array $column = ['*']): BaseCollection
+    {
+        return $this->dao->findMany($ids, $column);
+    }
+
     /**
      * Description:获取单个值
      * @return null|HigherOrderTapProxy|mixed|void
@@ -233,9 +238,9 @@ trait ServiceTrait
     /**
      * 获取子孙节点.
      */
-    public function getDescendants(int $parentId): array
+    public function getDescendants(int $parentId, array $columns = ['*']): array
     {
-        return $this->dao->getDescendants($parentId);
+        return $this->dao->getDescendants($parentId,$columns);
     }
 
     /**
@@ -261,5 +266,10 @@ trait ServiceTrait
     public function findManyFormCache(array $ids): BaseCollection
     {
         return $this->dao->findManyFormCache($ids);
+    }
+
+    public function belongMe(array $condition = []): bool
+    {
+        return $this->dao->belongMe($condition);
     }
 }

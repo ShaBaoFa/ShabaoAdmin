@@ -20,6 +20,8 @@ use App\Exception\BusinessException;
 use App\Model\DiskFile;
 use Hyperf\Collection\Arr;
 use Hyperf\Stringable\Str;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 use function Hyperf\Stringable\str;
 
@@ -111,10 +113,16 @@ class DiskService extends BaseService
         return $this->dao->save($this->handleFolderData($data));
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getDownloadTokens(array $hashes): array
     {
-        if (! $this->belongMe($hashes)) {
-            throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
+        foreach ($hashes as $hash) {
+            if (! $this->belongMe(['hash' => $hash])) {
+                throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
+            }
         }
         $fs = di()->get(FileSystemService::class);
         return $fs->getDownloaderStsToken($hashes);
@@ -209,14 +217,32 @@ class DiskService extends BaseService
              * @var int $itemId
              */
             $diskFile = DiskFile::find($itemId)->toArray();
+            $descendants = $this->getDescendants(Arr::get($diskFile, $pk), [$pk]);
+            foreach ($descendants as $descendant) {
+                if (Arr::get($descendant, $pk) == $targetFolderId) {
+                    throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_MOVE);
+                }
+            }
             if (Arr::get($diskFile, $pk) == $targetFolderId || Arr::get($diskFile, 'parent_id') == $targetFolderId) {
-                continue;
+                throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_MOVE);
             }
             Arr::set($diskFile, 'parent_id', $targetFolderId);
             if (! $this->update(Arr::get($diskFile, $pk), $diskFile)) {
                 return false;
             }
         }
+        return true;
+    }
+
+    public function deleteItems(array $itemIds): bool
+    {
+        // 判断$items
+        foreach ($itemIds as $id) {
+            if (! $this->belongMe(['id' => $id])) {
+                throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
+            }
+        }
+        $this->delete($itemIds);
         return true;
     }
 
@@ -294,16 +320,6 @@ class DiskService extends BaseService
         return $this->handleData($data);
     }
 
-    private function belongMe(array $hashes): bool
-    {
-        foreach ($hashes as $hash) {
-            if (! $this->dao->belongMe($hash)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     private function getNewFileName(array $data): array
     {
         // 先根据'.'获取到文件名部分
@@ -312,5 +328,10 @@ class DiskService extends BaseService
         // 添加随机字符之后再拼接回去
         Arr::set($data, 'name', $name . '.' . Arr::get($data, 'suffix'));
         return $data;
+    }
+
+    public function getRecycle(): array
+    {
+        return $this->dao->getRecycle();
     }
 }

@@ -14,6 +14,8 @@ namespace App\Model;
 
 use App\Base\BaseModel;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Relations\BelongsTo;
+use Hyperf\Database\Model\Relations\HasMany;
 
 /**
  * @property int $id 主键
@@ -32,6 +34,7 @@ use Carbon\Carbon;
  * @property Carbon $updated_at 更新时间
  * @property string $deleted_at 删除时间
  * @property string $remark 备注
+ * @property int $is_deleted 是否删除
  */
 class DiskFile extends BaseModel
 {
@@ -40,15 +43,17 @@ class DiskFile extends BaseModel
      */
     protected ?string $table = 'disk_files';
 
+    protected array $hidden = [''];
+
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'name', 'level', 'hash', 'suffix', 'parent_id', 'size_byte', 'size_info', 'type', 'file_type', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected array $fillable = ['id', 'name', 'level', 'hash', 'suffix', 'parent_id', 'size_byte', 'size_info', 'type', 'file_type', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark', 'is_deleted'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'int', 'parent_id' => 'integer', 'size_byte' => 'integer', 'is_folder' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'type' => 'integer', 'file_type' => 'integer'];
+    protected array $casts = ['id' => 'int', 'parent_id' => 'integer', 'size_byte' => 'integer', 'is_folder' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'type' => 'integer', 'file_type' => 'integer', 'is_deleted' => 'integer'];
 
     public function getName(): string
     {
@@ -93,5 +98,15 @@ class DiskFile extends BaseModel
     public function getFileType(): int
     {
         return $this->file_type;
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(DiskFile::class, 'parent_id', 'id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(DiskFile::class, 'parent_id', 'id');
     }
 }

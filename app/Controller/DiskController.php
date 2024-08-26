@@ -46,6 +46,16 @@ class DiskController extends BaseController
     }
 
     /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[GetMapping('recycle'), Permission('disks:recycle')]
+    public function recycle(DiskRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->getRecycle());
+    }
+
+    /**
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
      * @description 文件夹meta
@@ -121,8 +131,8 @@ class DiskController extends BaseController
     #[DeleteMapping('delete'), Permission('disks:delete')]
     public function delete(DiskRequest $request): ResponseInterface
     {
-        $itemIds = $request->input('item_ids'); // 传入对象 id 数组
-        return $this->response->success($this->service->deleteItems($itemIds));
+        $items = $request->input('items'); // 传入对象 id 数组
+        return $this->service->deleteItems($items) ? $this->response->success() : $this->response->fail();
     }
 
     /**

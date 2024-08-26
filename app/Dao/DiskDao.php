@@ -15,11 +15,10 @@ namespace App\Dao;
 use App\Base\BaseDao;
 use App\Constants\DiskFileCode;
 use App\Model\DiskFile;
+use Exception;
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
-
-use function App\Helper\user;
 
 class DiskDao extends BaseDao
 {
@@ -117,7 +116,7 @@ class DiskDao extends BaseDao
 
     public function isFolder(int $folderId): bool
     {
-        return $this->model::query()->find($folderId)->type == DiskFileCode::TYPE_FOLDER->value;
+        return $this->model::query()->find($folderId)?->type == DiskFileCode::TYPE_FOLDER->value;
     }
 
     public function areFolders(array $folderIds): bool
@@ -139,15 +138,41 @@ class DiskDao extends BaseDao
         if (! is_null($id)) {
             $query->where($this->getModel()->getKeyName(), '<>', $id);
         }
-        $query->where('parent_id', $parentId)->where('name', $name)->where($this->getModel()->getDataScopeField(), user()->getId());
+        $query->where('parent_id', $parentId)->where('name', $name)->userDataScope();
         return $query->exists();
     }
 
     /**
-     * 文件归属.
+     * @throws Exception
      */
-    public function belongMe(string $hash): bool
+    #[Transactional]
+    public function delete($ids): bool
     {
-        return $this->checkExists(Arr::merge(['hash' => $hash], [$this->getModel()->getDataScopeField() => user()->getId()]));
+        $deleteIds = [];
+        foreach ($ids as $id) {
+            $file = $this->model::find($id);
+            $this->update($file->id, ['is_deleted' => true]);
+            // 如果是文件夹，需要递归删除所有子文件和子文件夹
+            if ($file->type == DiskFileCode::TYPE_FOLDER->value) {
+                $deleteIds = Arr::merge($deleteIds, $this->getDescendants($file->id, ['id']));
+            }
+        }
+        $this->getModel()::destroy(Arr::merge($ids, $deleteIds));
+        return true;
+    }
+
+    public function getRecycle(): array
+    {
+        return $this->model::withTrashed()
+            ->where('is_deleted', '=', true)
+            ->where(function (Builder $query) {
+                $query->where('parent_id', '=', 0) // 顶级目录
+                    ->orWhereDoesntHave('parent', function (Builder $q) {
+                        $q->withoutGlobalScopes()->where('is_deleted', '=', true); // 禁用软删除作用域，避免 deleted_at 条件
+                    }); // 父目录没有被软删除`
+            })
+            ->userDataScope()
+            ->get()
+            ->toArray();
     }
 }

@@ -14,11 +14,14 @@ namespace App\Base\Trait;
 
 use App\Base\BaseCollection;
 use App\Base\BaseModel;
+use Hyperf\Collection\Arr;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Tappable\HigherOrderTapProxy;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+
+use function App\Helper\user;
 
 trait DaoTrait
 {
@@ -75,7 +78,7 @@ trait DaoTrait
 
     public function findMany(array $ids, $columns = []): BaseCollection
     {
-        return new BaseCollection($this->model::findMany($ids, $columns = [])->toArray());
+        return new BaseCollection($this->model::findMany($ids, $columns)->toArray());
     }
 
     public function findFormCache(mixed $id): ?BaseModel
@@ -340,14 +343,22 @@ trait DaoTrait
     /**
      * 获取子孙节点.
      */
-    public function getDescendants(int $parentId): array
+    public function getDescendants(int $parentId, array $columns = ['*']): array
     {
         $params = ['level' => $parentId];
-        return $this->handleSearch($this->model::query(), $params)->get()->toArray();
+        return $this->handleSearch($this->model::query(), $params)->get($columns)->toArray();
     }
 
     public function checkExists(?array $params = null): bool
     {
         return $this->model::query()->where($params)->exists();
+    }
+
+    /**
+     * 文件归属.
+     */
+    public function belongMe(array $condition): bool
+    {
+        return $this->checkExists(Arr::merge($condition, [$this->getModel()->getDataScopeField() => user()->getId()]));
     }
 }
