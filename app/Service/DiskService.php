@@ -22,6 +22,7 @@ use Hyperf\Collection\Arr;
 use Hyperf\Stringable\Str;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Random\RandomException;
 
 use function Hyperf\Stringable\str;
 
@@ -241,6 +242,16 @@ class DiskService extends BaseService
         return true;
     }
 
+    public function share(array $data): array
+    {
+        foreach (Arr::get($data, 'items') as $id) {
+            if (! $this->belongMe(['id' => $id])) {
+                throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
+            }
+        }
+        if (Arr::has($data, 'shared_with'));
+    }
+
     private function getNewFolderName(array $data): array
     {
         Arr::set($data, 'name', str(Arr::get($data, 'name')) . '_' . Str::random(6));
@@ -323,5 +334,13 @@ class DiskService extends BaseService
         // 添加随机字符之后再拼接回去
         Arr::set($data, 'name', $name . '.' . Arr::get($data, 'suffix'));
         return $data;
+    }
+
+    /**
+     * @throws RandomException
+     */
+    private function generateUniqueShareLink(int $length = 16)
+    {
+        return bin2hex(random_bytes($length / 2));
     }
 }

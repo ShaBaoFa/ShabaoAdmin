@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace App\Dao;
 
+use App\Base\BaseCollection;
 use App\Base\BaseDao;
 use App\Constants\DiskFileCode;
 use App\Model\DiskFile;
@@ -215,5 +216,18 @@ class DiskDao extends BaseDao
             $this->update($id, ['is_deleted' => false]);
         }
         return true;
+    }
+
+    /**
+     * 获取前端选择树.
+     */
+    public function getSelectTree(): array
+    {
+        $treeData = $this->model::query()->where('type', DiskFileCode::TYPE_FOLDER->value)->select(['id', 'parent_id', 'id AS value', 'name AS label'])
+            ->orderBy('parent_id')
+            ->userDataScope()
+            ->get()->toArray();
+
+        return (new BaseCollection())->toTree($treeData, $treeData[0]['parent_id'] ?? 0);
     }
 }

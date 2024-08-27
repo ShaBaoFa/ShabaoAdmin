@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Base\BaseFormRequest;
+use Hyperf\Validation\Rule;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RedisException;
@@ -114,6 +115,18 @@ class DiskRequest extends BaseFormRequest
         ];
     }
 
+    public function shareRules(): array
+    {
+        return [
+            'items' => 'required|array',
+            'items.*' => 'required|int|exists:disk_files,id',
+            'shared_with' => 'nullable|array',
+            'shared_with.*' => 'int|exists:users,id',
+            'expire_type' => ['int', Rule::in([1, 7, 30])],
+            'password' => ['nullable', 'alpha_num:ascii', 'min:4', 'max:4'],
+        ];
+    }
+
     /**
      * 字段映射名称
      * return array.
@@ -126,8 +139,14 @@ class DiskRequest extends BaseFormRequest
             'path' => '地址',
             'files.*.hash' => '文件hash',
             'hashes.*' => '文件hash',
-            'files.*.parent_id' => '文件夹id',
+            'files.*.parent_id' => '文件夹',
             'files.*.name' => '文件名',
+            'items.*' => '文件或文件夹',
+            'new_name' => '新名字',
+            'target_folder_id' => '目标文件夹',
+            'parent_id' => '文件夹',
+            'expire_type' => '过期时间',
+            'password' => '密码',
         ];
     }
 

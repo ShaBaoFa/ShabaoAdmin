@@ -34,6 +34,7 @@ use OSS\OssClient;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Random\RandomException;
 use RedisException;
 use Wlfpanda1012\AliyunSts\Constants\OSSClientCode;
 use Wlfpanda1012\AliyunSts\Oss\OssRamService;
@@ -62,11 +63,14 @@ class TestCommand extends HyperfCommand
      * @throws ContainerExceptionInterface
      * @throws OssException
      * @throws RedisException
+     * @throws RandomException
      */
     public function handle(): void
     {
-        make(OssRamService::class, ['a' => 'b']);
-        var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
+
+       var_dump(bin2hex(random_bytes(32 / 2)));
+//        make(OssRamService::class, ['a' => 'b']);
+//        var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
         //        $ids = [];
         //        for ($i = 0; $i < 10; ++$i) {
         //            $ids[] = $i * 5 + 1;

@@ -182,8 +182,7 @@ class DiskController extends BaseController
     #[PostMapping('share'), Permission('disks:share'),OperationLog]
     public function share(DiskRequest $request): ResponseInterface
     {
-        $items = $request->input('items'); // 传入对象 id 数组
-        return $this->response->success($this->service->shareItems($items));
+        return $this->response->success($this->service->share($request->all()));
     }
 
     /**
