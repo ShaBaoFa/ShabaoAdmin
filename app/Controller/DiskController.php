@@ -63,7 +63,7 @@ class DiskController extends BaseController
     #[GetMapping('recycle'), Permission('disks:recycle')]
     public function recycle(DiskRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->getPageListByRecycle());
+        return $this->response->success($this->service->getPageListByRecycle(['list_recycle' => true]));
     }
 
     /**
@@ -205,10 +205,10 @@ class DiskController extends BaseController
      * @description 从回收站中永久删除文件或文件夹
      * 批量操作：接受多个对象 id.
      */
-    #[DeleteMapping('realDelete'), Permission('disks:realDelete'),OperationLog]
+    #[DeleteMapping('realDelete'), Permission('disks:realDelete')]
     public function realDelete(DiskRequest $request): ResponseInterface
     {
-        $itemIds = $request->input('item_ids'); // 传入文件或文件夹的 id 数组
-        return $this->response->success($this->service->realDelete($itemIds));
+        $ids = $request->input('items'); // 传入文件或文件夹的 id 数组
+        return $this->service->realDelete($ids) ? $this->response->success():$this->response->fail();
     }
 }

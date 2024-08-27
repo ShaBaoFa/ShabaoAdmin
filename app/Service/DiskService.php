@@ -58,7 +58,7 @@ class DiskService extends BaseService
             'id' => $id,
             'data' => $handleData,
         ];
-        $descendants = $this->dao->getDescendants((int) $id);
+        $descendants = $this->dao->getDescendants(parentId: (int) $id);
         foreach ($descendants as $descendant) {
             $handleDescendantLevelData = $this->handleDescendantLevels($descendant['level'], $handleData['level'], $id);
             $update[] = [
@@ -70,22 +70,17 @@ class DiskService extends BaseService
     }
 
     /**
-     * 真实删除部门.
+     * 真实删除.
      */
-    public function realDel(array $ids): ?array
+    public function realDelete(array $ids): bool
     {
-        // 跳过的部门
-        $ctuIds = [];
-        if (count($ids)) {
-            foreach ($ids as $id) {
-                if (! $this->checkChildrenExists((int) $id) && ! $this->dao->find($id)->users()->exists()) {
-                    $this->dao->realDelete([$id]);
-                } else {
-                    $ctuIds[] = $id;
-                }
+        // 判断$items
+        foreach ($ids as $id) {
+            if (! $this->belongMe(['id' => $id])) {
+                throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
             }
         }
-        return count($ctuIds) ? $this->dao->getDeptName($ctuIds) : null;
+        return parent::realDelete($ids);
     }
 
     public function saveFiles(array $filesData): bool
@@ -205,7 +200,7 @@ class DiskService extends BaseService
              * @var int $itemId
              */
             $diskFile = DiskFile::find($itemId)->toArray();
-            $descendants = $this->getDescendants(Arr::get($diskFile, $pk), [$pk]);
+            $descendants = $this->getDescendants(parentId: Arr::get($diskFile, $pk),columns: [$pk]);
             foreach ($descendants as $descendant) {
                 if (Arr::get($descendant, $pk) == $targetFolderId) {
                     throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_MOVE);

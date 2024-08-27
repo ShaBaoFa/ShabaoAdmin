@@ -125,7 +125,7 @@ class MenuService extends BaseService
             'id' => $id,
             'data' => $handleData,
         ];
-        $descendants = $this->getDescendants((int) $id);
+        $descendants = $this->getDescendants(parentId: (int) $id);
         foreach ($descendants as $descendant) {
             $handleDescendantMenuLevelData = $this->handleDescendantLevels($descendant['level'], $handleData['level'], $id);
             $update[] = [

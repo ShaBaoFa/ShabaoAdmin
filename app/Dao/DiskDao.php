@@ -113,7 +113,7 @@ class DiskDao extends BaseDao
         );
 
         $query->when(
-            Arr::get($params, 'recycle'),
+            Arr::get($params, 'list_recycle'),
             function (Builder $query) {
                 $query->where('is_deleted', '=', true)
                     ->where(function (Builder $query) {
@@ -166,27 +166,47 @@ class DiskDao extends BaseDao
         $deleteIds = [];
         foreach ($ids as $id) {
             $file = $this->model::find($id);
+            if (is_null($file)) continue;
             $this->update($file->id, ['is_deleted' => true]);
             // 如果是文件夹，需要递归删除所有子文件和子文件夹
             if ($file->type == DiskFileCode::TYPE_FOLDER->value) {
-                $deleteIds = Arr::merge($deleteIds, $this->getDescendants($file->id, ['id']));
+                $deleteIds = Arr::merge($deleteIds, $this->getDescendants(parentId: $file->id,columns: ['id']));
             }
         }
         return parent::delete(Arr::merge($ids, $deleteIds));
     }
 
     #[Transactional]
+    public function realDelete($ids): bool
+    {
+        $deleteIds = [];
+        foreach ($ids as $key => $id) {
+            $file = $this->model::onlyTrashed()->find($id);
+            if (is_null($file)) {
+                Arr::forget($ids,$key);
+                continue;
+            }
+            // 如果是文件夹，需要递归删除所有子文件和子文件夹
+            if ($file->type == DiskFileCode::TYPE_FOLDER->value) {
+                $deleteIds = Arr::merge($deleteIds, $this->getDescendants(parentId: $file->id,params: ['recycle' => true],columns: ['id']));
+            }
+        }
+        return parent::realDelete(Arr::merge($ids, $deleteIds));
+    }
+
+
+    #[Transactional]
     public function recovery(array $ids): bool
     {
         $recoveryIds = [];
         foreach ($ids as $id) {
-            $file = $this->model::withTrashed()->find($id);
+            $file = $this->model::onlyTrashed()->find($id);
             if (is_null($file)) {
                 continue;
             }
             // 如果是文件夹，需要递归删除所有子文件和子文件夹
             if ($file->type == DiskFileCode::TYPE_FOLDER->value) {
-                $recoveryIds = Arr::merge($recoveryIds, $this->getDescendants($file->id, ['id']));
+                $recoveryIds = Arr::merge($recoveryIds, $this->getDescendants(parentId: $file->id,params: ['recycle' => true],columns: ['id']));
             }
         }
         parent::recovery(Arr::merge($ids, $recoveryIds));

@@ -71,7 +71,7 @@ class DeptService extends BaseService
             'id' => $id,
             'data' => $handleData,
         ];
-        $descendants = $this->dao->getDescendants((int) $id);
+        $descendants = $this->getDescendants(parentId: (int) $id);
         foreach ($descendants as $descendant) {
             $handleDescendantDeptLevelData = $this->handleDescendantLevels($descendant['level'], $handleData['level'], $id);
             $update[] = [

@@ -98,6 +98,14 @@ class DiskRequest extends BaseFormRequest
         ];
     }
 
+    public function realDeleteRules(): array
+    {
+        return [
+            'items' => 'required|array',
+            'items.*' => 'required|int|exists:disk_files,id',
+        ];
+    }
+
     public function recoveryRules(): array
     {
         return [
