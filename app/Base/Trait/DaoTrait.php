@@ -14,6 +14,7 @@ namespace App\Base\Trait;
 
 use App\Base\BaseCollection;
 use App\Base\BaseModel;
+use Hyperf\Collection\Arr;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Tappable\HigherOrderTapProxy;
@@ -340,10 +341,11 @@ trait DaoTrait
     /**
      * 获取子孙节点.
      */
-    public function getDescendants(int $parentId, array $columns = ['*']): array
+    public function getDescendants(int $parentId,array $params = [],bool $isScope = true, array $columns = ['*']): array
     {
-        $params = ['level' => $parentId];
-        return $this->handleSearch($this->model::query(), $params)->get($columns)->toArray();
+        $params = Arr::merge($params,['level' => $parentId]);
+        Arr::set($params,'select',$columns);
+        return $this->listQuerySetting($params, $isScope)->get($columns)->toArray();
     }
 
     public function checkExists(?array $condition, bool $isScope): bool
