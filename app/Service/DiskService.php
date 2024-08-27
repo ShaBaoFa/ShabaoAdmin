@@ -200,7 +200,7 @@ class DiskService extends BaseService
              * @var int $itemId
              */
             $diskFile = DiskFile::find($itemId)->toArray();
-            $descendants = $this->getDescendants(parentId: Arr::get($diskFile, $pk),columns: [$pk]);
+            $descendants = $this->getDescendants(parentId: Arr::get($diskFile, $pk), columns: [$pk]);
             foreach ($descendants as $descendant) {
                 if (Arr::get($descendant, $pk) == $targetFolderId) {
                     throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_MOVE);

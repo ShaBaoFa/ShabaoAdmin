@@ -166,11 +166,13 @@ class DiskDao extends BaseDao
         $deleteIds = [];
         foreach ($ids as $id) {
             $file = $this->model::find($id);
-            if (is_null($file)) continue;
+            if (is_null($file)) {
+                continue;
+            }
             $this->update($file->id, ['is_deleted' => true]);
             // 如果是文件夹，需要递归删除所有子文件和子文件夹
             if ($file->type == DiskFileCode::TYPE_FOLDER->value) {
-                $deleteIds = Arr::merge($deleteIds, $this->getDescendants(parentId: $file->id,columns: ['id']));
+                $deleteIds = Arr::merge($deleteIds, $this->getDescendants(parentId: $file->id, columns: ['id']));
             }
         }
         return parent::delete(Arr::merge($ids, $deleteIds));
@@ -183,17 +185,16 @@ class DiskDao extends BaseDao
         foreach ($ids as $key => $id) {
             $file = $this->model::onlyTrashed()->find($id);
             if (is_null($file)) {
-                Arr::forget($ids,$key);
+                Arr::forget($ids, $key);
                 continue;
             }
             // 如果是文件夹，需要递归删除所有子文件和子文件夹
             if ($file->type == DiskFileCode::TYPE_FOLDER->value) {
-                $deleteIds = Arr::merge($deleteIds, $this->getDescendants(parentId: $file->id,params: ['recycle' => true],columns: ['id']));
+                $deleteIds = Arr::merge($deleteIds, $this->getDescendants(parentId: $file->id, params: ['recycle' => true], columns: ['id']));
             }
         }
         return parent::realDelete(Arr::merge($ids, $deleteIds));
     }
-
 
     #[Transactional]
     public function recovery(array $ids): bool
@@ -206,7 +207,7 @@ class DiskDao extends BaseDao
             }
             // 如果是文件夹，需要递归删除所有子文件和子文件夹
             if ($file->type == DiskFileCode::TYPE_FOLDER->value) {
-                $recoveryIds = Arr::merge($recoveryIds, $this->getDescendants(parentId: $file->id,params: ['recycle' => true],columns: ['id']));
+                $recoveryIds = Arr::merge($recoveryIds, $this->getDescendants(parentId: $file->id, params: ['recycle' => true], columns: ['id']));
             }
         }
         parent::recovery(Arr::merge($ids, $recoveryIds));

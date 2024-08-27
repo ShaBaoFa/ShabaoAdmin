@@ -209,6 +209,6 @@ class DiskController extends BaseController
     public function realDelete(DiskRequest $request): ResponseInterface
     {
         $ids = $request->input('items'); // 传入文件或文件夹的 id 数组
-        return $this->service->realDelete($ids) ? $this->response->success():$this->response->fail();
+        return $this->service->realDelete($ids) ? $this->response->success() : $this->response->fail();
     }
 }

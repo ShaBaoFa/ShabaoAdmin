@@ -341,10 +341,10 @@ trait DaoTrait
     /**
      * 获取子孙节点.
      */
-    public function getDescendants(int $parentId,array $params = [],bool $isScope = true, array $columns = ['*']): array
+    public function getDescendants(int $parentId, array $params = [], bool $isScope = true, array $columns = ['*']): array
     {
-        $params = Arr::merge($params,['level' => $parentId]);
-        Arr::set($params,'select',$columns);
+        $params = Arr::merge($params, ['level' => $parentId]);
+        Arr::set($params, 'select', $columns);
         return $this->listQuerySetting($params, $isScope)->get($columns)->toArray();
     }
 

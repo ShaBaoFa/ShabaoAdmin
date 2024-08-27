@@ -238,9 +238,9 @@ trait ServiceTrait
     /**
      * 获取子孙节点.
      */
-    public function getDescendants(int $parentId,array $params = [],bool $isScope = true, array $columns = ['*']): array
+    public function getDescendants(int $parentId, array $params = [], bool $isScope = true, array $columns = ['*']): array
     {
-        return $this->dao->getDescendants($parentId,$params,$isScope,$columns);
+        return $this->dao->getDescendants($parentId, $params, $isScope, $columns);
     }
 
     /**
