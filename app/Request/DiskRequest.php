@@ -115,6 +115,15 @@ class DiskRequest extends BaseFormRequest
         ];
     }
 
+    public function copyRules(): array
+    {
+        return [
+            'items' => 'required|array',
+            'items.*' => 'required|int|exists:disk_files,id',
+            'target_folder_id' => 'nullable|int|exists:disk_files,id',
+        ];
+    }
+
     public function shareRules(): array
     {
         return [

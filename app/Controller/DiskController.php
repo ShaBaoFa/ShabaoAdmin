@@ -169,8 +169,9 @@ class DiskController extends BaseController
     #[PostMapping('copy'), Permission('disks:copy')]
     public function copy(DiskRequest $request): ResponseInterface
     {
-        $items = $request->input('items'); // 传入数组，每个元素包含 item_id 和 target_folder_id
-        return $this->response->success($this->service->copyItems($items));
+        $targetFolderId = $request->input('target_folder_id', 0); // 传入 target_folder_id
+        $items = $request->input('items'); // 传入数组
+        return $this->service->copy($items, (int) $targetFolderId) ? $this->response->success() : $this->response->fail();
     }
 
     /**
