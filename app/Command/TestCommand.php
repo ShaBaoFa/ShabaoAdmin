@@ -67,10 +67,9 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-
-       var_dump(bin2hex(random_bytes(32 / 2)));
-//        make(OssRamService::class, ['a' => 'b']);
-//        var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
+        var_dump(bin2hex(random_bytes(32 / 2)));
+        //        make(OssRamService::class, ['a' => 'b']);
+        //        var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
         //        $ids = [];
         //        for ($i = 0; $i < 10; ++$i) {
         //            $ids[] = $i * 5 + 1;

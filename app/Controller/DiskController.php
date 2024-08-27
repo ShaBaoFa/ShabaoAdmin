@@ -204,7 +204,7 @@ class DiskController extends BaseController
      * @description 从回收站中永久删除文件或文件夹
      * 批量操作：接受多个对象 id.
      */
-    #[DeleteMapping('realDelete'), Permission('disks:realDelete')]
+    #[DeleteMapping('realDelete'), Permission('disks:realDelete'),OperationLog]
     public function realDelete(DiskRequest $request): ResponseInterface
     {
         $ids = $request->input('items'); // 传入文件或文件夹的 id 数组
