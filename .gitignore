@@ -388,3 +388,4 @@ vendor/
 /.docker/mysql/performance_schema/users_144.sdi
 /.docker/mysql/performance_schema/variables_by_thr_183.sdi
 /.docker/mysql/performance_schema/variables_info_186.sdi
+/.docker
