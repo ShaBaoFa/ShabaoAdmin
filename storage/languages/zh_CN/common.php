@@ -101,5 +101,5 @@ return [
     // disk
     'disk_file_not_exist' => '文件不存在',
     'disk_folder_not_exist' => '文件夹不存在',
-    'disk_folder_illegal_move' => '文件夹非法移动',
+    'disk_folder_illegal_selected' => '不合法的文件夹选择',
 ];

@@ -22,7 +22,6 @@ use Hyperf\Collection\Arr;
 use Hyperf\Stringable\Str;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Random\RandomException;
 
 use function Hyperf\Stringable\str;
 
@@ -204,11 +203,11 @@ class DiskService extends BaseService
             $descendants = $this->getDescendants(parentId: Arr::get($diskFile, $pk), columns: [$pk]);
             foreach ($descendants as $descendant) {
                 if (Arr::get($descendant, $pk) == $targetFolderId) {
-                    throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_MOVE);
+                    throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_SELECTED);
                 }
             }
             if (Arr::get($diskFile, $pk) == $targetFolderId || Arr::get($diskFile, 'parent_id') == $targetFolderId) {
-                throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_MOVE);
+                throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_SELECTED);
             }
             Arr::set($diskFile, 'parent_id', $targetFolderId);
             if (! $this->update(Arr::get($diskFile, $pk), $diskFile)) {
@@ -249,7 +248,48 @@ class DiskService extends BaseService
                 throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
             }
         }
-        if (Arr::has($data, 'shared_with'));
+        if (Arr::has($data, 'shared_with')) {
+            return [];
+        }
+        return [];
+    }
+
+    public function copy(array $items, int $targetFolderId): bool
+    {
+        if ($targetFolderId > 0 && DiskFile::find($targetFolderId)->type != DiskFileCode::TYPE_FOLDER->value) {
+            throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
+        }
+        $pk = $this->dao->getModel()->getKeyName();
+        foreach ($items as $itemId) {
+            /**
+             * @var int $itemId
+             */
+            $diskFile = DiskFile::find($itemId)?->toArray();
+            if (is_null($diskFile)) {
+                throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
+            }
+            if (Arr::get($diskFile, 'type') == DiskFileCode::TYPE_FILE->value) {
+                Arr::set($diskFile, 'parent_id', $targetFolderId);
+                $this->save($this->handleData($diskFile));
+                continue;
+            }
+            $descendants = $this->getDescendants(parentId: Arr::get($diskFile, $pk));
+            foreach ($descendants as $descendant) {
+                if (Arr::get($descendant, $pk) == $targetFolderId) {
+                    throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_SELECTED);
+                }
+            }
+            if (Arr::get($diskFile, $pk) == $targetFolderId || Arr::get($diskFile, 'parent_id') == $targetFolderId) {
+                throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_SELECTED);
+            }
+            Arr::set($diskFile, 'parent_id', $targetFolderId);
+            $descendantsPid = $this->save($this->handleData($diskFile));
+            foreach ($descendants as $descendant) {
+                Arr::set($descendant, 'parent_id', $descendantsPid);
+                $this->save($this->handleData($descendant));
+            }
+        }
+        return true;
     }
 
     public function search(array $query): array
@@ -341,10 +381,7 @@ class DiskService extends BaseService
         return $data;
     }
 
-    /**
-     * @throws RandomException
-     */
-    private function generateUniqueShareLink(int $length = 16)
+    private function generateUniqueShareLink(int $length = 32)
     {
         return bin2hex(random_bytes($length / 2));
     }

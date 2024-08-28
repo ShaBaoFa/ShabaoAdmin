@@ -129,8 +129,9 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.disk_folder_not_exist')]
     case DISK_FOLDER_NOT_EXIST = 100002;
 
-    #[Message('common.disk_folder_illegal_move')]
-    case DISK_FOLDER_ILLEGAL_MOVE = 100003;
+    // 不可选择的目录
+    #[Message('common.disk_folder_illegal_selected')]
+    case DISK_FOLDER_ILLEGAL_SELECTED = 100003;
 
     public function getMessage(?array $translate = null): string
     {
