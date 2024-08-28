@@ -46,6 +46,18 @@ class DiskController extends BaseController
     }
 
     /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @description 搜索文件和文件夹
+     */
+    #[GetMapping('search'), Permission('disks:list')]
+    public function search(DiskRequest $request): ResponseInterface
+    {
+        $query = $request->input('query');
+        return $this->response->success($this->service->search((array) $query));
+    }
+
+    /**
      * 前端选择树（不需要权限）.
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

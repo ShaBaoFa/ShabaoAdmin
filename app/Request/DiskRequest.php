@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Base\BaseFormRequest;
+use App\Constants\DiskFileCode;
 use Hyperf\Validation\Rule;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -127,6 +128,15 @@ class DiskRequest extends BaseFormRequest
         ];
     }
 
+    public function searchRules(): array
+    {
+        return [
+            'query' => 'required|array',
+            'query.name' => 'nullable|string',
+            'query.file_type' => ['nullable', 'integer:strict', Rule::in($this->getFileType())],
+        ];
+    }
+
     /**
      * 字段映射名称
      * return array.
@@ -147,6 +157,9 @@ class DiskRequest extends BaseFormRequest
             'parent_id' => '文件夹',
             'expire_type' => '过期时间',
             'password' => '密码',
+            'query.file_type' => '文件类型',
+            'query.name' => '搜索名称',
+            'shared_with' => '分享对象',
         ];
     }
 
@@ -158,5 +171,16 @@ class DiskRequest extends BaseFormRequest
     private function getFilesMines(): string
     {
         return 'txt,doc,docx,xls,xlsx,ppt,pptx,rar,zip,7z,gz,pdf,wps,md';
+    }
+
+    private function getFileType(): array
+    {
+        return [
+            DiskFileCode::FILE_TYPE_AUDIO->value,
+            DiskFileCode::FILE_TYPE_IMAGE->value,
+            DiskFileCode::FILE_TYPE_VIDEO->value,
+            DiskFileCode::FILE_TYPE_DOCUMENT->value,
+            DiskFileCode::FILE_TYPE_OTHER->value,
+        ];
     }
 }

@@ -92,6 +92,16 @@ class DiskDao extends BaseDao
         );
 
         $query->when(
+            $file_type = Arr::get($params, 'file_type'),
+            fn (Builder $query) => $query->where('file_type', '=', $file_type)
+        );
+
+        $query->when(
+            $type = Arr::get($params, 'type'),
+            fn (Builder $query) => $query->where('type', '=', $type)
+        );
+
+        $query->when(
             Arr::accessible($hashes = Arr::get($params, 'hashes')),
             fn (Builder $query) => $query->whereIn('hash', $hashes)
         );

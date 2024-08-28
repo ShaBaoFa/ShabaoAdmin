@@ -252,6 +252,11 @@ class DiskService extends BaseService
         if (Arr::has($data, 'shared_with'));
     }
 
+    public function search(array $query): array
+    {
+        return $this->getList($query);
+    }
+
     private function getNewFolderName(array $data): array
     {
         Arr::set($data, 'name', str(Arr::get($data, 'name')) . '_' . Str::random(6));
