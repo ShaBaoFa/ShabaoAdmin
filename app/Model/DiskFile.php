@@ -14,7 +14,9 @@ namespace App\Model;
 
 use App\Base\BaseModel;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsTo;
+use Hyperf\Database\Model\Relations\BelongsToMany;
 use Hyperf\Database\Model\Relations\HasMany;
 
 /**
@@ -35,6 +37,9 @@ use Hyperf\Database\Model\Relations\HasMany;
  * @property string $deleted_at 删除时间
  * @property string $remark 备注
  * @property int $is_deleted 是否删除
+ * @property null|DiskFile $parent
+ * @property null|Collection|DiskFile[] $children
+ * @property null|Collection|DiskFileShare[] $shares
  */
 class DiskFile extends BaseModel
 {
@@ -108,5 +113,15 @@ class DiskFile extends BaseModel
     public function children(): HasMany
     {
         return $this->hasMany(DiskFile::class, 'parent_id', 'id');
+    }
+
+    public function shares(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            DiskFileShare::class,
+            'disk_file_share_file',
+            'file_id',
+            'share_id'
+        );
     }
 }

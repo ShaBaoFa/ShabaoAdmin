@@ -31,6 +31,7 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property Carbon $updated_at
  * @property Carbon $deleted_at
  * @property string $user_type 用户类型：(100系统用户)
+ * @property null|Collection|DiskFileShare[] $shares
  * @property null|Collection|Role[] $roles
  * @property null|Collection|Department[] $depts
  * @property null|Collection|Organization[] $organizations
@@ -100,5 +101,15 @@ class User extends BaseModel
     public function setPasswordAttribute(string $value): void
     {
         $this->attributes['password'] = password_hash($value, PASSWORD_DEFAULT);
+    }
+
+    public function sharedFiles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            DiskFileShare::class,
+            'disk_file_share_user',
+            'user_id',
+            'share_id'
+        );
     }
 }

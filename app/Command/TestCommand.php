@@ -14,6 +14,7 @@ namespace App\Command;
 
 use App\Amqp\Producer\DelayedMessageProducer;
 use App\Amqp\Producer\MessageProducer;
+use App\Constants\DiskFileShareExpireCode;
 use App\Constants\ErrorCode;
 use App\Constants\MessageContentTypeCode;
 use App\Constants\QueueMesContentTypeCode;
@@ -34,7 +35,6 @@ use OSS\OssClient;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
-use Random\RandomException;
 use RedisException;
 use Wlfpanda1012\AliyunSts\Constants\OSSClientCode;
 use Wlfpanda1012\AliyunSts\Oss\OssRamService;
@@ -67,7 +67,7 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        var_dump(bin2hex(random_bytes(32 / 2)));
+        var_dump(DiskFileShareExpireCode::from(4)->getTimestamp());
         //        make(OssRamService::class, ['a' => 'b']);
         //        var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
         //        $ids = [];

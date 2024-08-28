@@ -14,15 +14,19 @@ namespace App\Service;
 
 use App\Base\BaseService;
 use App\Constants\DiskFileCode;
+use App\Constants\DiskFileShareExpireCode;
 use App\Constants\ErrorCode;
 use App\Dao\DiskDao;
+use App\Dao\DiskShareDao;
 use App\Exception\BusinessException;
 use App\Model\DiskFile;
+use Carbon\Carbon;
 use Hyperf\Collection\Arr;
 use Hyperf\Stringable\Str;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
+use function App\Helper\user;
 use function Hyperf\Stringable\str;
 
 class DiskService extends BaseService
@@ -32,9 +36,15 @@ class DiskService extends BaseService
      */
     public $dao;
 
-    public function __construct(DiskDao $dao)
+    /**
+     * @var DiskShareDao
+     */
+    public $shareDao;
+
+    public function __construct(DiskDao $dao, DiskShareDao $shareDao)
     {
         $this->dao = $dao;
+        $this->shareDao = $shareDao;
     }
 
     /**
@@ -111,12 +121,12 @@ class DiskService extends BaseService
         return $fs->getDownloaderStsToken($hashes);
     }
 
-    public function getFolderMeta(int $folder_id = 0): array
+    public function getFolderMeta(int $folder_id = 0, $column = ['id', 'name', 'level', 'parent_id', 'type', 'size_byte', 'size_info']): array
     {
         if ($folder_id > 0) {
             (! $this->dao->isFolder($folder_id)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
-        $currentFolder = $this->find($folder_id, ['id', 'name', 'level', 'parent_id', 'type', 'size_byte', 'size_info']);
+        $currentFolder = $this->find($folder_id, $column);
         /**
          * @var DiskFile $currentFolder
          */
@@ -243,15 +253,22 @@ class DiskService extends BaseService
 
     public function share(array $data): array
     {
-        foreach (Arr::get($data, 'items') as $id) {
+        $ids = Arr::get($data, 'items');
+        foreach ($ids as $id) {
             if (! $this->belongMe(['id' => $id])) {
                 throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
             }
         }
-        if (Arr::has($data, 'shared_with')) {
-            return [];
+        if (Arr::get($data, 'shared_with') && in_array(user()->getId(), Arr::get($data, 'shared_with'))) {
+            throw new BusinessException(ErrorCode::DISK_CANNOT_SHARE_TO_YOURSELF);
         }
-        return [];
+        Arr::set($data, 'share_link', $this->generateUniqueShareLink());
+        $expires_at = DiskFileShareExpireCode::from((int) Arr::get($data, 'expire_type'))->getSec();
+        if ($expires_at) {
+            $expires_at = Carbon::now()->addSeconds($expires_at);
+        }
+        Arr::set($data, 'expires_at', $expires_at);
+        return $this->shareDao->save($data);
     }
 
     public function copy(array $items, int $targetFolderId): bool
@@ -295,6 +312,14 @@ class DiskService extends BaseService
     public function search(array $query): array
     {
         return $this->getList($query);
+    }
+
+    protected function generateUniqueShareLink($length = 16): string
+    {
+        do {
+            $shareLink = bin2hex(random_bytes($length / 2));
+        } while ($this->shareDao->checkExists(['share_link' => $shareLink], false));
+        return $shareLink;
     }
 
     private function getNewFolderName(array $data): array
@@ -379,10 +404,5 @@ class DiskService extends BaseService
         // 添加随机字符之后再拼接回去
         Arr::set($data, 'name', $name . '.' . Arr::get($data, 'suffix'));
         return $data;
-    }
-
-    private function generateUniqueShareLink(int $length = 32)
-    {
-        return bin2hex(random_bytes($length / 2));
     }
 }

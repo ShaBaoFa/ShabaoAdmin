@@ -100,4 +100,6 @@ return [
     'disk_file_not_exist' => 'disk_file_not_exist',
     'disk_folder_not_exist' => 'disk_folder_not_exist',
     'disk_folder_illegal_selected' => 'disk_folder_illegal_selected',
+    'disk_file_illegal_share' => 'disk_file_illegal_share',
+    'disk_cannot_share_to_yourself' => 'disk_cannot_share_to_yourself',
 ];

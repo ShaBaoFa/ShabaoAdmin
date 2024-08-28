@@ -133,6 +133,14 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.disk_folder_illegal_selected')]
     case DISK_FOLDER_ILLEGAL_SELECTED = 100003;
 
+    // DISK_FILE_ILLEGAL_SHARE
+    #[Message('common.disk_file_illegal_share')]
+    case DISK_FILE_ILLEGAL_SHARE = 100004;
+
+    // 不可分享给自己
+    #[Message('common.disk_cannot_share_to_yourself')]
+    case DISK_CANNOT_SHARE_TO_YOURSELF = 100005;
+
     public function getMessage(?array $translate = null): string
     {
         $arguments = [];

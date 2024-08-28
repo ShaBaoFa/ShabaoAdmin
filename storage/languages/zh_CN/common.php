@@ -102,4 +102,6 @@ return [
     'disk_file_not_exist' => '文件不存在',
     'disk_folder_not_exist' => '文件夹不存在',
     'disk_folder_illegal_selected' => '不合法的文件夹选择',
+    'disk_file_illegal_share' => '不合法的文件分享',
+    'disk_cannot_share_to_yourself' => '不能分享给自己',
 ];

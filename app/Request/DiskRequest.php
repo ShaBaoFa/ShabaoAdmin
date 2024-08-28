@@ -14,6 +14,8 @@ namespace App\Request;
 
 use App\Base\BaseFormRequest;
 use App\Constants\DiskFileCode;
+use App\Constants\DiskFileShareExpireCode;
+use App\Constants\DiskFileSharePermissionCode;
 use Hyperf\Validation\Rule;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -128,11 +130,24 @@ class DiskRequest extends BaseFormRequest
     public function shareRules(): array
     {
         return [
+            'name' => 'required|string|max:255',
+            'permission' => ['int', Rule::in([
+                DiskFileSharePermissionCode::DOWNLOAD->value,
+                DiskFileSharePermissionCode::ONLY_READ->value,
+            ])],
             'items' => 'required|array',
             'items.*' => 'required|int|exists:disk_files,id',
             'shared_with' => 'nullable|array',
             'shared_with.*' => 'int|exists:users,id',
-            'expire_type' => ['int', Rule::in([1, 7, 30])],
+            'expire_type' => ['int', Rule::in(
+                [
+                    DiskFileShareExpireCode::EXPIRE_TYPE_ONE_DAY->value,
+                    DiskFileShareExpireCode::EXPIRE_TYPE_ONE_MONTH->value,
+                    DiskFileShareExpireCode::EXPIRE_TYPE_ONE_WEEK->value,
+                    DiskFileShareExpireCode::EXPIRE_TYPE_ONE_YEAR->value,
+                    DiskFileShareExpireCode::EXPIRE_TYPE_FOREVER->value,
+                ]
+            )],
             'password' => ['nullable', 'alpha_num:ascii', 'min:4', 'max:4'],
         ];
     }
