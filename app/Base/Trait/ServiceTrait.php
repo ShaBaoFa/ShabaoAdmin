@@ -104,6 +104,11 @@ trait ServiceTrait
         return $this->dao->save($data);
     }
 
+    public function checkExists(?array $condition, bool $isScope = true): bool
+    {
+        return $this->dao->checkExists($condition, $isScope);
+    }
+
     /**
      * 批量新增.
      */
@@ -222,7 +227,7 @@ trait ServiceTrait
     /**
      * 数字更新操作.
      */
-    public function numberOperation(mixed $id, string $field, int $value): bool
+    public function numberOperation(mixed $id, string $field, int $value = 1): bool
     {
         return $this->dao->numberOperation($id, $field, $value);
     }

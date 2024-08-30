@@ -14,19 +14,15 @@ namespace App\Service;
 
 use App\Base\BaseService;
 use App\Constants\DiskFileCode;
-use App\Constants\DiskFileShareExpireCode;
 use App\Constants\ErrorCode;
 use App\Dao\DiskDao;
-use App\Dao\DiskShareDao;
 use App\Exception\BusinessException;
 use App\Model\DiskFile;
-use Carbon\Carbon;
 use Hyperf\Collection\Arr;
 use Hyperf\Stringable\Str;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-use function App\Helper\user;
 use function Hyperf\Stringable\str;
 
 class DiskService extends BaseService
@@ -36,15 +32,9 @@ class DiskService extends BaseService
      */
     public $dao;
 
-    /**
-     * @var DiskShareDao
-     */
-    public $shareDao;
-
-    public function __construct(DiskDao $dao, DiskShareDao $shareDao)
+    public function __construct(DiskDao $dao)
     {
         $this->dao = $dao;
-        $this->shareDao = $shareDao;
     }
 
     /**
@@ -251,26 +241,6 @@ class DiskService extends BaseService
         return true;
     }
 
-    public function share(array $data): array
-    {
-        $ids = Arr::get($data, 'items');
-        foreach ($ids as $id) {
-            if (! $this->belongMe(['id' => $id])) {
-                throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
-            }
-        }
-        if (Arr::get($data, 'shared_with') && in_array(user()->getId(), Arr::get($data, 'shared_with'))) {
-            throw new BusinessException(ErrorCode::DISK_CANNOT_SHARE_TO_YOURSELF);
-        }
-        Arr::set($data, 'share_link', $this->generateUniqueShareLink());
-        $expires_at = DiskFileShareExpireCode::from((int) Arr::get($data, 'expire_type'))->getSec();
-        if ($expires_at) {
-            $expires_at = Carbon::now()->addSeconds($expires_at);
-        }
-        Arr::set($data, 'expires_at', $expires_at);
-        return $this->shareDao->save($data);
-    }
-
     public function copy(array $items, int $targetFolderId): bool
     {
         if ($targetFolderId > 0 && DiskFile::find($targetFolderId)->type != DiskFileCode::TYPE_FOLDER->value) {
@@ -312,14 +282,6 @@ class DiskService extends BaseService
     public function search(array $query): array
     {
         return $this->getList($query);
-    }
-
-    protected function generateUniqueShareLink($length = 16): string
-    {
-        do {
-            $shareLink = bin2hex(random_bytes($length / 2));
-        } while ($this->shareDao->checkExists(['share_link' => $shareLink], false));
-        return $shareLink;
     }
 
     private function getNewFolderName(array $data): array

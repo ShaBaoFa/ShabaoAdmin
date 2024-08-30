@@ -348,7 +348,7 @@ trait DaoTrait
         return $this->listQuerySetting($params, $isScope)->get($columns)->toArray();
     }
 
-    public function checkExists(?array $condition, bool $isScope): bool
+    public function checkExists(?array $condition, bool $isScope = true): bool
     {
         $query = $this->model::withTrashed()->where($condition);
         $isScope && $query->userDataScope();

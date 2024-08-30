@@ -27,6 +27,9 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.forbidden')]
     case FORBIDDEN = 403;
 
+    #[Message('common.not_found')]
+    case NOT_FOUND = 404;
+
     #[Message('common.invalid_params')]
     case INVALID_PARAMS = 422;
 
@@ -140,6 +143,10 @@ enum ErrorCode: int implements ErrorCodeInterface
     // 不可分享给自己
     #[Message('common.disk_cannot_share_to_yourself')]
     case DISK_CANNOT_SHARE_TO_YOURSELF = 100005;
+
+    // 分享密码错误
+    #[Message('common.disk_share_password_error')]
+    case DISK_SHARE_PASSWORD_ERROR = 100006;
 
     public function getMessage(?array $translate = null): string
     {

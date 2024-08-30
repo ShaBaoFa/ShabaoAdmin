@@ -31,7 +31,7 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property Carbon $updated_at
  * @property Carbon $deleted_at
  * @property string $user_type 用户类型：(100系统用户)
- * @property null|Collection|DiskFileShare[] $shares
+ * @property null|Collection|DiskFileShare[] $sharedFiles
  * @property null|Collection|Role[] $roles
  * @property null|Collection|Department[] $depts
  * @property null|Collection|Organization[] $organizations

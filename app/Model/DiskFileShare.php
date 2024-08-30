@@ -24,8 +24,8 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property int $updated_by 更新者ID
  * @property string $share_link 分享链接的唯一标识符
  * @property int $permission 分享权限（例如：1.查看+下载、2.只查看）
- * @property string $share_password 分享密码（可为空）
- * @property string $expires_at 到期时间
+ * @property string $share_password 分享密码
+ * @property int $expire_at 到期时间
  * @property int $view_count 查看次数
  * @property int $download_count 下载次数
  * @property Carbon $created_at 创建时间
@@ -45,12 +45,12 @@ class DiskFileShare extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'name', 'created_by', 'updated_by', 'share_link', 'permission', 'share_password', 'expires_at', 'view_count', 'download_count', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected array $fillable = ['id', 'name', 'created_by', 'updated_by', 'share_link', 'permission', 'share_password', 'expire_at', 'view_count', 'download_count', 'created_at', 'updated_at', 'deleted_at', 'remark'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'int', 'created_by' => 'integer', 'updated_by' => 'integer', 'view_count' => 'integer', 'download_count' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'permission' => 'integer'];
+    protected array $casts = ['id' => 'int', 'created_by' => 'integer', 'updated_by' => 'integer', 'view_count' => 'integer', 'download_count' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'permission' => 'integer', 'expire_at' => 'integer'];
 
     /**
      * 定义与 User 的多对多关系.
@@ -73,5 +73,15 @@ class DiskFileShare extends BaseModel
             'share_id',
             'file_id'
         );
+    }
+
+    public static function getViewCountName(): string
+    {
+        return 'view_count';
+    }
+
+    public static function getDownloadCountName(): string
+    {
+        return 'download_count';
     }
 }

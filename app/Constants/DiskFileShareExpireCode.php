@@ -28,14 +28,14 @@ enum DiskFileShareExpireCode: int
     case EXPIRE_TYPE_FOREVER = -1;
 
     // 获得时间戳
-    public function getSec(): ?int
+    public function getTimestamp(): ?int
     {
         switch ($this) {
-            case self::EXPIRE_TYPE_ONE_DAY: return 86400;
+            case self::EXPIRE_TYPE_ONE_DAY: return time() + 86400;
                 // no break
-            case self::EXPIRE_TYPE_ONE_WEEK: return 604800;
-            case self::EXPIRE_TYPE_ONE_MONTH: return 2592000;
-            case self::EXPIRE_TYPE_ONE_YEAR: return 31536000;
+            case self::EXPIRE_TYPE_ONE_WEEK: return time() + 604800;
+            case self::EXPIRE_TYPE_ONE_MONTH: return time() + 2592000;
+            case self::EXPIRE_TYPE_ONE_YEAR: return time() + 31536000;
             case self::EXPIRE_TYPE_FOREVER: return null;
         }
         return null;

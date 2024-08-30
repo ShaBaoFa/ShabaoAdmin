@@ -18,6 +18,7 @@ return [
     'forbidden' => '禁止访问',
     'invalid_params' => '无效参数',
     'server_error' => '服务器错误',
+    'not_found' => '资源未找到',
 
     // user
     'user_not_found' => '用户不存在',
@@ -104,4 +105,5 @@ return [
     'disk_folder_illegal_selected' => '不合法的文件夹选择',
     'disk_file_illegal_share' => '不合法的文件分享',
     'disk_cannot_share_to_yourself' => '不能分享给自己',
+    'disk_share_password_error' => '分享密码错误',
 ];

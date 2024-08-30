@@ -189,54 +189,6 @@ class DiskController extends BaseController
     /**
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
-     * @description 生成文件或文件夹的分享链接
-     * 批量操作：接受多个对象 id.
-     */
-    #[PostMapping('share/save'), Permission('disks:share:save'),OperationLog]
-    public function share(DiskRequest $request): ResponseInterface
-    {
-        return $this->response->success($this->service->share($request->all()));
-    }
-
-    /**
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
-     * @description 删除分享链接
-     * 批量操作：接受多个对象 id.
-     */
-    #[DeleteMapping('share/revoke'), Permission('disks:share:revoke')]
-    public function revokeShare(DiskRequest $request): ResponseInterface
-    {
-        return $this->response->success($this->service->revokeShare($request->all()));
-    }
-
-    #[GetMapping('shareStats'), Permission('disks:share:stats')]
-    public function stats(DiskRequest $request): ResponseInterface
-    {
-        return $this->response->success($this->service->getShareStats($request->all()));
-    }
-
-    #[GetMapping('share/list'), Permission('disks:share:list')]
-    public function listShare(DiskRequest $request): ResponseInterface
-    {
-        return $this->response->success($this->service->listShare($request->all()));
-    }
-
-    #[GetMapping('shareLink')]
-    public function getShareByLink(DiskRequest $request): ResponseInterface
-    {
-        return $this->response->success($this->service->getShareByLink($request->all()));
-    }
-
-    #[GetMapping('share/download-token')]
-    public function getShareDownloadToken(DiskRequest $request): ResponseInterface
-    {
-        return $this->response->success($this->service->getShareDownloadToken($request->all()));
-    }
-
-    /**
-     * @throws NotFoundExceptionInterface
-     * @throws ContainerExceptionInterface
      * @description 从回收站还原文件或文件夹
      * 批量操作：接受多个对象 id.
      */

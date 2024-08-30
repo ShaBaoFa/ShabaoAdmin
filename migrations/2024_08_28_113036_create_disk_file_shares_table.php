@@ -30,7 +30,7 @@ return new class extends Migration {
             $table->unsignedInteger('view_count')->default(0)->comment('查看次数');
             $table->unsignedInteger('download_count')->default(0)->comment('下载次数');
             $table->addColumn('timestamp', 'created_at', ['precision' => 0, 'comment' => '创建时间'])->nullable();
-            $table->addColumn('timestamp', 'expires_at', ['precision' => 0, 'comment' => '到期时间'])->nullable();
+            $table->addColumn('integer', 'expire_at', ['comment' => '到期时间'])->nullable();
             $table->addColumn('timestamp', 'updated_at', ['precision' => 0, 'comment' => '更新时间'])->nullable();
             $table->addColumn('timestamp', 'deleted_at', ['precision' => 0, 'comment' => '删除时间'])->nullable();
             $table->addColumn('string', 'remark', ['length' => 255, 'comment' => '备注'])->nullable();

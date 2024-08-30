@@ -18,6 +18,7 @@ return [
     'forbidden' => 'forbidden',
     'invalid_params' => 'invalid_params',
     'server_error' => 'server_error',
+    'not_found' => 'not_found',
 
     // user
     'user_not_found' => 'user_not_found',
@@ -102,4 +103,5 @@ return [
     'disk_folder_illegal_selected' => 'disk_folder_illegal_selected',
     'disk_file_illegal_share' => 'disk_file_illegal_share',
     'disk_cannot_share_to_yourself' => 'disk_cannot_share_to_yourself',
+    'disk_share_password_error' => 'disk_share_password_error',
 ];
