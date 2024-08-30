@@ -17,6 +17,8 @@ use App\Model\DiskFileShare;
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class DiskShareDao extends BaseDao
 {
@@ -69,5 +71,31 @@ class DiskShareDao extends BaseDao
         );
 
         return $query;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getShareItems(int $shareId, int $pid = 0): array
+    {
+        $select = ['id', 'name', 'type', 'file_type', 'hash'];
+        $rootItems = $this->model::find($shareId)->diskFiles()->get($select);
+        if ($pid == 0) {
+            return $rootItems->toArray();
+        }
+        $rootIds = $rootItems->pluck('id')->toArray();
+        $disk = di()->get(DiskDao::class);
+        if (in_array($pid, $rootIds)) {
+            return $disk->getList(['parent_id' => $pid, 'select' => $select], false);
+        }
+
+        foreach ($rootIds as $rootId) {
+            $descendants = $disk->getDescendants($rootId, ['parent_id' => $pid], false, $select);
+            if (count($descendants) > 0) {
+                return $descendants;
+            }
+        }
+        return [];
     }
 }

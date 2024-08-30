@@ -81,9 +81,13 @@ class DiskFileShareService extends BaseService
         $key = sprintf('%sshare_link:%s', config('cache.default.prefix'), Arr::get($data, 'share_link'));
         redis()->incr($key);
         $this->numberOperation($share->id, DiskFileShare::getViewCountName());
-        $tree = $this->getDiskFilesTree($share);
+        $pid = Arr::get($data, 'parent_id', 0);
+        /**
+         * @var DiskFileShare $share
+         */
+        $items = $this->getShareItems($share->id, (int) $pid);
         $shareArray = $share->toArray();
-        Arr::set($shareArray, 'items', $tree);
+        Arr::set($shareArray, 'items', $items);
         /**
          * @todo 异步队列增加浏览量
          */
@@ -139,5 +143,14 @@ class DiskFileShareService extends BaseService
             $shareLink = bin2hex(random_bytes($length / 2));
         } while ($this->dao->checkExists(['share_link' => $shareLink], false));
         return $shareLink;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    private function getShareItems(int $shareId, int $pid = 0): array
+    {
+        return $this->dao->getShareItems($shareId, $pid);
     }
 }

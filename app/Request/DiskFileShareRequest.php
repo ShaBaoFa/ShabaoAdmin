@@ -46,6 +46,7 @@ class DiskFileShareRequest extends BaseFormRequest
         return [
             'share_password' => ['required', 'alpha_num:ascii', 'min:4', 'max:4'],
             'share_link' => ['required', 'string', 'exists:disk_file_shares,share_link'],
+            'parent_id' => ['int', 'exists:disk_files:id'],
         ];
     }
 

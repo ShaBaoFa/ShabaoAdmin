@@ -30,14 +30,12 @@ enum DiskFileShareExpireCode: int
     // 获得时间戳
     public function getTimestamp(): ?int
     {
-        switch ($this) {
-            case self::EXPIRE_TYPE_ONE_DAY: return time() + 86400;
-                // no break
-            case self::EXPIRE_TYPE_ONE_WEEK: return time() + 604800;
-            case self::EXPIRE_TYPE_ONE_MONTH: return time() + 2592000;
-            case self::EXPIRE_TYPE_ONE_YEAR: return time() + 31536000;
-            case self::EXPIRE_TYPE_FOREVER: return null;
-        }
-        return null;
+        return match ($this) {
+            self::EXPIRE_TYPE_ONE_DAY => time() + 86400,
+            self::EXPIRE_TYPE_ONE_WEEK => time() + 604800,
+            self::EXPIRE_TYPE_ONE_MONTH => time() + 2592000,
+            self::EXPIRE_TYPE_ONE_YEAR => time() + 31536000,
+            self::EXPIRE_TYPE_FOREVER => null,
+        };
     }
 }
