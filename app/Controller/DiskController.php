@@ -39,7 +39,7 @@ class DiskController extends BaseController
      * @throws ContainerExceptionInterface
      * @description 列出指定文件夹下的所有文件和子文件夹
      */
-    #[GetMapping('folder/list'), Permission('disks:list')]
+    #[GetMapping('folder/index'), Permission('disks,disks:index')]
     public function list(DiskRequest $request): ResponseInterface
     {
         return $this->response->success($this->service->listContents((int) $request->input('parent_id') ?? 0));
@@ -50,7 +50,7 @@ class DiskController extends BaseController
      * @throws ContainerExceptionInterface
      * @description 搜索文件和文件夹
      */
-    #[GetMapping('search'), Permission('disks:list')]
+    #[GetMapping('index'), Permission('disks,disks:index')]
     public function search(DiskRequest $request): ResponseInterface
     {
         $query = $request->input('query');

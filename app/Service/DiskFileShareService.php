@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Amqp\Consumer\DiskFileShareOpCountConsumer;
+use App\Amqp\Producer\DiskFileShareOpCountProducer;
 use App\Base\BaseModel;
 use App\Base\BaseService;
 use App\Constants\DiskFileCode;
@@ -21,6 +23,7 @@ use App\Dao\DiskShareDao;
 use App\Exception\BusinessException;
 use App\Model\DiskFile;
 use App\Model\DiskFileShare;
+use App\Vo\AmqpQueueVo;
 use Hyperf\Collection\Arr;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -79,7 +82,6 @@ class DiskFileShareService extends BaseService
         $share = $this->getShare($data);
         $key = sprintf('%sshare_link:uid_%s:%s', config('cache.default.prefix'), $share->created_by, Arr::get($data, 'share_link'));
         redis()->hIncrBy($key, DiskFileShare::getViewCountName(), 1);
-        $this->numberOperation($share->id, DiskFileShare::getViewCountName());
         $pid = Arr::get($data, 'parent_id', 0);
         /**
          * @var DiskFileShare $share
@@ -87,9 +89,21 @@ class DiskFileShareService extends BaseService
         $items = $this->getShareItems($share->id, (int) $pid);
         $shareArray = $share->toArray();
         Arr::set($shareArray, 'items', $items);
-        /**
-         * @todo 异步队列增加浏览量
-         */
+        if (config('amqp.enable') && di()->get(DiskFileShareOpCountConsumer::class)->isEnable()) {
+            $amqpQueueVo = new AmqpQueueVo();
+            $amqpQueueVo->setProducer(DiskFileShareOpCountProducer::class);
+            $queueData = [
+                'id' => $share->id,
+                'count_key' => DiskFileShare::getViewCountName(),
+                'count_value' => 1,
+            ];
+            $amqpQueueVo->setData($queueData);
+            if (! di()->get(QueueLogService::class)->addQueue($amqpQueueVo)) {
+                $this->numberOperation($share->id, DiskFileShare::getViewCountName());
+            }
+        } else {
+            $this->numberOperation($share->id, DiskFileShare::getViewCountName());
+        }
         return $shareArray;
     }
 
@@ -99,7 +113,7 @@ class DiskFileShareService extends BaseService
             'share_password' => Arr::get($data, 'share_password'),
             'share_link' => Arr::get($data, 'share_link'),
         ];
-        if (! $this->checkExists($condition)) {
+        if (! $this->checkExists($condition, false)) {
             throw new BusinessException(ErrorCode::FORBIDDEN);
         }
         $share = $this->dao->first($condition, ['id', 'name', 'expire_at', 'permission', 'share_link', 'created_by']);
@@ -190,6 +204,47 @@ class DiskFileShareService extends BaseService
         return $ds->getDescendants(parentId: $folder_id, params: ['type' => DiskFileCode::TYPE_FILE->value], isScope: false, columns: $cols);
     }
 
+    public function delete(array $ids): bool
+    {
+        // 判断$items
+        foreach ($ids as $id) {
+            if (! $this->belongMe(['id' => $id])) {
+                throw new BusinessException(ErrorCode::FORBIDDEN);
+            }
+        }
+        parent::delete($ids);
+        return true;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     */
+    public function info(int $id): array
+    {
+        if (! $this->belongMe(['id' => $id])) {
+            throw new BusinessException(ErrorCode::FORBIDDEN);
+        }
+        /**
+         * @var DiskFileShare $share
+         */
+        $share = $this->find($id);
+        $key = sprintf('%sshare_link:uid_%s:%s', config('cache.default.prefix'), $share->created_by, $share->share_link);
+        $stat = redis()->hGetAll($key);
+        if ($redisDownloadCount = Arr::get($stat, DiskFileShare::getDownloadCountName())) {
+            $share->download_count = $redisDownloadCount;
+        }
+        if ($redisViewCount = Arr::get($stat, DiskFileShare::getViewCountName())) {
+            $share->view_count = $redisViewCount;
+        }
+        return $share
+            ->load(['shareWith' => function ($query) {
+                $query->select(['id', 'username']);
+            }])
+            ->toArray();
+    }
+
     protected function generateUniqueShareLink($length = 16): string
     {
         do {
@@ -205,9 +260,5 @@ class DiskFileShareService extends BaseService
     private function getShareItems(int $shareId, int $pid = 0): array
     {
         return $this->dao->getShareItems($shareId, $pid);
-    }
-
-    public function listShare(array $all)
-    {
     }
 }

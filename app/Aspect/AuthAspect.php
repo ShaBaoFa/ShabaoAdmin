@@ -13,6 +13,8 @@ declare(strict_types=1);
 namespace App\Aspect;
 
 use App\Annotation\Auth;
+use App\Constants\ErrorCode;
+use App\Exception\AuthException;
 use Hyperf\Di\Annotation\Aspect;
 use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
@@ -54,7 +56,9 @@ class AuthAspect extends AbstractAspect
             $scene = $auth->scene ?? 'default';
         }
         $currentUser = user($scene);
-        $currentUser->check(scene: $scene);
+        if (! $currentUser->check(scene: $scene)) {
+            throw new AuthException(ErrorCode::UNAUTHORIZED);
+        }
 
         return $proceedingJoinPoint->process();
     }

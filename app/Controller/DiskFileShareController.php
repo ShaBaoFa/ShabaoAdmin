@@ -21,9 +21,9 @@ use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\PostMapping;
-use Hyperf\HttpServer\Contract\ResponseInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\Http\Message\ResponseInterface;
 use RedisException;
 
 #[Controller(prefix: 'api/v1/diskFileShares')]
@@ -39,7 +39,7 @@ class DiskFileShareController extends BaseController
      * 批量操作：接受多个对象 id.
      */
     #[PostMapping('save'), Permission('disks:share:save')]
-    public function share(DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
+    public function share(DiskFileShareRequest $request): ResponseInterface
     {
         return $this->response->success($this->service->save($request->all()));
     }
@@ -53,19 +53,24 @@ class DiskFileShareController extends BaseController
     #[DeleteMapping('delete'), Permission('disks:share:delete')]
     public function delete(DiskFileShareRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->revokeShare($request->all()));
+        $ids = $request->input('ids');
+        return $this->service->delete((array) $ids) ? $this->response->success() : $this->response->fail();
     }
 
-    #[GetMapping('stats'), Permission('disks:share:stats')]
-    public function stats(DiskFileShareRequest $request): ResponseInterface
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[GetMapping('info/{id:\d+}'), Permission('disks:share:info')]
+    public function info(int $id, DiskFileShareRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->getShareStats($request->all()));
+        return $this->response->success($this->service->info($id));
     }
 
-    #[GetMapping('list'), Permission('disks:share:list')]
-    public function list(DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
+    #[GetMapping('index'), Permission('disks:share,disks:share:index')]
+    public function index(DiskFileShareRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->listShare($request->all()));
+        return $this->response->success($this->service->getList($request->all()));
     }
 
     /**
@@ -74,7 +79,7 @@ class DiskFileShareController extends BaseController
      * @throws RedisException
      */
     #[GetMapping('shareLink')]
-    public function getShareByLink(DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
+    public function getShareByLink(DiskFileShareRequest $request): ResponseInterface
     {
         return $this->response->success($this->service->getShareByLink($request->all()));
     }
@@ -85,7 +90,7 @@ class DiskFileShareController extends BaseController
      * @throws ContainerExceptionInterface
      */
     #[GetMapping('downloadToken')]
-    public function getShareDownloadToken(DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
+    public function getShareDownloadToken(DiskFileShareRequest $request): ResponseInterface
     {
         return $this->response->success($this->service->getShareDownloadToken($request->all()));
     }
@@ -95,7 +100,7 @@ class DiskFileShareController extends BaseController
      * @throws NotFoundExceptionInterface
      */
     #[GetMapping('hash/folder/{folder_id:\d+}')]
-    public function getFolderHash(int $folder_id, DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
+    public function getFolderHash(int $folder_id, DiskFileShareRequest $request): ResponseInterface
     {
         return $this->response->success($this->service->getHash($folder_id, $request->all()));
     }

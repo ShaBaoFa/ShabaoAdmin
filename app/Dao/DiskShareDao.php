@@ -79,7 +79,7 @@ class DiskShareDao extends BaseDao
      */
     public function getShareItems(int $shareId, int $pid = 0): array
     {
-        $select = ['id', 'name', 'type', 'file_type', 'hash'];
+        $select = ['id', 'name', 'type', 'file_type', 'hash', 'size_byte', 'size_info'];
         $rootItems = $this->model::find($shareId)->diskFiles()->get($select);
         if ($pid == 0) {
             return $rootItems->toArray();

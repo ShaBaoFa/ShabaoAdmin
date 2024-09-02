@@ -27,6 +27,14 @@ class DiskFileShareRequest extends BaseFormRequest
         return [];
     }
 
+    public function listRules(): array
+    {
+        return [
+            'query' => 'array',
+            'query.name' => 'string|max:255',
+        ];
+    }
+
     public function saveRules(): array
     {
         return [
@@ -70,6 +78,14 @@ class DiskFileShareRequest extends BaseFormRequest
         ];
     }
 
+    public function deleteRules(): array
+    {
+        return [
+            'ids' => 'required|array',
+            'ids.*' => 'required|int|exists:disk_file_shares,id',
+        ];
+    }
+
     /**
      * 字段映射名称
      * return array.
@@ -83,6 +99,9 @@ class DiskFileShareRequest extends BaseFormRequest
             'permission' => '分享权限',
             'password' => '密码',
             'shared_with' => '分享对象',
+            'share_link' => '分享链接',
+            'ids.*' => '分享包',
+            'query.name' => '分享包名称',
         ];
     }
 
