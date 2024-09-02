@@ -102,7 +102,7 @@ class DiskFileShareService extends BaseService
         if (! $this->checkExists($condition)) {
             throw new BusinessException(ErrorCode::FORBIDDEN);
         }
-        $share = $this->dao->first($condition, ['id', 'name', 'expire_at', 'permission', 'share_link']);
+        $share = $this->dao->first($condition, ['id', 'name', 'expire_at', 'permission', 'share_link', 'created_by']);
         /**
          * @var DiskFileShare $share
          */
@@ -205,5 +205,9 @@ class DiskFileShareService extends BaseService
     private function getShareItems(int $shareId, int $pid = 0): array
     {
         return $this->dao->getShareItems($shareId, $pid);
+    }
+
+    public function listShare(array $all)
+    {
     }
 }

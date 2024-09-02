@@ -63,7 +63,7 @@ class DiskFileShareController extends BaseController
     }
 
     #[GetMapping('list'), Permission('disks:share:list')]
-    public function list(DiskFileShareRequest $request): ResponseInterface
+    public function list(DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
     {
         return $this->response->success($this->service->listShare($request->all()));
     }
@@ -71,6 +71,7 @@ class DiskFileShareController extends BaseController
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws RedisException
      */
     #[GetMapping('shareLink')]
     public function getShareByLink(DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
@@ -89,6 +90,10 @@ class DiskFileShareController extends BaseController
         return $this->response->success($this->service->getShareDownloadToken($request->all()));
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     #[GetMapping('hash/folder/{folder_id:\d+}')]
     public function getFolderHash(int $folder_id, DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
     {
