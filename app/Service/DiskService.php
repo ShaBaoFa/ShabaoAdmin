@@ -284,6 +284,15 @@ class DiskService extends BaseService
         return $this->getList($query);
     }
 
+    public function getHash(int $folder_id): array
+    {
+        if (! $this->dao->isFolder($folder_id) && ! $this->belongMe(['id' => $folder_id])) {
+            throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
+        }
+        $cols = ['id', 'name', 'hash'];
+        return $this->getDescendants(parentId: $folder_id, params: ['type' => DiskFileCode::TYPE_FILE->value], columns: $cols);
+    }
+
     private function getNewFolderName(array $data): array
     {
         Arr::set($data, 'name', str(Arr::get($data, 'name')) . '_' . Str::random(6));

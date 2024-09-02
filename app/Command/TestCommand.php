@@ -67,7 +67,10 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        var_dump(DiskFileShareExpireCode::from(4)->getTimestamp());
+        $arr = [1, 2, 3, 4, 5, 6, 7];
+        $arr2 = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        var_dump(in_array($arr, $arr2));
+        //        var_dump(DiskFileShareExpireCode::from(4)->getTimestamp());
         //        make(OssRamService::class, ['a' => 'b']);
         //        var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
         //        $ids = [];

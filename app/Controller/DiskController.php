@@ -135,6 +135,17 @@ class DiskController extends BaseController
     /**
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
+     * @description 获取文件夹下所有hash
+     */
+    #[GetMapping('hash/folder/{folder_id:\d+}'), Permission('disks:download')]
+    public function getFolderHash(int $folder_id): ResponseInterface
+    {
+        return $this->response->success($this->service->getHash($folder_id));
+    }
+
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
      * @description 重命名文件或文件夹
      * 单个对象操作：接受对象的 id 和新的名称.
      */
@@ -205,7 +216,7 @@ class DiskController extends BaseController
      * @description 从回收站中永久删除文件或文件夹
      * 批量操作：接受多个对象 id.
      */
-    #[DeleteMapping('realDelete'), Permission('disks:realDelete'),OperationLog]
+    #[DeleteMapping('realDelete'), Permission('disks:realDelete'), OperationLog]
     public function realDelete(DiskRequest $request): ResponseInterface
     {
         $ids = $request->input('items'); // 传入文件或文件夹的 id 数组
