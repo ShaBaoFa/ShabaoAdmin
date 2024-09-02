@@ -50,12 +50,23 @@ class DiskFileShareRequest extends BaseFormRequest
         ];
     }
 
-    public function downloadTokenRule(): array
+    public function getShareDownloadTokenRule(): array
     {
         return [
             'hashes' => ['required', 'array'],
             'hashes.*' => 'required|string|min:32|max:32|exists:upload_files,hash',
             'share_link' => ['required', 'string', 'min:16', 'max:16', 'exists:disk_file_shares,share_link'],
+            'share_password' => ['required', 'alpha_num:ascii', 'min:4', 'max:4'],
+        ];
+    }
+
+    public function getFolderHashRule(): array
+    {
+        return [
+            'hashes' => ['required', 'array'],
+            'hashes.*' => 'required|string|min:32|max:32|exists:upload_files,hash',
+            'share_link' => ['required', 'string', 'min:16', 'max:16', 'exists:disk_file_shares,share_link'],
+            'share_password' => ['required', 'alpha_num:ascii', 'min:4', 'max:4'],
         ];
     }
 

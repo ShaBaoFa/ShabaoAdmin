@@ -24,6 +24,7 @@ use Hyperf\HttpServer\Annotation\PostMapping;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use RedisException;
 
 #[Controller(prefix: 'api/v1/diskFileShares')]
 class DiskFileShareController extends BaseController
@@ -77,9 +78,20 @@ class DiskFileShareController extends BaseController
         return $this->response->success($this->service->getShareByLink($request->all()));
     }
 
+    /**
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws ContainerExceptionInterface
+     */
     #[GetMapping('downloadToken')]
-    public function getShareDownloadToken(DiskFileShareRequest $request): ResponseInterface
+    public function getShareDownloadToken(DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
     {
         return $this->response->success($this->service->getShareDownloadToken($request->all()));
+    }
+
+    #[GetMapping('hash/folder/{folder_id:\d+}')]
+    public function getFolderHash(int $folder_id, DiskFileShareRequest $request): \Psr\Http\Message\ResponseInterface
+    {
+        return $this->response->success($this->service->getHash($folder_id, $request->all()));
     }
 }

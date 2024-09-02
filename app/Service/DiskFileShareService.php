@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\Base\BaseCollection;
 use App\Base\BaseModel;
 use App\Base\BaseService;
 use App\Constants\DiskFileCode;
@@ -78,8 +77,8 @@ class DiskFileShareService extends BaseService
     public function getShareByLink(array $data): array
     {
         $share = $this->getShare($data);
-        $key = sprintf('%sshare_link:%s', config('cache.default.prefix'), Arr::get($data, 'share_link'));
-        redis()->incr($key);
+        $key = sprintf('%sshare_link:uid_%s:%s', config('cache.default.prefix'), $share->created_by, Arr::get($data, 'share_link'));
+        redis()->hIncrBy($key, DiskFileShare::getViewCountName(), 1);
         $this->numberOperation($share->id, DiskFileShare::getViewCountName());
         $pid = Arr::get($data, 'parent_id', 0);
         /**
@@ -117,24 +116,78 @@ class DiskFileShareService extends BaseService
         return $share;
     }
 
-    public function getDiskFilesTree($share): array
+    /**
+     * @param mixed $share
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getAllShareItemsByType($share, DiskFileCode $type): array
     {
         $select = ['id', 'name', 'hash', 'level', 'type', 'parent_id'];
         $diskFiles = $share->diskFiles()->get($select);
-        $treeData = [];
+        $allData = [];
         foreach ($diskFiles as $diskFile) {
             /**
              * @var DiskFile $diskFile
              */
-            $treeData[] = $diskFile->toArray();
-            if ($diskFile->type == DiskFileCode::TYPE_FILE->value) {
+            if ($type == DiskFileCode::TYPE_FILE && $diskFile->type == DiskFileCode::TYPE_FILE->value) {
+                $allData[] = $diskFile->toArray();
                 continue;
             }
+            if ($type == DiskFileCode::TYPE_FOLDER && $diskFile->type == DiskFileCode::TYPE_FOLDER->value) {
+                $allData[] = $diskFile->toArray();
+            }
             $ds = di()->get(DiskService::class);
-            $descendants = $ds->getDescendants(parentId: $diskFile->id, isScope: false, columns: $select);
-            $treeData = Arr::merge($treeData, $descendants);
+            $params = ['type' => $type->value];
+            $descendants = $ds->getDescendants(parentId: $diskFile->id, params: $params, isScope: false, columns: $select);
+            $allData = Arr::merge($allData, $descendants);
         }
-        return (new BaseCollection())->toTree($treeData);
+        return $allData;
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     */
+    public function getShareDownloadToken(array $data): array
+    {
+        $share = $this->getShare($data);
+        $key = sprintf('%sshare_link:uid_%s:%s', config('cache.default.prefix'), $share->created_by, Arr::get($data, 'share_link'));
+        redis()->hIncrBy($key, DiskFileShare::getDownloadCountName(), 1);
+        $this->numberOperation($share->id, DiskFileShare::getDownloadCountName());
+        $items = $this->getAllShareItemsByType($share, DiskFileCode::TYPE_FILE);
+        $hashes = [];
+        foreach ($items as $item) {
+            $hashes[] = Arr::get($item, 'hash');
+        }
+        // $hashes 中 是否包含数组里的所有值
+        if (array_diff(Arr::get($data, 'hashes'), $hashes)) {
+            throw new BusinessException(ErrorCode::NOT_FOUND);
+        }
+        $fs = di()->get(FileSystemService::class);
+        return $fs->getDownloaderStsToken(Arr::get($data, 'hashes'));
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function getHash(int $folder_id, array $data): array
+    {
+        $share = $this->getShare($data);
+        $allFolder = $this->getAllShareItemsByType($share, DiskFileCode::TYPE_FOLDER);
+        $ids = [];
+        foreach ($allFolder as $folder) {
+            $ids[] = Arr::get($folder, 'id');
+        }
+        if (! in_array($folder_id, $ids)) {
+            throw new BusinessException(ErrorCode::NOT_FOUND);
+        }
+
+        $cols = ['id', 'name', 'hash'];
+        $ds = di()->get(DiskService::class);
+        return $ds->getDescendants(parentId: $folder_id, params: ['type' => DiskFileCode::TYPE_FILE->value], isScope: false, columns: $cols);
     }
 
     protected function generateUniqueShareLink($length = 16): string
