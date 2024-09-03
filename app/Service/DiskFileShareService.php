@@ -167,9 +167,6 @@ class DiskFileShareService extends BaseService
     public function getShareDownloadToken(array $data): array
     {
         $share = $this->getShare($data);
-        $key = sprintf('%sshare_link:uid_%s:%s', config('cache.default.prefix'), $share->created_by, Arr::get($data, 'share_link'));
-        redis()->hIncrBy($key, DiskFileShare::getDownloadCountName(), 1);
-        $this->numberOperation($share->id, DiskFileShare::getDownloadCountName());
         $items = $this->getAllShareItemsByType($share, DiskFileCode::TYPE_FILE);
         $hashes = [];
         foreach ($items as $item) {
@@ -178,6 +175,23 @@ class DiskFileShareService extends BaseService
         // $hashes 中 是否包含数组里的所有值
         if (array_diff(Arr::get($data, 'hashes'), $hashes)) {
             throw new BusinessException(ErrorCode::NOT_FOUND);
+        }
+        $key = sprintf('%sshare_link:uid_%s:%s', config('cache.default.prefix'), $share->created_by, Arr::get($data, 'share_link'));
+        redis()->hIncrBy($key, DiskFileShare::getDownloadCountName(), 1);
+        if (config('amqp.enable') && di()->get(DiskFileShareOpCountConsumer::class)->isEnable()) {
+            $amqpQueueVo = new AmqpQueueVo();
+            $amqpQueueVo->setProducer(DiskFileShareOpCountProducer::class);
+            $queueData = [
+                'id' => $share->id,
+                'count_key' => DiskFileShare::getDownloadCountName(),
+                'count_value' => 1,
+            ];
+            $amqpQueueVo->setData($queueData);
+            if (! di()->get(QueueLogService::class)->addQueue($amqpQueueVo)) {
+                $this->numberOperation($share->id, DiskFileShare::getDownloadCountName());
+            }
+        } else {
+            $this->numberOperation($share->id, DiskFileShare::getViewCountName());
         }
         $fs = di()->get(FileSystemService::class);
         return $fs->getDownloaderStsToken(Arr::get($data, 'hashes'));

@@ -60,6 +60,7 @@ class DiskFileShareController extends BaseController
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws RedisException
      */
     #[GetMapping('info/{id:\d+}'), Permission('disks:share:info')]
     public function info(int $id, DiskFileShareRequest $request): ResponseInterface
