@@ -20,6 +20,10 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
 /**
  * @property int $id
  * @property string $username 账号
+ * @property string $nickname 昵称
+ * @property string $avatar 头像
+ * @property string $post 岗位
+ * @property string $dept 部门
  * @property int $status 状态 (1正常 2停用)
  * @property string $phone 手机
  * @property string $login_ip 最后登陆IP
@@ -53,7 +57,7 @@ class User extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'username', 'password', 'status', 'phone', 'login_ip', 'login_time', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'user_type'];
+    protected array $fillable = ['id', 'username', 'nickname', 'avatar', 'post', 'dept', 'password', 'status', 'phone', 'login_ip', 'login_time', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'user_type'];
 
     /**
      * The attributes that should be cast to native types.

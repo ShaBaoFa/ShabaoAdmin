@@ -26,7 +26,7 @@ use PhpAmqpLib\Wire\AMQPTable;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-#[Consumer(exchange: 'web-api', routingKey: 'disk.file.share.op.count.routing', queue: 'disk.file.share.op.count.queue', name: 'DiskFileShareOpCountConsumer', nums: 8)]
+#[Consumer(exchange: 'web-api', routingKey: 'disk.file.share.op.count.routing', queue: 'disk.file.share.op.count.queue', name: 'DiskFileShareOpCountConsumer', nums: 1)]
 class DiskFileShareOpCountConsumer extends BaseConsumer
 {
     public function __construct(

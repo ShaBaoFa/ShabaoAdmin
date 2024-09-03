@@ -25,10 +25,10 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property string $share_link 分享链接的唯一标识符
  * @property int $permission 分享权限（例如：1.查看+下载、2.只查看）
  * @property string $share_password 分享密码
- * @property int $expire_at 到期时间
  * @property int $view_count 查看次数
  * @property int $download_count 下载次数
  * @property Carbon $created_at 创建时间
+ * @property int $expire_at 到期时间
  * @property Carbon $updated_at 更新时间
  * @property string $deleted_at 删除时间
  * @property string $remark 备注
@@ -45,7 +45,7 @@ class DiskFileShare extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'name', 'created_by', 'updated_by', 'share_link', 'permission', 'share_password', 'expire_at', 'view_count', 'download_count', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected array $fillable = ['id', 'name', 'created_by', 'updated_by', 'share_link', 'permission', 'share_password', 'view_count', 'download_count', 'created_at', 'expire_at', 'updated_at', 'deleted_at', 'remark'];
 
     /**
      * The attributes that should be cast to native types.

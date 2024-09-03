@@ -35,6 +35,6 @@ class CreateMessageReceivesTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('message_receives');
+        Schema::dropIfExists('message_receivers');
     }
 }
