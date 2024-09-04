@@ -10,7 +10,8 @@ declare(strict_types=1);
  * @contact  mail@wlfpanda1012.com
  */
 return [
-    'enable' => true,
+    'enable' => false,
+    'host' => '127.0.0.1',
     'port' => 9500,
     'json_dir' => BASE_PATH . '/storage/swagger',
     'html' => null,

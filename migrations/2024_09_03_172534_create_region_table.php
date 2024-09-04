@@ -29,6 +29,7 @@ return new class extends Migration {
             $table->addColumn('string', 'citycode', ['length' => 10, 'default' => '', 'comment' => '城市编码']);
             $table->addColumn('string', 'adcode', ['length' => 10, 'default' => '', 'comment' => '区域编码']);
             $table->addColumn('string', 'lng_lat', ['length' => 30, 'default' => '', 'comment' => '中心经纬度']);
+            $table->addColumn('timestamp', 'deleted_at', ['precision' => 0, 'comment' => '删除时间'])->nullable();
             $table->index(['name', 'initial', 'pinyin']);
         });
     }

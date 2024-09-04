@@ -61,6 +61,15 @@ class OrganizationService extends BaseService
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
+    public function getRegion(int $id): array
+    {
+        $rs = di()->get(RegionService::class);
+        return $rs->info($id);
+    }
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     public function getAllDept(int $id): array
     {
         $userDao = di()->get(UserDao::class);

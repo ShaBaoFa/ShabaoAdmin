@@ -18,7 +18,7 @@ use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
- * @property int $id
+ * @property int $id 
  * @property int $parent_id 父ID
  * @property string $level 组级集合
  * @property string $name 部门名称
@@ -29,12 +29,12 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property int $created_by 创建者
  * @property int $updated_by 更新者
  * @property string $remark 备注
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property string $deleted_at
- * @property null|Collection|User[] $users
- * @property null|Collection|Role[] $roles
- * @property null|Collection|Organization[] $organizations
+ * @property Carbon $created_at 
+ * @property Carbon $updated_at 
+ * @property string $deleted_at 
+ * @property-read null|Collection|User[] $users 
+ * @property-read null|Collection|Role[] $roles 
+ * @property-read null|Collection|Organization[] $organizations 
  */
 class Department extends BaseModel
 {

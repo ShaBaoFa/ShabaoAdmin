@@ -67,9 +67,9 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-                $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
-                $zip_file   = BASE_PATH . '/region.json.zip';
-                file_put_contents($zip_file, $online_zip);
+        $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
+        $zip_file = BASE_PATH . '/region.json.zip';
+        file_put_contents($zip_file, $online_zip);
         return;
         // 示例的 region_data 数据
         $regionData = Db::table('region')->get()->toArray();
