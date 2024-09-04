@@ -66,6 +66,7 @@ class OrganizationService extends BaseService
         $rs = di()->get(RegionService::class);
         return $rs->info($id);
     }
+
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface

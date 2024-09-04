@@ -21,7 +21,7 @@ use Hyperf\Database\Model\Relations\HasMany;
 use Hyperf\Database\Model\Relations\HasOne;
 
 /**
- * @property int $id 
+ * @property int $id
  * @property int $super_admin_id 企业超管ID
  * @property int $parent_id 父ID
  * @property int $province_region_id 省级ID
@@ -40,12 +40,12 @@ use Hyperf\Database\Model\Relations\HasOne;
  * @property int $created_by 创建者
  * @property int $updated_by 更新者
  * @property string $remark 备注
- * @property Carbon $created_at 
- * @property Carbon $updated_at 
- * @property string $deleted_at 
- * @property-read null|Collection|User[] $users 
- * @property-read null|Collection|Department[] $depts 
- * @property-read null|User $superAdmin 
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property string $deleted_at
+ * @property null|Collection|User[] $users
+ * @property null|Collection|Department[] $depts
+ * @property null|User $superAdmin
  */
 class Organization extends BaseModel
 {

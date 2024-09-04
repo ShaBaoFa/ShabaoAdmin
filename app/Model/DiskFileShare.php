@@ -32,8 +32,8 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property Carbon $updated_at 更新时间
  * @property string $deleted_at 删除时间
  * @property string $remark 备注
- * @property-read null|Collection|DiskFile[] $diskFiles 
- * @property-read null|Collection|User[] $shareWith 
+ * @property null|Collection|DiskFile[] $diskFiles
+ * @property null|Collection|User[] $shareWith
  */
 class DiskFileShare extends BaseModel
 {
