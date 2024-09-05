@@ -12,18 +12,7 @@ declare(strict_types=1);
 
 namespace HyperfTest\Cases;
 
-use App\Kernel\Context\Coroutine;
-use App\Kernel\Log\AppendRequestIdProcessor;
-use Hyperf\Context\Context;
-use Hyperf\Di\Definition\FactoryDefinition;
-use Hyperf\Di\Resolver\FactoryResolver;
-use Hyperf\Di\Resolver\ResolverDispatcher;
-use Hyperf\Engine\Channel;
-use Hyperf\Support\Reflection\ClassInvoker;
 use HyperfTest\HttpTestCase;
-use Mockery;
-use Psr\Container\ContainerInterface;
-use Throwable;
 
 /**
  * @internal
@@ -34,6 +23,5 @@ class ExampleTest extends HttpTestCase
     public function testExample()
     {
         $this->assertTrue(true);
-
     }
 }

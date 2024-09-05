@@ -94,7 +94,7 @@ class RoleDao extends BaseDao
     /**
      * 更新角色.
      */
-    #[CacheEvict(prefix: 'loginInfo', all: true), Transactional]
+    #[CacheEvict(prefix: 'LoginInfo', all: true), Transactional]
     public function update(mixed $id, array $data): bool
     {
         $menuIds = $data['menu_ids'] ?? [];
@@ -115,7 +115,7 @@ class RoleDao extends BaseDao
     /**
      * 批量真实删除角色.
      */
-    #[CacheEvict(prefix: 'loginInfo', all: true), Transactional]
+    #[CacheEvict(prefix: 'LoginInfo', all: true), Transactional]
     public function realDelete(array $ids): bool
     {
         foreach ($ids as $id) {
@@ -140,7 +140,7 @@ class RoleDao extends BaseDao
     /**
      * 单个或批量软删除数据.
      */
-    #[CacheEvict(prefix: 'loginInfo', all: true)]
+    #[CacheEvict(prefix: 'LoginInfo', all: true)]
     public function delete(array $ids): bool
     {
         $adminId = env('ADMIN_ROLE');
