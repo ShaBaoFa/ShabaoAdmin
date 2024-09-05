@@ -18,7 +18,7 @@ use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
 /**
- * @property int $id
+ * @property int $id 
  * @property string $name 角色名称
  * @property string $code 角色代码
  * @property int $type 角色类型(1公共角色 2UGC角色)
@@ -27,12 +27,12 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property int $created_by 创建者
  * @property int $updated_by 更新者
  * @property string $remark 备注
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property string $deleted_at
- * @property null|Collection|Department[] $depts
- * @property null|Collection|Menu[] $menus
- * @property null|Collection|User[] $users
+ * @property Carbon $created_at 
+ * @property Carbon $updated_at 
+ * @property string $deleted_at 
+ * @property-read null|Collection|Department[] $depts 
+ * @property-read null|Collection|Menu[] $menus 
+ * @property-read null|Collection|User[] $users 
  */
 class Role extends BaseModel
 {
