@@ -1,4 +1,4 @@
-name: PHPUnit for Hyperf
+name: PHPUnit for ShabaoAdmin
 
 on: [ push, pull_request ]
 
