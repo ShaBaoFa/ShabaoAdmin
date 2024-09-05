@@ -23,6 +23,10 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('username', 20)->unique()->comment('账号');
+            $table->string('nickname', 20)->nullable()->comment('昵称');
+            $table->string('avatar', 255)->nullable()->comment('头像');
+            $table->string('post', 255)->nullable()->comment('岗位');
+            $table->string('dept', 255)->nullable()->comment('部门');
             $table->string('password', 100)->comment('密码');
             $table->addColumn('smallInteger', 'status', ['default' => 1, 'comment' => '状态 (1正常 2停用)'])->index()->nullable();
             $table->addColumn('string', 'phone', ['length' => 11, 'comment' => '手机'])->nullable();

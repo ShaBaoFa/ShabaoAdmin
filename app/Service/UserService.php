@@ -233,7 +233,7 @@ class UserService extends BaseService
             $roles = $roleDao->getMenuIdsByRoleIds($user->roles()->pluck('id')->toArray());
             $ids = $this->filterMenuIds($roles);
             $data['organization'] = $user->organizations()->first(['id', 'name']);
-            $data['roles'] = $user->roles()->pluck('code')->toArray();
+            $data['roles'] = $user->roles()->get(['name', 'code'])->toArray();
             $data['routers'] = $menuDao->getRoutersByIds($ids);
             $data['codes'] = $menuDao->getMenuCode($ids);
         }

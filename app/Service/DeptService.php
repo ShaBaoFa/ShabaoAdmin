@@ -71,9 +71,9 @@ class DeptService extends BaseService
             'id' => $id,
             'data' => $handleData,
         ];
-        $descendants = $this->dao->getDescendantsDepts((int) $id);
+        $descendants = $this->getDescendants(parentId: (int) $id);
         foreach ($descendants as $descendant) {
-            $handleDescendantDeptLevelData = $this->handleDescendantDeptLevels($descendant['level'], $handleData['level'], $id);
+            $handleDescendantDeptLevelData = $this->handleDescendantLevels($descendant['level'], $handleData['level'], $id);
             $update[] = [
                 'id' => $descendant['id'],
                 'data' => ['level' => $handleDescendantDeptLevelData],
@@ -102,14 +102,6 @@ class DeptService extends BaseService
     }
 
     /**
-     * 检查子部门是否存在.
-     */
-    public function checkChildrenExists(int $id): bool
-    {
-        return $this->dao->checkChildrenExists($id);
-    }
-
-    /**
      * 处理数据.
      */
     protected function handleData(array $data): array
@@ -129,17 +121,5 @@ class DeptService extends BaseService
         }
 
         return $data;
-    }
-
-    /**
-     * 处理下级部门.
-     */
-    protected function handleDescendantDeptLevels(string $descendantLevel, string $handleDataLevel, int $id): string
-    {
-        $descendantLevelArr = explode(',', $descendantLevel);
-        $handleDataLevelArr = explode(',', $handleDataLevel);
-        $position = array_search($id, $descendantLevelArr);
-        array_splice($descendantLevelArr, 0, $position, $handleDataLevelArr);
-        return implode(',', $descendantLevelArr);
     }
 }

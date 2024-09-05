@@ -97,8 +97,6 @@ class BaseModel extends Model
         return $this;
     }
 
-
-
     /**
      * Create a new Model Collection instance.
      */

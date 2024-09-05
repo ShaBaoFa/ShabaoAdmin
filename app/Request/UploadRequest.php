@@ -112,7 +112,7 @@ class UploadRequest extends BaseFormRequest
 
     private function getImagesMimes(): string
     {
-        return 'jpg,jpeg,png,gif,svg,bmp';
+        return 'jpg,jpeg,png,gif,svg,bmp,webp';
     }
 
     private function getFilesMines(): string

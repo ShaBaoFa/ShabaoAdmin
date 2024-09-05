@@ -74,8 +74,7 @@ class BaseCollection extends Collection
         }
 
         $tree = [];
-
-        foreach ($data as $value) {
+        foreach ($data as $key => $value) {
             if ($value[$parentField] == $parentId) {
                 $child = $this->toTree($data, $value[$id], $id, $parentField, $children);
                 if (! empty($child)) {

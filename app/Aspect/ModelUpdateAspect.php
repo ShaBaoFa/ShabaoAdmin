@@ -55,7 +55,7 @@ class ModelUpdateAspect extends AbstractAspect
             && di()->get(BaseRequest::class)->getHeaderLine('authorization')
         ) {
             try {
-                $instance->updated_by = user()->getId();
+                $instance->updated_by = user()->getId() ?? 0;
             } catch (Throwable $e) {
             }
         }

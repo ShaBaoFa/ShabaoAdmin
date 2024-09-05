@@ -92,15 +92,6 @@ class OrganizationDao extends BaseDao
     }
 
     /**
-     * 获取子孙部门.
-     */
-    public function getDescendantsOrgs(int $id): array
-    {
-        $params = ['level' => $id];
-        return $this->handleSearch($this->model::query(), $params)->get()->toArray();
-    }
-
-    /**
      * 生成组织超级管理员.
      */
     #[ArrayShape(

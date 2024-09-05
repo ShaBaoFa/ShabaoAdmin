@@ -40,19 +40,19 @@ class ModelSaveAspect extends AbstractAspect
     public function process(ProceedingJoinPoint $proceedingJoinPoint)
     {
         $instance = $proceedingJoinPoint->getInstance();
+        $user = user();
+        if (! $user->check()) {
+            return $proceedingJoinPoint->process();
+        }
         if (config('base-common.data_scope_enabled')) {
             // 获取当前登录用户信息
             // 设置创建人
             if ($instance instanceof BaseModel && in_array($instance->getDataScopeField(), $instance->getFillable()) && is_null($instance[$instance->getDataScopeField()])) {
-                $user = user();
-                $user->check();
                 $instance[$instance->getDataScopeField()] = Arr::get($user->getUserInfo(), 'id');
             }
 
             // 设置更新人
             if ($instance instanceof BaseModel && in_array('updated_by', $instance->getFillable())) {
-                $user = user();
-                $user->check();
                 $instance->updated_by = Arr::get($user->getUserInfo(), 'id');
             }
         }

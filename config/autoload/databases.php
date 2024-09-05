@@ -26,7 +26,7 @@ return [
         'prefix' => env('DB_PREFIX', ''),
         'pool' => [
             'min_connections' => 1,
-            'max_connections' => 32,
+            'max_connections' => 10,
             'connect_timeout' => 10.0,
             'wait_timeout' => 3.0,
             'heartbeat' => -1,
@@ -35,7 +35,7 @@ return [
         'cache' => [
             'handler' => RedisHandler::class,
             'cache_key' => '{mc:%s:m:%s}:%s:%s',
-            'prefix' => 'default',
+            'prefix' => env('APP_NAME', 'default'),
             'ttl' => 3600 * 24,
             'empty_model_ttl' => 600,
             'load_script' => true,

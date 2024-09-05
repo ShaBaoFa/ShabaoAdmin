@@ -1,50 +1,89 @@
 version: '3.7'
 services:
   mysql:
-    image: "mysql/mysql-server:5.7"
+    image: "mysql:8.0"
     environment:
       TZ: "Asia/Shanghai"
       MYSQL_ALLOW_EMPTY_PASSWORD: "true"
       MYSQL_ROOT_HOST: "%"
-      MYSQL_DATABASE: "hyperf"
     networks:
       - net
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ./.docker/mysql:/var/lib/mysql
       - ./.github/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "13306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      retries: 3
+      timeout: 5s
     restart: "always"
   redis:
-    image: "redis"
+    image: "redis:alpine"
     command:
       - "redis-server"
       - "--databases 256"
+    ports:
+      - "61379:6379"
     networks:
       - net
     volumes:
-      - redis-data:/data
+      - ./.docker/redis:/data
+      - ./.docker/redis/redis.conf:/usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 3
+      timeout: 5s
     restart: "always"
-  hyperf:
-    image: "hyperf/biz-skeleton:latest"
-    build:
-      context: "."
+  shabao-admin:
+    image: "wlfpanda1012/hyperf:8.1-alpine-v3.18-swoole-xlswriter"
+    restart: always
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       APP_ENV: "${APP_ENV:-prod}"
       DB_HOST: "mysql"
       REDIS_HOST: "redis"
+    working_dir: "/opt/www"
     ports:
-      - "9501:9501"
+      - "9505:9505"
+      - "9506:9506"
     volumes:
-      - "./.env.example:/opt/www/.env"
+      - "./:/opt/www"
+      - "./.env.docker:/opt/www/.env"
     networks:
       - net
-    restart: "always"
-    deploy:
-      replicas: 1
+    entrypoint: ["php", "watch", "-c"]
+  rabbitmq:
+    image: wlfpanda1012/rabbitmq:rabbitmq_delayed_message_exchange-3.13.0
+    restart: always
+    networks:
+      - net
+    ports:
+      - "5369:4369"
+      - "6672:5672"
+      - "25672:15672"
+      - "35672:25672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=shabaoadmin
+      - RABBITMQ_DEFAULT_PASS=12345678
+    volumes:
+      - ./.docker/rabbitmq:/var/lib/rabbitmq
+      - ./.docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 networks:
   net:
+    driver: bridge
 volumes:
   mysql-data:
   redis-data:
