@@ -18,6 +18,7 @@ use App\Dao\OrganizationDao;
 use App\Dao\UserDao;
 use App\Exception\BusinessException;
 use App\Model\Department;
+use Hyperf\Collection\Arr;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -149,6 +150,8 @@ class OrganizationService extends BaseService
              */
             $data['level'] = $parent->level . ',' . $data['parent_id'];
         }
+        Arr::set($data, 'province_region_name', Arr::get($this->getRegion(Arr::get($data, 'province_region_id')), 'name'));
+        Arr::set($data, 'city_region_name', Arr::get($this->getRegion(Arr::get($data, 'city_region_id')), 'name'));
 
         return $data;
     }
