@@ -15,7 +15,7 @@ use App\Middleware\WsAuthMiddleware;
 use Hyperf\HttpServer\Router\Router;
 
 Router::get('/', function () {
-    return 'see u.';
+    return 'welcome to ShabaoAdmin.';
 });
 
 Router::addServer('message', function () {
