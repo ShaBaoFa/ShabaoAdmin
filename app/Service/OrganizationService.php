@@ -18,6 +18,7 @@ use App\Dao\OrganizationDao;
 use App\Dao\UserDao;
 use App\Exception\BusinessException;
 use App\Model\Department;
+use Hyperf\Cache\Annotation\Cacheable;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -151,5 +152,18 @@ class OrganizationService extends BaseService
         }
 
         return $data;
+    }
+
+    public function info(int $id)
+    {
+        if (! $this->checkExists(['id' => $id],false)){
+            throw new BusinessException(ErrorCode::NOT_FOUND);
+        }
+        return $this->getCacheData($id);
+    }
+    #[Cacheable(prefix: 'OrgInfo', value: 'OrgId_#{id}', ttl: 0)]
+    private function getCacheData(int $id):array
+    {
+        return $this->dao->find($id)->load(['parent'])->toArray();
     }
 }
