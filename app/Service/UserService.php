@@ -67,7 +67,7 @@ class UserService extends BaseService
     /**
      * 更新用户信息.
      */
-    #[CacheEvict(prefix: 'loginInfo', value: 'userId_#{id}')]
+    #[CacheEvict(prefix: 'LoginInfo', value: 'UserId_#{id}')]
     public function update(mixed $id, array $data): bool
     {
         if (Arr::has($data, 'username')) {
@@ -195,7 +195,7 @@ class UserService extends BaseService
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[CacheEvict(prefix: 'loginInfo', value: 'userId_#{id}')]
+    #[CacheEvict(prefix: 'LoginInfo', value: 'UserId_#{id}')]
     public function updateInfo(int $id, array $params): bool
     {
         if (! $id) {
@@ -209,7 +209,7 @@ class UserService extends BaseService
     /**
      * 获取缓存用户信息.
      */
-    #[Cacheable(prefix: 'loginInfo', value: 'userId_#{id}', ttl: 0)]
+    #[Cacheable(prefix: 'LoginInfo', value: 'UserId_#{id}', ttl: 0)]
     protected function getCacheInfo(int $id): array
     {
         /** @var User $user */

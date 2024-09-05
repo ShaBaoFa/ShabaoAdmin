@@ -130,7 +130,7 @@ class MenuDao extends BaseDao
     /**
      * 单个或批量真实删除数据.
      */
-    #[CacheEvict(prefix: 'loginInfo', all: true), Transactional]
+    #[CacheEvict(prefix: 'LoginInfo', all: true), Transactional]
     public function realDelete(array $ids): bool
     {
         foreach ($ids as $id) {
@@ -146,7 +146,7 @@ class MenuDao extends BaseDao
     /**
      * 新增菜单.
      */
-    #[CacheEvict(prefix: 'loginInfo', all: true)]
+    #[CacheEvict(prefix: 'LoginInfo', all: true)]
     public function save(array $data): mixed
     {
         return parent::save($data);
@@ -155,7 +155,7 @@ class MenuDao extends BaseDao
     /**
      * 更新菜单.
      */
-    #[CacheEvict(prefix: 'loginInfo', all: true)]
+    #[CacheEvict(prefix: 'LoginInfo', all: true)]
     public function update(mixed $id, array $data): bool
     {
         return parent::update($id, $data);
@@ -164,7 +164,7 @@ class MenuDao extends BaseDao
     /**
      * 批量更新菜单.
      */
-    #[CacheEvict(prefix: 'loginInfo', all: true),Transactional]
+    #[CacheEvict(prefix: 'LoginInfo', all: true),Transactional]
     public function batchUpdate(array $update): bool
     {
         foreach ($update as $item) {
@@ -179,7 +179,7 @@ class MenuDao extends BaseDao
     /**
      * 逻辑删除菜单.
      */
-    #[CacheEvict(prefix: 'loginInfo', all: true)]
+    #[CacheEvict(prefix: 'LoginInfo', all: true)]
     public function delete(array $ids): bool
     {
         return parent::delete($ids);

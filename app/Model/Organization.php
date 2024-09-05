@@ -43,6 +43,10 @@ use Hyperf\Database\Model\Relations\HasOne;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * @property null|Organization $parent
+ * @property null|Collection|Organization[] $children
+ * @property null|Region $provinceRegion
+ * @property null|Region $cityRegion
  * @property null|Collection|User[] $users
  * @property null|Collection|Department[] $depts
  * @property null|User $superAdmin

@@ -35,6 +35,7 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property Carbon $updated_at
  * @property Carbon $deleted_at
  * @property string $user_type 用户类型：(100系统用户)
+ * @property int $point 个人积分
  * @property null|Collection|DiskFileShare[] $sharedFiles
  * @property null|Collection|Role[] $roles
  * @property null|Collection|Department[] $depts
@@ -57,12 +58,12 @@ class User extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'username', 'nickname', 'avatar', 'post', 'dept', 'password', 'status', 'phone', 'login_ip', 'login_time', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'user_type'];
+    protected array $fillable = ['id', 'username', 'nickname', 'avatar', 'post', 'dept', 'password', 'status', 'phone', 'login_ip', 'login_time', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'user_type', 'point'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'integer', 'username' => 'string', 'password' => 'string', 'status' => 'integer', 'login_ip' => 'string', 'login_time' => 'datetime', 'created_by' => 'integer', 'updated_by' => 'integer', 'remark' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'deleted_at' => 'datetime'];
+    protected array $casts = ['id' => 'integer', 'username' => 'string', 'password' => 'string', 'status' => 'integer', 'login_ip' => 'string', 'login_time' => 'datetime', 'created_by' => 'integer', 'updated_by' => 'integer', 'remark' => 'string', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'deleted_at' => 'datetime', 'point' => 'integer'];
 
     /**
      * 通过中间表关联角色.
