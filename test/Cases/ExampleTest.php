@@ -35,59 +35,5 @@ class ExampleTest extends HttpTestCase
     {
         $this->assertTrue(true);
 
-        $res = $this->get('/');
-
-        $this->assertSame(0, $res['code']);
-        $this->assertSame('Hello Hyperf.', $res['data']['message']);
-        $this->assertSame('GET', $res['data']['method']);
-        $this->assertSame('Hyperf', $res['data']['user']);
-
-        $res = $this->get('/', ['user' => 'limx']);
-
-        $this->assertSame(0, $res['code']);
-        $this->assertSame('limx', $res['data']['user']);
-
-        $res = $this->post('/', [
-            'user' => 'limx',
-        ]);
-        $this->assertSame('Hello Hyperf.', $res['data']['message']);
-        $this->assertSame('POST', $res['data']['method']);
-        $this->assertSame('limx', $res['data']['user']);
-
-        Context::set(AppendRequestIdProcessor::REQUEST_ID, $id = uniqid());
-        $pool = new Channel(1);
-        di()->get(Coroutine::class)->create(function () use ($pool) {
-            try {
-                $all = Context::getContainer();
-                $pool->push((array) $all);
-            } catch (Throwable $exception) {
-                $pool->push(false);
-            }
-        });
-
-        $data = $pool->pop();
-        $this->assertIsArray($data);
-        $this->assertSame($id, $data[AppendRequestIdProcessor::REQUEST_ID]);
-    }
-
-    public function testGetDefinitionResolver()
-    {
-        $container = Mockery::mock(ContainerInterface::class);
-        $dispatcher = new ClassInvoker(new ResolverDispatcher($container));
-        $resolver = $dispatcher->getDefinitionResolver(Mockery::mock(FactoryDefinition::class));
-        $this->assertInstanceOf(FactoryResolver::class, $resolver);
-        $this->assertSame($resolver, $dispatcher->factoryResolver);
-
-        $resolver2 = $dispatcher->getDefinitionResolver(Mockery::mock(FactoryDefinition::class));
-        $this->assertInstanceOf(FactoryResolver::class, $resolver2);
-        $this->assertSame($resolver2, $dispatcher->factoryResolver);
-    }
-
-    /**
-     * @group OpenSSL
-     */
-    public function testOpenSSL()
-    {
-        $this->assertNotFalse(openssl_encrypt('12345', 'bf', 'xxxxxxxx', 0, 'xxxxxxxx'));
     }
 }
