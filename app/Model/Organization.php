@@ -28,6 +28,8 @@ use Hyperf\Database\Model\Relations\HasOne;
  * @property int $city_region_id 市级ID
  * @property string $level 组级集合
  * @property string $name 组织名称
+ * @property string $province_region_name 省级地区名称
+ * @property string $city_region_name 市级地区名称
  * @property string $address 组织地址
  * @property string $legal_person 法人
  * @property string $phone 联系电话
@@ -61,7 +63,7 @@ class Organization extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'super_admin_id', 'parent_id', 'province_region_id', 'city_region_id', 'level', 'name', 'address', 'legal_person', 'phone', 'contact', 'contact_address', 'zip_code', 'email', 'status', 'sort', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'super_admin_id', 'parent_id', 'province_region_id', 'city_region_id', 'level', 'name', 'province_region_name', 'city_region_name', 'address', 'legal_person', 'phone', 'contact', 'contact_address', 'zip_code', 'email', 'status', 'sort', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.

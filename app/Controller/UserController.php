@@ -30,7 +30,7 @@ use Psr\Http\Message\ResponseInterface;
 
 use function App\Helper\user;
 
-#[Controller(prefix: 'api/v1/users'),Auth]
+#[Controller(prefix: 'api/v1/users')]
 class UserController extends BaseController
 {
     #[Inject]
