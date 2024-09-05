@@ -45,6 +45,12 @@ class OrganizationController extends BaseController
         return $this->response->success($this->service->getList($this->request->all()));
     }
 
+    #[GetMapping('info/{id:\d+}'), Permission('organizations, organizations:info')]
+    public function info(int $id): ResponseInterface
+    {
+        return $this->response->success($this->service->info($id));
+    }
+
     /**
      * 回收站组织列表.
      * @throws ContainerExceptionInterface
