@@ -19,7 +19,7 @@ class RegionSeeder extends Seeder
      */
     public function run()
     {
-        $json_file = BASE_PATH . '/region.json';
+        $json_file = BASE_PATH . '/storage/region/region.json';
         echo '正在读取json数据···' . "\n";
         $json = file_get_contents($json_file);
         $data = json_decode($json, true);
