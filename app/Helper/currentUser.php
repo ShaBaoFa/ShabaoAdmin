@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace App\Helper;
 
 use App\Base\BaseRequest;
-use App\Constants\ErrorCode;
-use App\Exception\AuthException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\SimpleCache\InvalidArgumentException;
@@ -48,9 +46,8 @@ class currentUser
                 return true;
             }
         } catch (InvalidArgumentException|Throwable $e) {
-            throw new AuthException(ErrorCode::UNAUTHORIZED);
+            return false;
         }
-
         return false;
     }
 

@@ -130,7 +130,6 @@ trait ModelMacroTrait
                                 );
                                 $this->userIds[] = $this->userid;
                                 break;
-                                break;
                             case Role::SELF_SCOPE:
                                 $this->userIds[] = $this->userid;
                                 break;

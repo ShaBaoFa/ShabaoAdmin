@@ -54,7 +54,7 @@ class QueueLogService extends BaseService implements QueueLogServiceInterface
         }
         $class = $amqpQueueVo->getProducer();
         // 通过反射获取实例
-        $producer = make($class, [$amqpQueueVo->getData()]);
+        $producer = make($class, ['data' => $amqpQueueVo->getData()]);
         $queueName = Str::beforeLast($producer->getRoutingKey(), '.') . '.queue';
         $id = $this->save([
             'exchange_name' => $producer->getExchange(),

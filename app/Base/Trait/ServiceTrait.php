@@ -12,6 +12,7 @@ declare(strict_types=1);
 
 namespace App\Base\Trait;
 
+use App\Base\BaseCollection;
 use App\Base\BaseDao;
 use App\Base\BaseModel;
 use Hyperf\DbConnection\Db;
@@ -103,6 +104,11 @@ trait ServiceTrait
         return $this->dao->save($data);
     }
 
+    public function checkExists(?array $condition, bool $isScope = true): bool
+    {
+        return $this->dao->checkExists($condition, $isScope);
+    }
+
     /**
      * 批量新增.
      */
@@ -122,6 +128,11 @@ trait ServiceTrait
     public function find(mixed $id, array $column = ['*']): ?BaseModel
     {
         return $this->dao->find($id, $column);
+    }
+
+    public function findMany(array $ids, array $column = ['*']): BaseCollection
+    {
+        return $this->dao->findMany($ids, $column);
     }
 
     /**
@@ -216,8 +227,54 @@ trait ServiceTrait
     /**
      * 数字更新操作.
      */
-    public function numberOperation(mixed $id, string $field, int $value): bool
+    public function numberOperation(mixed $id, string $field, int $value = 1): bool
     {
         return $this->dao->numberOperation($id, $field, $value);
+    }
+
+    /**
+     * 检查子节点是否存在.
+     */
+    public function checkChildrenExists(int $id): bool
+    {
+        return $this->dao->checkChildrenExists($id);
+    }
+
+    /**
+     * 获取子孙节点.
+     */
+    public function getDescendants(int $parentId, array $params = [], bool $isScope = true, array $columns = ['*']): array
+    {
+        return $this->dao->getDescendants($parentId, $params, $isScope, $columns);
+    }
+
+    /**
+     * 处理子孙节点.
+     */
+    public function handleDescendantLevels(string $descendantLevel, string $handleDataLevel, int $id): string
+    {
+        $descendantLevelArr = explode(',', $descendantLevel);
+        $handleDataLevelArr = explode(',', $handleDataLevel);
+        $position = array_search($id, $descendantLevelArr);
+        array_splice($descendantLevelArr, 0, $position, $handleDataLevelArr);
+        return implode(',', $descendantLevelArr);
+    }
+
+    /**
+     * 获取单一模型缓存.
+     */
+    public function findFormCache(mixed $id): ?BaseModel
+    {
+        return $this->dao->findFormCache($id);
+    }
+
+    public function findManyFormCache(array $ids): BaseCollection
+    {
+        return $this->dao->findManyFormCache($ids);
+    }
+
+    public function belongMe(array $condition = []): bool
+    {
+        return $this->dao->belongMe($condition);
     }
 }

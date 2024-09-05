@@ -20,7 +20,7 @@ if (\Hyperf\Support\env('APP_ENV') === 'testing') {
         'class' => StreamHandler::class,
         'constructor' => [
             'stream' => 'php://output',
-            'level' => Level::Debug,
+            'level' => Level::Info,
         ],
     ];
 }

@@ -60,6 +60,9 @@ class PermissionAspect extends AbstractAspect
         if (isset($proceedingJoinPoint->getAnnotationMetadata()->method[Permission::class])) {
             $permission = $proceedingJoinPoint->getAnnotationMetadata()->method[Permission::class];
         }
+        if (! $this->currentUser->check()) {
+            throw new NoPermissionException(ErrorCode::FORBIDDEN);
+        }
         if ($this->currentUser->isSuperAdmin() || empty($permission->code)) {
             return $proceedingJoinPoint->process();
         }

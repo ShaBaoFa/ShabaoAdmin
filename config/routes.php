@@ -14,6 +14,10 @@ use App\Controller\WsServerController;
 use App\Middleware\WsAuthMiddleware;
 use Hyperf\HttpServer\Router\Router;
 
+Router::get('/', function () {
+    return 'see u.';
+});
+
 Router::addServer('message', function () {
     Router::get('/ws.message.io', WsServerController::class, [
         'middleware' => [WsAuthMiddleware::class],

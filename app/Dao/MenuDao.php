@@ -112,15 +112,6 @@ class MenuDao extends BaseDao
     }
 
     /**
-     * 获取子孙menus.
-     */
-    public function getDescendantsMenus(int $parentId): array
-    {
-        $params = ['level' => $parentId];
-        return $this->handleSearch($this->model::query(), $params)->get()->toArray();
-    }
-
-    /**
      * 查询菜单code.
      */
     public function getMenuCode(?array $ids = null): array
@@ -210,11 +201,6 @@ class MenuDao extends BaseDao
         return $this->model::withTrashed()->whereIn('id', $ids)->pluck('name')->toArray();
     }
 
-    public function checkChildrenExists(int $id): bool
-    {
-        return $this->model::withTrashed()->where('parent_id', $id)->exists();
-    }
-
     /**
      * 搜索处理器.
      */
@@ -228,6 +214,11 @@ class MenuDao extends BaseDao
         $query->when(
             $name = Arr::get($params, 'name'),
             fn (Builder $query) => $query->where('name', 'like', '%' . $name . '%')
+        );
+
+        $query->when(
+            $level = Arr::get($params, 'level'),
+            fn (Builder $query) => $query->where('level', 'like', '%' . $level . '%')
         );
 
         $query->when(

@@ -1,8 +1,8 @@
-# 介绍
+# 🚀介绍
 Hyperf 骨架包
 [https://gitee.com/limingxinleo/biz-skeleton.git](https://gitee.com/limingxinleo/biz-skeleton.git)
 
-# 安装 composer 包
+# 🔧安装 composer 包
 ```shell
 # swagger 文档生成
 composer require "hyperf/swagger:3.1.*" -W
@@ -21,7 +21,7 @@ composer require "xmo/jwt-auth" -W
 
 ```
 
-# 发布配置
+# 🤖发布配置
 ```shell
 # [hyperf/swagger] publishes [config] successfully.
 php bin/hyperf.php vendor:publish hyperf/swagger

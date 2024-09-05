@@ -27,6 +27,9 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.forbidden')]
     case FORBIDDEN = 403;
 
+    #[Message('common.not_found')]
+    case NOT_FOUND = 404;
+
     #[Message('common.invalid_params')]
     case INVALID_PARAMS = 422;
 
@@ -121,6 +124,29 @@ enum ErrorCode: int implements ErrorCodeInterface
     // 不可以对自己发私信
     #[Message('common.message_cannot_send_to_yourself')]
     case MESSAGE_CANNOT_SEND_TO_YOURSELF = 90001;
+
+    // disk
+    #[Message('common.disk_file_not_exist')]
+    case DISK_FILE_NOT_EXIST = 100001;
+
+    #[Message('common.disk_folder_not_exist')]
+    case DISK_FOLDER_NOT_EXIST = 100002;
+
+    // 不可选择的目录
+    #[Message('common.disk_folder_illegal_selected')]
+    case DISK_FOLDER_ILLEGAL_SELECTED = 100003;
+
+    // DISK_FILE_ILLEGAL_SHARE
+    #[Message('common.disk_file_illegal_share')]
+    case DISK_FILE_ILLEGAL_SHARE = 100004;
+
+    // 不可分享给自己
+    #[Message('common.disk_cannot_share_to_yourself')]
+    case DISK_CANNOT_SHARE_TO_YOURSELF = 100005;
+
+    // 分享密码错误
+    #[Message('common.disk_share_password_error')]
+    case DISK_SHARE_PASSWORD_ERROR = 100006;
 
     public function getMessage(?array $translate = null): string
     {

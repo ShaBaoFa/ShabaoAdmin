@@ -55,14 +55,36 @@ class UploadFileDao extends BaseDao
         return $model->toArray();
     }
 
+    /**
+     * 通过hash获取上传文件的信息.
+     */
+    public function getFilesUrlByHash(array $hash): ?array
+    {
+        $model = $this->model::query()->whereIn('hash', $hash)->pluck('url', 'hash');
+        if (! $model) {
+            return null;
+        }
+        return $model->toArray();
+    }
+
     public function isUploaded(string $hash): bool
     {
         return $this->model::query()->where('hash', $hash)->where('status', UploadStatusCode::UPLOAD_FINISHED->value)->exists();
     }
 
-    public function changeStatusByHash(string $hash): bool
+    public function areUploaded(array $hashes): bool
     {
-        return $this->updateByCondition(['hash' => $hash], ['status' => UploadStatusCode::UPLOAD_FINISHED->value]);
+        foreach ($hashes as $hash) {
+            if (! $this->isUploaded($hash)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function changeStatusByHash(string $hash, UploadStatusCode $code): bool
+    {
+        return $this->updateByCondition(['hash' => $hash], ['status' => $code->value]);
     }
 
     /**

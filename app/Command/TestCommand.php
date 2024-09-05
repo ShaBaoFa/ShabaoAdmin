@@ -14,6 +14,7 @@ namespace App\Command;
 
 use App\Amqp\Producer\DelayedMessageProducer;
 use App\Amqp\Producer\MessageProducer;
+use App\Constants\DiskFileShareExpireCode;
 use App\Constants\ErrorCode;
 use App\Constants\MessageContentTypeCode;
 use App\Constants\QueueMesContentTypeCode;
@@ -40,6 +41,7 @@ use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 
 use function App\Helper\redis;
 use function Hyperf\Config\config;
+use function Hyperf\Support\make;
 
 #[Command]
 class TestCommand extends HyperfCommand
@@ -61,18 +63,66 @@ class TestCommand extends HyperfCommand
      * @throws ContainerExceptionInterface
      * @throws OssException
      * @throws RedisException
+     * @throws RandomException
      */
     public function handle(): void
     {
-        $ids = [];
-        for ($i = 0; $i < 10; ++$i) {
-            $ids[] = $i * 5 + 1;
+        $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
+        $zip_file = BASE_PATH . '/region.json.zip';
+        file_put_contents($zip_file, $online_zip);
+        return;
+        // 示例的 region_data 数据
+        $regionData = Db::table('region')->get()->toArray();
+        // 读取 Lua 脚本内容
+        $luaScript = file_get_contents(BASE_PATH . '/store_region_data.lua');
+        $redis = redis();
+        // 将 Lua 脚本加载到 Redis
+        $scriptSha = $redis->script('load', $luaScript);
+        var_dump($scriptSha);
+        // 准备 Lua 脚本的参数
+        $argv = [];
+        foreach ($regionData as $region) {
+            $argv[] = $region->id;
+            $argv[] = $region->parent_id;
+            $argv[] = $region->level;
+            $argv[] = $region->name;
+            $argv[] = $region->initial;
+            $argv[] = $region->pinyin;
+            $argv[] = $region->citycode;
+            $argv[] = $region->adcode;
+            $argv[] = $region->lng_lat;
         }
-        foreach ($ids as $id) {
-            var_dump($id);
-            Arr::forget($ids, $id);
-            var_dump($ids);
-        }
+        // 执行 Lua 脚本
+        // 准备 KEYS 和 ARGV 参数
+        $keys = ['region'];
+        // 合并 KEYS 和 ARGV 参数
+        $params = array_merge($keys, $argv);
+
+        // 执行 Lua 脚本
+        $result = $redis->evalSha($scriptSha, $params, count($keys));
+        var_dump($result);
+
+        //        var_dump(BASE_PATH);
+        //        print ('正在下载json数据压缩包···' . "\n");
+        //        $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
+        //        $zip_file   = BASE_PATH . '/region.json.zip';
+        //        $json_file  = BASE_PATH . '/region.json';
+        //        file_put_contents($zip_file, $online_zip);
+        //        $arr = [1, 2, 3, 4, 5, 6, 7];
+        //        $arr2 = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+        //        var_dump(in_array($arr, $arr2));
+        //        var_dump(DiskFileShareExpireCode::from(4)->getTimestamp());
+        //        make(OssRamService::class, ['a' => 'b']);
+        //        var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
+        //        $ids = [];
+        //        for ($i = 0; $i < 10; ++$i) {
+        //            $ids[] = $i * 5 + 1;
+        //        }
+        //        foreach ($ids as $id) {
+        //            var_dump($id);
+        //            Arr::forget($ids, $id);
+        //            var_dump($ids);
+        //        }
         //        di()->get(WsSenderService::class)->sendByUid(1, 'test');
         //        $key = sprintf('%sws:uid:%s:fd:%s', config('cache.default.prefix'), '1', '20');
         //        redis()->setex($key, config('jwt.ttl'), 1);
@@ -156,6 +206,12 @@ class TestCommand extends HyperfCommand
         //        }
     }
 
+    /**
+     * @param mixed $pid
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     */
     //    private function generateOssCallback(array $customParams = []): array
     //    {
     //        $sts = di()->get(ConfigInterface::class)->get('sts');

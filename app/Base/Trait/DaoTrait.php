@@ -14,6 +14,7 @@ namespace App\Base\Trait;
 
 use App\Base\BaseCollection;
 use App\Base\BaseModel;
+use Hyperf\Collection\Arr;
 use Hyperf\Contract\LengthAwarePaginatorInterface;
 use Hyperf\Database\Model\Builder;
 use Hyperf\Tappable\HigherOrderTapProxy;
@@ -71,6 +72,21 @@ trait DaoTrait
     public function find(mixed $id, array $column = ['*']): ?BaseModel
     {
         return ($model = $this->model::find($id, $column)) ? $model : null;
+    }
+
+    public function findMany(array $ids, $columns = []): BaseCollection
+    {
+        return new BaseCollection($this->model::findMany($ids, $columns)->toArray());
+    }
+
+    public function findFormCache(mixed $id): ?BaseModel
+    {
+        return $this->model::findFromCache($id);
+    }
+
+    public function findManyFormCache(array $ids): BaseCollection
+    {
+        return new BaseCollection($this->model::findManyFromCache($ids)->toArray());
     }
 
     /**
@@ -312,5 +328,38 @@ trait DaoTrait
     public function numberOperation(mixed $id, string $field, int $value): bool
     {
         return $this->find($id)->increment($field, $value) > 0;
+    }
+
+    /**
+     * 检查是否有子节点.
+     */
+    public function checkChildrenExists(int $id): bool
+    {
+        return $this->model::withTrashed()->where('parent_id', $id)->exists();
+    }
+
+    /**
+     * 获取子孙节点.
+     */
+    public function getDescendants(int $parentId, array $params = [], bool $isScope = true, array $columns = ['*']): array
+    {
+        $params = Arr::merge($params, ['level' => $parentId]);
+        Arr::set($params, 'select', $columns);
+        return $this->listQuerySetting($params, $isScope)->get($columns)->toArray();
+    }
+
+    public function checkExists(?array $condition, bool $isScope = true): bool
+    {
+        $query = $this->model::withTrashed()->where($condition);
+        $isScope && $query->userDataScope();
+        return $query->exists();
+    }
+
+    /**
+     * 文件归属.
+     */
+    public function belongMe(array $condition): bool
+    {
+        return $this->checkExists($condition, true);
     }
 }

@@ -20,6 +20,10 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
 /**
  * @property int $id
  * @property string $username 账号
+ * @property string $nickname 昵称
+ * @property string $avatar 头像
+ * @property string $post 岗位
+ * @property string $dept 部门
  * @property int $status 状态 (1正常 2停用)
  * @property string $phone 手机
  * @property string $login_ip 最后登陆IP
@@ -31,6 +35,7 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property Carbon $updated_at
  * @property Carbon $deleted_at
  * @property string $user_type 用户类型：(100系统用户)
+ * @property null|Collection|DiskFileShare[] $sharedFiles
  * @property null|Collection|Role[] $roles
  * @property null|Collection|Department[] $depts
  * @property null|Collection|Organization[] $organizations
@@ -52,7 +57,7 @@ class User extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'username', 'password', 'status', 'phone', 'login_ip', 'login_time', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'user_type'];
+    protected array $fillable = ['id', 'username', 'nickname', 'avatar', 'post', 'dept', 'password', 'status', 'phone', 'login_ip', 'login_time', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'user_type'];
 
     /**
      * The attributes that should be cast to native types.
@@ -100,5 +105,15 @@ class User extends BaseModel
     public function setPasswordAttribute(string $value): void
     {
         $this->attributes['password'] = password_hash($value, PASSWORD_DEFAULT);
+    }
+
+    public function sharedFiles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            DiskFileShare::class,
+            'disk_file_share_user',
+            'user_id',
+            'share_id'
+        );
     }
 }
