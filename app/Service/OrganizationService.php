@@ -18,6 +18,7 @@ use App\Dao\OrganizationDao;
 use App\Dao\UserDao;
 use App\Exception\BusinessException;
 use App\Model\Department;
+use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Collection\Arr;
 use Hyperf\Cache\Annotation\Cacheable;
 use Psr\Container\ContainerExceptionInterface;
@@ -63,7 +64,7 @@ class OrganizationService extends BaseService
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public function getRegion(int $id): array
+    public function getRegion(mixed $id): array
     {
         $rs = di()->get(RegionService::class);
         return $rs->info($id);
@@ -90,6 +91,7 @@ class OrganizationService extends BaseService
     /**
      * 更新组织.
      */
+    #[CacheEvict(prefix: 'OrgInfo', value: 'OrgId_#{id}')]
     public function update(mixed $id, array $data): bool
     {
         $handleData = $this->handleData($data);
@@ -116,12 +118,13 @@ class OrganizationService extends BaseService
      */
     public function realDel(array $ids): ?array
     {
-        // 跳过的组织
+        // 跳过的
         $ctuIds = [];
         if (count($ids)) {
             foreach ($ids as $id) {
                 if (! $this->checkChildrenExists((int) $id) && ! $this->dao->find($id)->users()->exists()) {
                     $this->dao->realDelete([$id]);
+                    $this->deleteCache((int)$id);
                 } else {
                     $ctuIds[] = $id;
                 }
@@ -157,7 +160,7 @@ class OrganizationService extends BaseService
         return $data;
     }
 
-    public function info(int $id)
+    public function info(mixed $id)
     {
         if (! $this->checkExists(['id' => $id],false)){
             throw new BusinessException(ErrorCode::NOT_FOUND);
