@@ -139,6 +139,16 @@ class OrganizationDao extends BaseDao
         );
 
         $query->when(
+            Arr::get($params, 'province_region_id'),
+            fn (Builder $query, $provinceRegionId) => $query->where('province_region_id', $provinceRegionId)
+        );
+
+        $query->when(
+            Arr::get($params, 'city_region_id'),
+            fn (Builder $query, $cityRegionId) => $query->where('city_region_id', $cityRegionId)
+        );
+
+        $query->when(
             Arr::get($params, 'address'),
             fn (Builder $query, $address) => $query->where('address', $address)
         );
