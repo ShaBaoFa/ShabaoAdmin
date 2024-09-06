@@ -6,8 +6,8 @@ use App\Annotation\Auth;
 use App\Annotation\OperationLog;
 use App\Annotation\Permission;
 use App\Base\BaseController;
-use App\Request\ExhLibAreaRequest;
-use App\Service\ExhLibAreaService;
+use App\Request\ExhLibTagRequest;
+use App\Service\ExhLibTagService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
@@ -18,29 +18,33 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/exhLib/area'),Auth]
-class AreaController extends BaseController
+#[Controller(prefix: 'api/v1/exhLib/tag'),Auth]
+class TagController extends BaseController
 {
     #[Inject]
-    protected ExhLibAreaService $service;
+    protected ExhLibTagService $service;
 
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('index'), Permission('exhLib:area, exhLib:area:index')]
+    #[GetMapping('index'), Permission('exhLib:tag, exhLib:tag:index')]
     public function index(): ResponseInterface
     {
         return $this->response->success($this->service->getList($this->request->all()));
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     #[GetMapping('select')]
     public function select(): ResponseInterface
     {
         return $this->response->success($this->service->getList($this->request->all()));
     }
 
-    #[GetMapping('info/{id:\d+}'), Permission('exhLib:area, exhLib:area:info')]
+    #[GetMapping('info/{id:\d+}'), Permission('exhLib:tag, exhLib:tag:info')]
     public function info(int $id): ResponseInterface
     {
         return $this->response->success($this->service->info($id));
@@ -51,7 +55,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('recycle'), Permission('exhLib:area:recycle')]
+    #[GetMapping('recycle'), Permission('exhLib:tag:recycle')]
     public function recycle(): ResponseInterface
     {
         return $this->response->success($this->service->getListByRecycle($this->request->all()));
@@ -63,8 +67,8 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PostMapping('save'), Permission('exhLib:area:save'),OperationLog]
-    public function save(ExhLibAreaRequest $request): ResponseInterface
+    #[PostMapping('save'), Permission('exhLib:tag:save'),OperationLog]
+    public function save(ExhLibTagRequest $request): ResponseInterface
     {
         return $this->response->success(['id' => $this->service->save($request->all())]);
     }
@@ -74,8 +78,8 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('update/{id:\d+}'), Permission('exhLib:area:update'), OperationLog]
-    public function update(int $id, ExhLibAreaRequest $request): ResponseInterface
+    #[PutMapping('update/{id:\d+}'), Permission('exhLib:tag:update'), OperationLog]
+    public function update(int $id, ExhLibTagRequest $request): ResponseInterface
     {
         return $this->service->update($id, $request->all()) ? $this->response->success() : $this->response->fail();
     }
@@ -85,8 +89,8 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('delete'), Permission('exhLib:area:delete')]
-    public function delete(ExhLibAreaRequest $request): ResponseInterface
+    #[DeleteMapping('delete'), Permission('exhLib:tag:delete')]
+    public function delete(ExhLibTagRequest $request): ResponseInterface
     {
         return $this->service->delete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
     }
@@ -96,8 +100,8 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('realDelete'), Permission('exhLib:area:realDelete'), OperationLog]
-    public function realDelete(ExhLibAreaRequest $request): ResponseInterface
+    #[DeleteMapping('realDelete'), Permission('exhLib:tag:realDelete'), OperationLog]
+    public function realDelete(ExhLibTagRequest $request): ResponseInterface
     {
         $result = $this->service->realDelete((array) $request->input('ids', []));
         return $result ?
@@ -110,8 +114,8 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('recovery'), Permission('exhLib:area:recovery')]
-    public function recovery(ExhLibAreaRequest $request): ResponseInterface
+    #[PutMapping('recovery'), Permission('exhLib:tag:recovery')]
+    public function recovery(ExhLibTagRequest $request): ResponseInterface
     {
         return $this->service->recovery((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
     }
@@ -121,8 +125,8 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('changeStatus'), Permission('exhLib:area:changeStatus'), OperationLog]
-    public function changeStatus(ExhLibAreaRequest $request): ResponseInterface
+    #[PutMapping('changeStatus'), Permission('exhLib:tag:changeStatus'), OperationLog]
+    public function changeStatus(ExhLibTagRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
             ? $this->response->success() : $this->response->fail();
@@ -133,7 +137,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('numberOperation'), Permission('exhLib:area:update'), OperationLog]
+    #[PutMapping('numberOperation'), Permission('exhLib:tag:update'), OperationLog]
     public function numberOperation(): ResponseInterface
     {
         return $this->service->numberOperation(

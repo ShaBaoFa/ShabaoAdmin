@@ -16,7 +16,7 @@ use App\Base\BaseFormRequest;
 use App\Constants\ExhibitionLibraryCode;
 use Hyperf\Validation\Rule;
 
-class ExhLibAreaRequest extends BaseFormRequest
+class ExhLibTagRequest extends BaseFormRequest
 {
     /**
      * 公共规则.
@@ -25,11 +25,10 @@ class ExhLibAreaRequest extends BaseFormRequest
     {
         return [
             'ids' => ['array'],
-            'ids.*' => ['integer', 'exists:exh_lib_areas,id'],
-            'id' => ['integer', 'exists:exh_lib_areas,id'],
+            'ids.*' => ['integer', 'exists:exh_lib_tags,id'],
+            'id' => ['integer', 'exists:exh_lib_tags,id'],
             'name' => ['string', 'max:20'],
-            'icon' => [ 'string', 'max:20'],
-            'lib_type' => ['integer',Rule::in([ExhibitionLibraryCode::STRATEGIC_EMERGING_INDUSTRIES->value,ExhibitionLibraryCode::INDUSTRY->value,ExhibitionLibraryCode::THEME->value,ExhibitionLibraryCode::SPECIAL->value])],
+            'code' => [ 'string', 'max:20'],
         ];
     }
 
@@ -47,9 +46,7 @@ class ExhLibAreaRequest extends BaseFormRequest
     {
         return [
             'name' => ['required', 'string', 'max:20'],
-            'icon' => ['required', 'string', 'max:20'],
-            'profile' => ['string'],
-            'lib_type' => ['required','integer',Rule::in([ExhibitionLibraryCode::STRATEGIC_EMERGING_INDUSTRIES->value,ExhibitionLibraryCode::INDUSTRY->value,ExhibitionLibraryCode::THEME->value,ExhibitionLibraryCode::SPECIAL->value])],
+            'code' => ['required', 'string', 'max:20'],
         ];
     }
 }
