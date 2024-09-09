@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace App\Request;
 
 use App\Base\BaseFormRequest;
-use App\Constants\ExhibitionLibraryCode;
-use Hyperf\Validation\Rule;
 
 class ExhLibTagRequest extends BaseFormRequest
 {
@@ -28,7 +26,7 @@ class ExhLibTagRequest extends BaseFormRequest
             'ids.*' => ['integer', 'exists:exh_lib_tags,id'],
             'id' => ['integer', 'exists:exh_lib_tags,id'],
             'name' => ['string', 'max:20'],
-            'code' => [ 'string', 'max:20'],
+            'code' => ['string', 'max:20'],
         ];
     }
 
@@ -42,6 +40,7 @@ class ExhLibTagRequest extends BaseFormRequest
             'name' => ['nullable', 'string', 'max:20'],
         ];
     }
+
     public function saveRules(): array
     {
         return [

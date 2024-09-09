@@ -20,6 +20,7 @@ use App\Constants\MessageContentTypeCode;
 use App\Constants\QueueMesContentTypeCode;
 use App\Exception\BusinessException;
 use App\Model\Message;
+use App\Service\FileSystemService;
 use App\Service\WsSenderService;
 use App\Vo\QueueMessageVo;
 use Carbon\Carbon;
@@ -67,44 +68,43 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        $arr = [1,2,3,4,5,6];
-        var_dump(end($arr));
-        return ;
+        $fss = di()->get(FileSystemService::class);
+        $res = $fss->getFileByHash('57dcd433720e0806140488400736a855');
+        var_dump($res);
+        //        $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
+        //        $zip_file = BASE_PATH . '/region.json.zip';
+        //        file_put_contents($zip_file, $online_zip);
+        //        return;
+        //        // 示例的 region_data 数据
+        //        $regionData = Db::table('region')->get()->toArray();
+        //        // 读取 Lua 脚本内容
+        //        $luaScript = file_get_contents(BASE_PATH . '/store_region_data.lua');
+        //        $redis = redis();
+        //        // 将 Lua 脚本加载到 Redis
+        //        $scriptSha = $redis->script('load', $luaScript);
+        //        var_dump($scriptSha);
+        //        // 准备 Lua 脚本的参数
+        //        $argv = [];
+        //        foreach ($regionData as $region) {
+        //            $argv[] = $region->id;
+        //            $argv[] = $region->parent_id;
+        //            $argv[] = $region->level;
+        //            $argv[] = $region->name;
+        //            $argv[] = $region->initial;
+        //            $argv[] = $region->pinyin;
+        //            $argv[] = $region->citycode;
+        //            $argv[] = $region->adcode;
+        //            $argv[] = $region->lng_lat;
+        //        }
+        //        // 执行 Lua 脚本
+        //        // 准备 KEYS 和 ARGV 参数
+        //        $keys = ['region'];
+        //        // 合并 KEYS 和 ARGV 参数
+        //        $params = array_merge($keys, $argv);
         //
-        $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
-        $zip_file = BASE_PATH . '/region.json.zip';
-        file_put_contents($zip_file, $online_zip);
-        return;
-        // 示例的 region_data 数据
-        $regionData = Db::table('region')->get()->toArray();
-        // 读取 Lua 脚本内容
-        $luaScript = file_get_contents(BASE_PATH . '/store_region_data.lua');
-        $redis = redis();
-        // 将 Lua 脚本加载到 Redis
-        $scriptSha = $redis->script('load', $luaScript);
-        var_dump($scriptSha);
-        // 准备 Lua 脚本的参数
-        $argv = [];
-        foreach ($regionData as $region) {
-            $argv[] = $region->id;
-            $argv[] = $region->parent_id;
-            $argv[] = $region->level;
-            $argv[] = $region->name;
-            $argv[] = $region->initial;
-            $argv[] = $region->pinyin;
-            $argv[] = $region->citycode;
-            $argv[] = $region->adcode;
-            $argv[] = $region->lng_lat;
-        }
-        // 执行 Lua 脚本
-        // 准备 KEYS 和 ARGV 参数
-        $keys = ['region'];
-        // 合并 KEYS 和 ARGV 参数
-        $params = array_merge($keys, $argv);
-
-        // 执行 Lua 脚本
-        $result = $redis->evalSha($scriptSha, $params, count($keys));
-        var_dump($result);
+        //        // 执行 Lua 脚本
+        //        $result = $redis->evalSha($scriptSha, $params, count($keys));
+        //        var_dump($result);
 
         //        var_dump(BASE_PATH);
         //        print ('正在下载json数据压缩包···' . "\n");

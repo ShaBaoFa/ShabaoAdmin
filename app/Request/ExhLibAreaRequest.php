@@ -28,8 +28,8 @@ class ExhLibAreaRequest extends BaseFormRequest
             'ids.*' => ['integer', 'exists:exh_lib_areas,id'],
             'id' => ['integer', 'exists:exh_lib_areas,id'],
             'name' => ['string', 'max:20'],
-            'icon' => [ 'string', 'max:20'],
-            'lib_type' => ['integer',Rule::in([ExhibitionLibraryCode::STRATEGIC_EMERGING_INDUSTRIES->value,ExhibitionLibraryCode::INDUSTRY->value,ExhibitionLibraryCode::THEME->value,ExhibitionLibraryCode::SPECIAL->value])],
+            'icon' => ['string', 'max:20'],
+            'lib_type' => ['integer', Rule::in([ExhibitionLibraryCode::STRATEGIC_EMERGING_INDUSTRIES->value, ExhibitionLibraryCode::INDUSTRY->value, ExhibitionLibraryCode::THEME->value, ExhibitionLibraryCode::SPECIAL->value])],
         ];
     }
 
@@ -43,13 +43,14 @@ class ExhLibAreaRequest extends BaseFormRequest
             'name' => ['nullable', 'string', 'max:20'],
         ];
     }
+
     public function saveRules(): array
     {
         return [
             'name' => ['required', 'string', 'max:20'],
             'icon' => ['required', 'string', 'max:20'],
             'profile' => ['string'],
-            'lib_type' => ['required','integer',Rule::in([ExhibitionLibraryCode::STRATEGIC_EMERGING_INDUSTRIES->value,ExhibitionLibraryCode::INDUSTRY->value,ExhibitionLibraryCode::THEME->value,ExhibitionLibraryCode::SPECIAL->value])],
+            'lib_type' => ['required', 'integer', Rule::in([ExhibitionLibraryCode::STRATEGIC_EMERGING_INDUSTRIES->value, ExhibitionLibraryCode::INDUSTRY->value, ExhibitionLibraryCode::THEME->value, ExhibitionLibraryCode::SPECIAL->value])],
         ];
     }
 }

@@ -146,3 +146,17 @@ if (! function_exists('ws_sender')) {
         return di()->get(Sender::class);
     }
 }
+
+if (! function_exists('base64url_encode')) {
+    /**
+     * 将结果中的加号（+）替换成短划线（-）。
+     *
+     * 将结果中的正斜线（/）替换成下划线（_）。
+     *
+     * 将结果中尾部的所有等号（=）省略。
+     */
+    function base64url_encode(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+}

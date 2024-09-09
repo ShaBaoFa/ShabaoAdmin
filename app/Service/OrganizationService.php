@@ -18,9 +18,9 @@ use App\Dao\OrganizationDao;
 use App\Dao\UserDao;
 use App\Exception\BusinessException;
 use App\Model\Department;
+use Hyperf\Cache\Annotation\Cacheable;
 use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Collection\Arr;
-use Hyperf\Cache\Annotation\Cacheable;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -124,13 +124,21 @@ class OrganizationService extends BaseService
             foreach ($ids as $id) {
                 if (! $this->checkChildrenExists((int) $id) && ! $this->dao->find($id)->users()->exists()) {
                     $this->dao->realDelete([$id]);
-                    $this->deleteCache((int)$id);
+                    $this->deleteCache((int) $id);
                 } else {
                     $ctuIds[] = $id;
                 }
             }
         }
         return count($ctuIds) ? $this->dao->getOrgName($ctuIds) : null;
+    }
+
+    public function info(mixed $id)
+    {
+        if (! $this->checkExists(['id' => $id], false)) {
+            throw new BusinessException(ErrorCode::NOT_FOUND);
+        }
+        return $this->getCacheData($id);
     }
 
     /**
@@ -160,15 +168,8 @@ class OrganizationService extends BaseService
         return $data;
     }
 
-    public function info(mixed $id)
-    {
-        if (! $this->checkExists(['id' => $id],false)){
-            throw new BusinessException(ErrorCode::NOT_FOUND);
-        }
-        return $this->getCacheData($id);
-    }
     #[Cacheable(prefix: 'OrgInfo', value: 'OrgId_#{id}', ttl: 0)]
-    private function getCacheData(int $id):array
+    private function getCacheData(int $id): array
     {
         return $this->dao->find($id)->load(['parent'])->toArray();
     }

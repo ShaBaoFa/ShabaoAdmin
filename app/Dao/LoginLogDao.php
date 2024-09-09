@@ -34,7 +34,6 @@ class LoginLogDao extends BaseDao
      */
     public function handleSearch(Builder $query, array $params): Builder
     {
-
         $query->when(
             Arr::get($params, 'status'),
             fn (Builder $query, $status) => $query->where('status', $status)
@@ -47,7 +46,6 @@ class LoginLogDao extends BaseDao
             Arr::get($params, 'username'),
             fn (Builder $query, $username) => $query->where('username', $username)
         );
-
 
         $query->when(
             Arr::get($params, 'login_time'),

@@ -1,11 +1,19 @@
 <?php
 
-use Hyperf\Database\Schema\Schema;
-use Hyperf\Database\Schema\Blueprint;
+declare(strict_types=1);
+/**
+ * This file is part of web-api.
+ *
+ * @link     https://blog.wlfpanda1012.com/
+ * @github   https://github.com/ShaBaoFa
+ * @gitee    https://gitee.com/wlfpanda/web-api
+ * @contact  mail@wlfpanda1012.com
+ */
 use Hyperf\Database\Migrations\Migration;
+use Hyperf\Database\Schema\Blueprint;
+use Hyperf\Database\Schema\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,8 +21,8 @@ return new class extends Migration
     {
         Schema::create('exh_lib_areas', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name',10)->comment('专区名称');
-            $table->string('icon',30)->comment('专区icon');
+            $table->string('name', 10)->comment('专区名称');
+            $table->string('icon', 30)->comment('专区icon');
             $table->text('profile')->comment('专区简介')->nullable();
             $table->addColumn('smallInteger', 'lib_type', ['default' => 1, 'comment' => '大区类型 (1战新 2行业 3主题 4专场)'])->index()->nullable();
             $table->addColumn('smallInteger', 'status', ['default' => 1, 'comment' => '状态 (1正常 2停用)'])->index()->nullable();

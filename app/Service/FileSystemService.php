@@ -31,6 +31,7 @@ use Hyperf\HttpMessage\Upload\UploadedFile;
 use Hyperf\Stringable\Str;
 use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
+use OSS\OssClient;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RedisException;
@@ -38,6 +39,7 @@ use Swoole\Coroutine\System;
 use Wlfpanda1012\AliyunSts\Constants\OSSClientCode;
 use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 
+use function App\Helper\base64url_encode;
 use function App\Helper\user;
 use function Hyperf\Support\make;
 
@@ -247,8 +249,17 @@ class FileSystemService extends BaseService
     private function generateSignature(Filesystem $filesystem, array $data): string
     {
         return match ($data['storage_mode']) {
-            FileSystemCode::OSS->value => $filesystem->temporaryUrl($data['url'], Carbon::now()->addHour()),
+            FileSystemCode::OSS->value => $filesystem->temporaryUrl($data['url'], Carbon::now()->addHour(), $this->imageProcessForPreview($data['storage_mode'], '卫凌峰')),
             default => $data['url']
+        };
+    }
+
+    private function imageProcessForPreview($mode, string $watermark): array
+    {
+        $watermark = base64url_encode($watermark);
+        return match ($mode) {
+            FileSystemCode::OSS->value => [OssClient::OSS_PROCESS => 'image/auto-orient,1/interlace,1/resize,p_50/quality,q_90/watermark,text_' . $watermark . ',type_d3F5LXplbmhlaQ,color_000000,size_40,rotate_156,fill_1,t_26,x_10,y_10'],
+            default => []
         };
     }
 

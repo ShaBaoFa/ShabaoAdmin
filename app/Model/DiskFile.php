@@ -37,9 +37,9 @@ use Hyperf\Database\Model\Relations\HasMany;
  * @property string $deleted_at 删除时间
  * @property string $remark 备注
  * @property int $is_deleted 是否删除
- * @property-read null|DiskFile $parent 
- * @property-read null|Collection|DiskFile[] $children 
- * @property-read null|Collection|DiskFileShare[] $shares 
+ * @property null|DiskFile $parent
+ * @property null|Collection|DiskFile[] $children
+ * @property null|Collection|DiskFileShare[] $shares
  */
 class DiskFile extends BaseModel
 {
