@@ -134,6 +134,14 @@ class DiskRequest extends BaseFormRequest
         ];
     }
 
+    public function folderMeta(): array
+    {
+        return [
+            'path' => 'string',
+            'id' => 'integer|exists:disk_files,id',
+        ];
+    }
+
     /**
      * 字段映射名称
      * return array.

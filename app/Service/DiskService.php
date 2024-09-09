@@ -51,14 +51,14 @@ class DiskService extends BaseService
     public function update(mixed $id, array $data): bool
     {
         $handleData = $this->handleData($data);
-        if (! $this->checkChildrenExists($id)) {
+        if (!$this->checkChildrenExists($id)) {
             return $this->dao->update($id, $handleData);
         }
         $update[] = [
             'id' => $id,
             'data' => $handleData,
         ];
-        $descendants = $this->dao->getDescendants(parentId: (int) $id);
+        $descendants = $this->dao->getDescendants(parentId: (int)$id);
         foreach ($descendants as $descendant) {
             $handleDescendantLevelData = $this->handleDescendantLevels($descendant['level'], $handleData['level'], $id);
             $update[] = [
@@ -76,7 +76,7 @@ class DiskService extends BaseService
     {
         // 判断$items
         foreach ($ids as $id) {
-            if (! $this->belongMe(['id' => $id])) {
+            if (!$this->belongMe(['id' => $id])) {
                 throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
             }
         }
@@ -103,7 +103,7 @@ class DiskService extends BaseService
     public function getDownloadTokens(array $hashes): array
     {
         foreach ($hashes as $hash) {
-            if (! $this->belongMe(['hash' => $hash])) {
+            if (!$this->belongMe(['hash' => $hash])) {
                 throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
             }
         }
@@ -111,19 +111,27 @@ class DiskService extends BaseService
         return $fs->getDownloaderStsToken($hashes);
     }
 
-    public function getFolderMeta(int $folder_id = 0, $column = ['id', 'name', 'level', 'parent_id', 'type', 'size_byte', 'size_info']): array
+    public function getFolderMeta(array $data, $column = ['id', 'name', 'level', 'parent_id', 'type', 'size_byte', 'size_info']): array
     {
-        if ($folder_id > 0) {
-            (! $this->dao->isFolder($folder_id)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
+        $folderId = 0;
+        if (Arr::get($data, 'id') > 0) {
+            $folderId = Arr::get($data, 'id');
+            (!$this->dao->isFolder((int)$folderId)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
-        $currentFolder = $this->find($folder_id, $column);
+        if ($path = Arr::get($data, 'path')) {
+            $folderId = $this->getFolderIdByPath($path);
+        }
+        if (! $folderId){
+            throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
+        }
+        $currentFolder = $this->find($folderId, $column);
         /**
          * @var DiskFile $currentFolder
          */
         $folders = explode(',', $currentFolder->level);
         $ancestor = [];
         foreach ($folders as $key => $folderId) {
-            if ((int) $folderId == 0) {
+            if ((int)$folderId == 0) {
                 Arr::set($ancestor, $folderId, '根目录');
                 continue;
             }
@@ -141,7 +149,7 @@ class DiskService extends BaseService
     public function listContents(int $folder_id = 0): array
     {
         if ($folder_id > 0) {
-            (! $this->dao->isFolder($folder_id)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
+            (!$this->dao->isFolder($folder_id)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
         return $this->getPageList([
             'parent_id' => $folder_id,
@@ -155,7 +163,7 @@ class DiskService extends BaseService
          */
         $item = $this->dao->find($item_id);
         // 1. 检查文件是否存在
-        if (! $item) {
+        if (!$item) {
             throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
         }
         if ($item->name == $newName) {
@@ -164,7 +172,7 @@ class DiskService extends BaseService
         $item = $item->toArray();
         // 2. 检查文件名是否已存在
         Arr::set($item, 'name', $newName);
-        $this->checkNameExists((int) Arr::get($item, 'parent_id', 0), $item);
+        $this->checkNameExists((int)Arr::get($item, 'parent_id', 0), $item);
         return $this->dao->update($item_id, $item);
     }
 
@@ -182,9 +190,9 @@ class DiskService extends BaseService
 
     public function getPid(array $data): int
     {
-        $pid = (int) Arr::get($data, 'parent_id', 0);
+        $pid = (int)Arr::get($data, 'parent_id', 0);
         if ($pid > 0) {
-            (! $this->dao->isFolder($pid)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
+            (!$this->dao->isFolder($pid)) && throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
         return $pid;
     }
@@ -210,7 +218,7 @@ class DiskService extends BaseService
                 throw new BusinessException(ErrorCode::DISK_FOLDER_ILLEGAL_SELECTED);
             }
             Arr::set($diskFile, 'parent_id', $targetFolderId);
-            if (! $this->update(Arr::get($diskFile, $pk), $diskFile)) {
+            if (!$this->update(Arr::get($diskFile, $pk), $diskFile)) {
                 return false;
             }
         }
@@ -221,7 +229,7 @@ class DiskService extends BaseService
     {
         // 判断$items
         foreach ($ids as $id) {
-            if (! $this->belongMe(['id' => $id])) {
+            if (!$this->belongMe(['id' => $id])) {
                 throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
             }
         }
@@ -233,7 +241,7 @@ class DiskService extends BaseService
     {
         // 判断$items
         foreach ($ids as $id) {
-            if (! $this->belongMe(['id' => $id])) {
+            if (!$this->belongMe(['id' => $id])) {
                 throw new BusinessException(ErrorCode::DISK_FILE_NOT_EXIST);
             }
         }
@@ -286,7 +294,7 @@ class DiskService extends BaseService
 
     public function getHash(int $folder_id): array
     {
-        if (! $this->dao->isFolder($folder_id) && ! $this->belongMe(['id' => $folder_id])) {
+        if (!$this->dao->isFolder($folder_id) && !$this->belongMe(['id' => $folder_id])) {
             throw new BusinessException(ErrorCode::DISK_FOLDER_NOT_EXIST);
         }
         $cols = ['id', 'name', 'hash'];
@@ -306,7 +314,7 @@ class DiskService extends BaseService
     {
         // 文件name、hash
         $fs = di()->get(FileSystemService::class);
-        if (! $fs->dao->isUploaded(Arr::get($data, 'hash'))) {
+        if (!$fs->dao->isUploaded(Arr::get($data, 'hash'))) {
             throw new BusinessException(ErrorCode::FILE_HAS_NOT_BEEN_UPLOADED);
         }
         $file = $fs->dao->getFileInfoByHash(Arr::get($data, 'hash'));
@@ -334,9 +342,9 @@ class DiskService extends BaseService
     private function handleLevel(array $data): array
     {
         if (Arr::get($data, 'parent_id', 0) === 0) {
-            Arr::set($data, 'level', (string) Arr::get($data, 'parent_id', '0'));
+            Arr::set($data, 'level', (string)Arr::get($data, 'parent_id', '0'));
         } else {
-            $parent = $this->find((int) Arr::get($data, 'parent_id'));
+            $parent = $this->find((int)Arr::get($data, 'parent_id'));
             /**
              * @var DiskFile $parent
              */
@@ -375,5 +383,25 @@ class DiskService extends BaseService
         // 添加随机字符之后再拼接回去
         Arr::set($data, 'name', $name . '.' . Arr::get($data, 'suffix'));
         return $data;
+    }
+
+    private function getFolderIdByPath(string $path): int
+    {
+        $path = explode(
+            '/',
+            trim(
+                $path,
+                '/'));
+        $currentPid = 0;
+        foreach ($path as $key => $value) {
+            // 判断每个文件夹是否存在
+            $condition = ['parent_id' => $currentPid, 'name' => $value, 'type' => DiskFileCode::TYPE_FOLDER->value];
+            $id = $this->value($condition);
+            if (is_null($id)) {
+                $id = $this->saveFolder($condition);
+            }
+            $currentPid = $id;
+        }
+        return $currentPid;
     }
 }

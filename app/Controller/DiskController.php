@@ -83,10 +83,10 @@ class DiskController extends BaseController
      * @throws ContainerExceptionInterface
      * @description 文件夹meta
      */
-    #[GetMapping('folder/{folder_id:\d+}'), Permission('disks:folder')]
-    public function folderMeta(int $folder_id): ResponseInterface
+    #[GetMapping('folder/info'), Permission('disks:folder')]
+    public function folderMeta(DiskRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->getFolderMeta($folder_id));
+        return $this->response->success($this->service->getFolderMeta($request->all()));
     }
 
     /**
