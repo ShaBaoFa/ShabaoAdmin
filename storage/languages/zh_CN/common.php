@@ -53,7 +53,7 @@ return [
     'hash_verification_failed' => '文件哈希验证失败',
     'file_not_exist' => '文件不存在',
     'file_too_large_to_read' => '文件过大，请更换方式读取',
-    'sts_not_support' => 'STS不支持',
+    'not_support' => '不支持',
     'finished' => '已完成',
     'unfinished' => '未完成',
     'file_has_been_uploaded' => '文件已上传',

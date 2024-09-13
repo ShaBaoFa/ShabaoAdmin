@@ -53,7 +53,7 @@ return [
     'hash_verification_failed' => 'hash_verification_failed',
     'file_not_exist' => 'file_not_exist',
     'file_too_large_to_read' => 'file_too_large_to_read',
-    'sts_not_support' => 'sts_not_support',
+    'not_support' => 'not_support',
     'finished' => 'finished',
     'unfinished' => 'unfinished',
     'file_has_been_uploaded' => 'file_has_been_uploaded',

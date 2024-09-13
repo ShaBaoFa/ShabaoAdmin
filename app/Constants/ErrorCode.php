@@ -101,8 +101,8 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.file_too_large_to_read')]
     case FILE_TOO_LARGE_TO_READ = 70005;
 
-    #[Message('common.sts_not_support')]
-    case STS_NOT_SUPPORT = 70006;
+    #[Message('common.not_support')]
+    case NOT_SUPPORT = 70006;
 
     #[Message('common.file_has_been_uploaded')]
     case FILE_HAS_BEEN_UPLOADED = 70007;
