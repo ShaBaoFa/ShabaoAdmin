@@ -13,18 +13,30 @@ declare(strict_types=1);
 namespace App\Amqp\Consumer;
 
 use App\Base\BaseConsumer;
-use App\Service\DiskFileShareService;
+use App\Service\FileSystemService;
 use Hyperf\Amqp\Annotation\Consumer;
 use Hyperf\Amqp\Builder\QueueBuilder;
 use Hyperf\Collection\Arr;
+use Hyperf\Config\Annotation\Value;
 use Hyperf\Di\Annotation\Inject;
+use OSS\Core\OssException;
+use OSS\Http\RequestCore_Exception;
 use PhpAmqpLib\Wire\AMQPTable;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
-#[Consumer(exchange: 'web-api', routingKey: 'disk.file.share.op.count.routing', queue: 'disk.file.share.op.count.queue', name: 'DiskFileShareOpCountConsumer', nums: 1)]
-class DiskFileShareOpCountConsumer extends BaseConsumer
+#[Consumer(exchange: 'web-api', routingKey: 'oss.process.routing', queue: 'oss.process.queue', name: 'OssProcessConsumer', nums: 1)]
+class OssProcessConsumer extends BaseConsumer
 {
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
     #[Inject]
-    protected DiskFileShareService $consumeService;
+    protected FileSystemService $consumeService;
+
+    #[Value('file.storage.oss')]
+    private array $ossConfigValue;
 
     /**
      * Overwrite.
@@ -43,8 +55,13 @@ class DiskFileShareOpCountConsumer extends BaseConsumer
         return true;
     }
 
+    /**
+     * @throws OssException
+     * @throws RequestCore_Exception
+     */
     protected function process(array $data): bool
     {
-        return $this->consumeService->dao->numberOperation(Arr::get($data, 'id'), Arr::get($data, 'count_key'), Arr::get($data, 'count_value'));
+        $file = $this->consumeService->find(Arr::get($data, 'id'))->toArray();
+        return $this->consumeService->saveAs($file, Arr::get($data, 'config'), Arr::get($data, 'save_obj'));
     }
 }

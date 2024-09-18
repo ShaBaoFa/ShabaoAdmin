@@ -13,59 +13,17 @@ declare(strict_types=1);
 namespace App\Amqp\Consumer;
 
 use App\Base\BaseConsumer;
-use App\Constants\ConsumerStatusCode;
-use App\Interfaces\QueueLogServiceInterface;
 use App\Service\OperationLogService;
-use Exception;
 use Hyperf\Amqp\Annotation\Consumer;
 use Hyperf\Amqp\Builder\QueueBuilder;
-use Hyperf\Amqp\Result;
-use Hyperf\Collection\Arr;
-use PhpAmqpLib\Message\AMQPMessage;
+use Hyperf\Di\Annotation\Inject;
 use PhpAmqpLib\Wire\AMQPTable;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 
 #[Consumer(exchange: 'web-api', routingKey: 'operation.log.routing', queue: 'operation.log.queue', name: 'OperationLogConsumer', nums: 1)]
 class OperationLogConsumer extends BaseConsumer
 {
-    public function __construct(
-        private readonly QueueLogServiceInterface $service,
-        private readonly OperationLogService $consumeService
-    ) {
-        parent::__construct($service, $consumeService);
-    }
-
-    /**
-     * @param mixed $data
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function consumeMessage($data, AMQPMessage $message): Result
-    {
-        $result = Result::DROP;
-        if (empty($data) && ! Arr::accessible($data)) {
-            return $result;
-        }
-        $queueId = Arr::get($data, 'queue_id');
-        try {
-            $consumeStatus = ['consume_status' => ConsumerStatusCode::CONSUME_STATUS_FAIL->value];
-            if ($this->consumeService->dao->insertByQueue($this->handleData($data))) {
-                Arr::set($consumeStatus, 'consume_status', ConsumerStatusCode::CONSUME_STATUS_SUCCESS->value);
-                $result = Result::ACK;
-            }
-            $this->service->update(
-                $queueId,
-                $consumeStatus
-            );
-        } catch (Exception $e) {
-            $this->service->update(
-                $queueId,
-                Arr::merge($consumeStatus, ['log_content' => $e->getMessage()])
-            );
-        }
-        return $result;
-    }
+    #[Inject]
+    protected OperationLogService $consumeService;
 
     /**
      * Overwrite.
@@ -82,5 +40,10 @@ class OperationLogConsumer extends BaseConsumer
     public function isEnable(): bool
     {
         return true;
+    }
+
+    protected function process($data): bool
+    {
+        return $this->consumeService->dao->insertByQueue($data);
     }
 }
