@@ -25,9 +25,9 @@ class CreateOrganizationsTable extends Migration
             $table->addColumn('bigInteger', 'super_admin_id', ['unsigned' => true, 'comment' => '企业超管ID'])->nullable();
             $table->addColumn('bigInteger', 'parent_id', ['default' => 0, 'unsigned' => true, 'comment' => '父ID'])->index();
             $table->addColumn('bigInteger', 'province_region_id', ['default' => 0, 'unsigned' => true, 'comment' => '省级ID'])->index();
-            $table->addColumn('bigInteger', 'province_region_name', ['length' => 30, 'comment' => '省级地区名称']);
+            $table->addColumn('string', 'province_region_name', ['length' => 30, 'comment' => '省级地区名称']);
             $table->addColumn('bigInteger', 'city_region_id', ['default' => 0, 'unsigned' => true, 'comment' => '市级ID'])->index();
-            $table->addColumn('bigInteger', 'city_region_name', ['length' => 30, 'comment' => '市级地区名称']);
+            $table->addColumn('string', 'city_region_name', ['length' => 30, 'comment' => '市级地区名称']);
             $table->addColumn('string', 'level', ['length' => 500, 'comment' => '组级集合']);
             $table->addColumn('string', 'name', ['length' => 30, 'comment' => '组织名称']);
             $table->addColumn('string', 'address', ['length' => 128, 'comment' => '组织地址'])->nullable();
