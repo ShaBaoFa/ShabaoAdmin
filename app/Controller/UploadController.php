@@ -111,7 +111,7 @@ class UploadController extends BaseController
     #[GetMapping('getFileByHash'),Auth]
     public function getFilesByHash(UploadRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->getFileByHash($request->input('hash', null)) ?? []);
+        return $this->response->success($this->service->getFileInfoByHash($request->input('hash')) ?? []);
     }
 
     /**
@@ -133,10 +133,15 @@ class UploadController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws FilesystemException
      */
-    #[GetMapping('showFileByHash/{hash}'),Auth]
-    public function showFileByHash(string $hash): ResponseInterface
+    #[GetMapping('getPreview/{hash}'),Auth]
+    public function getPreviewByHash(string $hash): ResponseInterface
     {
-        [$file, $context] = $this->service->responseFileByHash($hash);
-        return $this->response->responseFile($context, $file['mime_type']);
+        return $this->response->success($this->service->getPreview($hash));
+    }
+
+    #[GetMapping('getThumbnail/{hash}'),Auth]
+    public function getThumbnailByHash(string $hash): ResponseInterface
+    {
+        return $this->response->success($this->service->getThumbnail($hash));
     }
 }

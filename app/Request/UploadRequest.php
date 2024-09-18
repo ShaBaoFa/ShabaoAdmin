@@ -37,7 +37,7 @@ class UploadRequest extends BaseFormRequest
     public function uploadFilesRules(): array
     {
         return [
-            'files' => 'required|mimes:' . $this->getFilesMines(),
+            'files' => 'required|mimes:' . $this->getFilesMines() . ',' . $this->getVideosMimes(),
             'path' => 'max:30',
         ];
     }
@@ -106,6 +106,7 @@ class UploadRequest extends BaseFormRequest
         return [
             'images' => '图片',
             'files' => '文件',
+            'videos' => '视频',
             'path' => '地址',
         ];
     }
@@ -113,6 +114,11 @@ class UploadRequest extends BaseFormRequest
     private function getImagesMimes(): string
     {
         return 'jpg,jpeg,png,gif,svg,bmp,webp';
+    }
+
+    private function getVideosMimes(): string
+    {
+        return 'mp4,avi,mkv';
     }
 
     private function getFilesMines(): string

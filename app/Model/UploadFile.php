@@ -34,6 +34,8 @@ use Carbon\Carbon;
  * @property Carbon $updated_at 更新时间
  * @property string $deleted_at 删除时间
  * @property string $remark 备注
+ * @property string $preview_url 预览地址
+ * @property string $thumb_url 缩略图地址
  */
 class UploadFile extends BaseModel
 {
@@ -45,7 +47,7 @@ class UploadFile extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'storage_mode', 'origin_name', 'object_name', 'hash', 'mime_type', 'storage_path', 'suffix', 'size_byte', 'size_info', 'url', 'status', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark'];
+    protected array $fillable = ['id', 'storage_mode', 'origin_name', 'object_name', 'hash', 'mime_type', 'storage_path', 'suffix', 'size_byte', 'size_info', 'url', 'status', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at', 'remark', 'preview_url', 'thumb_url'];
 
     /**
      * The attributes that should be cast to native types.
