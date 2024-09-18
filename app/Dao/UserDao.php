@@ -75,7 +75,7 @@ class UserDao extends BaseDao
         $role_ids = $data['role_ids'] ?? [];
         //        $post_ids = $data['post_ids'] ?? [];
         $dept_ids = $data['dept_ids'] ?? [];
-        $org_id = $data['org_id'] ?? 0;
+        $org_id = $data['organization_id'] ?? 0;
         $this->filterExecuteAttributes($data, true);
         $user = $this->model::create($data);
         $user->roles()->sync($role_ids, false);

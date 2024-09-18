@@ -65,7 +65,7 @@ class UserRequest extends BaseFormRequest
             'phone' => ['telephone_number'],
             'dept_ids' => ['nullable', 'array'],
             'dept_ids.*' => ['required_with:dept_ids', 'integer', 'exists:depts,id'],
-            'org_id' => ['required', 'integer', 'exists:organizations,id'],
+            'organization_id' => ['required', 'integer', 'exists:organizations,id'],
             'role_ids' => ['required'],
             'remark' => ['max:255'],
         ];
