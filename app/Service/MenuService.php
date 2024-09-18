@@ -17,6 +17,7 @@ use App\Constants\ErrorCode;
 use App\Dao\MenuDao;
 use App\Exception\BusinessException;
 use App\Model\Menu;
+use Hyperf\Collection\Arr;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -74,7 +75,7 @@ class MenuService extends BaseService
         $id = $this->dao->save($this->handleData($data));
 
         // 生成RESTFUL按钮菜单
-        if ($data['type'] == Menu::MENUS_LIST && $data['gen_btn'] === Menu::GEN_BTN) {
+        if (Arr::get($data, 'type') == Menu::MENUS_LIST && Arr::get($data, 'gen_btn') === Menu::GEN_BTN) {
             $model = $this->dao->model::find($id, ['id', 'name', 'code']);
             $this->genButtonMenu($model);
         }
@@ -161,9 +162,9 @@ class MenuService extends BaseService
     protected function handleData(array $data): array
     {
         if (empty($data['parent_id']) || $data['parent_id'] == 0) {
-            $data['level'] = '0';
-            $data['parent_id'] = 0;
-            $data['type'] = $data['type'] === Menu::BUTTON ? Menu::MENUS_LIST : $data['type'];
+            Arr::has($data, 'level') && $data['level'] = '0';
+            Arr::has($data, 'parent_id') && $data['parent_id'] = 0;
+            Arr::has($data, 'type') && $data['type'] = $data['type'] === Menu::BUTTON ? Menu::MENUS_LIST : $data['type'];
         } else {
             $parentMenu = $this->dao->find((int) $data['parent_id']);
             $data['level'] = $parentMenu['level'] . ',' . $parentMenu['id'];

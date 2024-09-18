@@ -44,12 +44,24 @@ class Menu extends BaseModel
     /**
      * 类型.
      */
+    /**
+     * 链接.
+     */
     public const LINK = 'L';
 
+    /**
+     * IFRAME.
+     */
     public const IFRAME = 'I';
 
+    /**
+     * 菜单.
+     */
     public const MENUS_LIST = 'M';
 
+    /**
+     * 按钮.
+     */
     public const BUTTON = 'B';
 
     /**
