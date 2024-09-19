@@ -63,7 +63,7 @@ return [
         Constant::OPTION_OPEN_HTTP2_PROTOCOL => true,
         Constant::OPTION_MAX_REQUEST => 0,
         Constant::OPTION_SOCKET_BUFFER_SIZE => 2 * 1024 * 1024,
-        Constant::OPTION_PACKAGE_MAX_LENGTH => 2 * 1024 * 1024,
+        Constant::OPTION_PACKAGE_MAX_LENGTH => 200 * 1024 * 1024,
     ],
     'callbacks' => [
         Event::ON_BEFORE_START => [ServerStartCallback::class, 'beforeStart'],
