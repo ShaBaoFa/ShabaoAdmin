@@ -214,13 +214,20 @@ class FileSystemService extends BaseService
         return $file;
     }
 
+    /**
+     * @throws RedisException
+     * @throws RequestCore_Exception
+     * @throws ContainerExceptionInterface
+     * @throws OssException
+     * @throws NotFoundExceptionInterface
+     */
     public function getPreview(string $hash): array
     {
         $file = $this->getFileInfoByHash($hash);
         if (! Arr::get($file, 'preview_url')) {
             [$config,$saveObj] = $this->processForPreview($file);
             // 是否可以持久化判断
-            if ($this->canPersistence($file)){
+            if ($this->canPersistence($file)) {
                 // 是否需要同步持久化
                 $needSync = true;
                 if (config('amqp.enable') && di()->get(OssProcessConsumer::class)->isEnable()) {
@@ -241,6 +248,27 @@ class FileSystemService extends BaseService
                 if ($needSync) {
                     $this->saveAs($file, $config, $saveObj);
                 }
+            }
+            if ($this->checkSuffix(Arr::get($file, 'suffix')) == DiskFileCode::FILE_TYPE_DOCUMENT) {
+                $ossConfig = config('file.storage.oss');
+                $ossClient = new OssClient(Arr::get($ossConfig, 'accessId'), Arr::get($ossConfig, 'accessSecret'), Arr::get($ossConfig, 'endpoint'));
+                $html = $ossClient->getObject(Arr::get($ossConfig, 'bucket'), $this->formatOssUrl(Arr::get($file, 'url')), $config);
+                // Define the regex pattern
+                $pattern = '/"RefreshToken":\s*"([^"]+)",\s*"AccessToken":\s*"([^"]+)",\s*"WebofficeURL":\s*"([^"]+)"/';
+                // 使用正则
+                if (! preg_match($pattern, $html, $matches)){
+                    throw new BusinessException(ErrorCode::SERVER_ERROR);
+                }
+                $refreshToken = $matches[1];
+                $accessToken = $matches[2];
+                $webOfficeURL = stripslashes($matches[3]);
+                return [
+                    'web_office_url' => $webOfficeURL,
+                    'type' => $this->checkSuffix(Arr::get($file, 'suffix')),
+                    'is_persistence' => false,
+                    'access_token' => $accessToken,
+                    'refresh_token' => $refreshToken,
+                ];
             }
 
             return [
@@ -305,9 +333,9 @@ class FileSystemService extends BaseService
         // 目前 OSS 不支持文档预览的持久化
         if (Arr::get($file, 'storage_mode') != FileSystemCode::OSS->value
             && $this->checkSuffix(Arr::get($file, 'suffix')) != DiskFileCode::FILE_TYPE_DOCUMENT) {
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 
     private function formatOssUrl(string $url): string
