@@ -74,7 +74,6 @@ class BaseUpload
 
     /**
      * 上传文件.
-     * @throws FileExistsException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws FilesystemException
