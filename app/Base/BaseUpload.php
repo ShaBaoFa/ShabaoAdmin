@@ -31,7 +31,7 @@ use Psr\EventDispatcher\EventDispatcherInterface;
 use RedisException;
 
 use function App\Helper\format_size;
-use function Hyperf\Support\env;
+use function Hyperf\Config\config;
 
 class BaseUpload
 {
@@ -81,7 +81,6 @@ class BaseUpload
      */
     public function upload(UploadedFile $uploadedFile, array $config = []): array
     {
-        var_dump('上传文件');
         return $this->handleUpload($uploadedFile, $config);
     }
 
@@ -150,11 +149,8 @@ class BaseUpload
     protected function handleUpload(UploadedFile $uploadedFile, array $config): array
     {
         $tmpFile = $uploadedFile->getPath() . '/' . $uploadedFile->getFilename();
-        var_dump($this->getStorageMode());
-        var_dump(FileSystemCode::LOCAL->value);
         $path = $this->getPath($config['path'] ?? null, $this->getStorageMode() != FileSystemCode::LOCAL->value);
         $filename = $this->getNewName() . '.' . Str::lower($uploadedFile->getExtension());
-        var_dump($path . '/' . $filename);
         try {
             $this->filesystem->writeStream($path . '/' . $filename, $uploadedFile->getStream()->detach());
         } catch (Exception $e) {
@@ -184,8 +180,8 @@ class BaseUpload
      */
     protected function getPath(?string $path = null, bool $isContainRoot = false): string
     {
-        $uploadfile = $isContainRoot ? '/' . env('UPLOAD_PATH', 'uploadfile') . '/' : '';
-        return empty($path) ? $uploadfile . date('Ymd') : $uploadfile . $path;
+        $uploadFile = $isContainRoot ? '/' . config('base-common.update_path') . '/' : '';
+        return empty($path) ? $uploadFile . date('Ymd') : $uploadFile . $path;
     }
 
     /**
