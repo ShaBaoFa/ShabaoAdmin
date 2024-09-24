@@ -24,7 +24,7 @@ return [
     'storage' => [
         'local' => [
             'driver' => LocalAdapterFactory::class,
-            'root' => __DIR__ . '/../../public/',
+            'root' => __DIR__ . '/../../public/' . env('UPLOAD_PATH', 'uploadFile'),
         ],
         'ftp' => [
             'driver' => FtpAdapterFactory::class,

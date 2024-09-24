@@ -18,7 +18,9 @@ use App\Constants\ErrorCode;
 use App\Constants\FileSystemCode;
 use App\Constants\UploadStatusCode;
 use App\Dao\UploadFileDao;
+use App\Events\AfterUpload;
 use App\Exception\BusinessException;
+use App\Service\KkFileView\PreviewService;
 use Carbon\Carbon;
 use Exception;
 use Hyperf\Cache\Annotation\Cacheable;
@@ -31,11 +33,13 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\FilesystemException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use RedisException;
 use Swoole\Coroutine\System;
 use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 
 use function App\Helper\user;
+use function Hyperf\Support\env;
 use function Hyperf\Support\make;
 
 class FileSystemService extends BaseService
@@ -49,6 +53,9 @@ class FileSystemService extends BaseService
     protected ConfigInterface $config;
 
     protected BaseUpload $uploadTool;
+
+    #[Inject]
+    protected EventDispatcherInterface $eventDispatcher;
 
     public function __construct(UploadFileDao $dao, BaseUpload $uploadTool)
     {
@@ -165,6 +172,8 @@ class FileSystemService extends BaseService
     #[CacheEvict(prefix: 'fileInfoByHash', value: 'fileHash_#{hash}')]
     public function uploaderCallback(string $hash): bool
     {
+        $fileInfo = $this->dao->getFileInfoByHash($hash);
+        $this->eventDispatcher->dispatch(new AfterUpload($fileInfo));
         return $this->dao->changeStatusByHash($hash, UploadStatusCode::UPLOAD_FINISHED);
     }
 
@@ -209,15 +218,32 @@ class FileSystemService extends BaseService
         return parent::update($id, $data);
     }
 
+    public function getPreview(string $hash)
+    {
+        $fileInfo = $this->getFileInfoByHash($hash);
+        $url = $this->generateSignature(Arr::get($fileInfo, 'url'));
+        $previewService = di()->get(PreviewService::class);
+        $userService = di()->get(UserService::class);
+        $nickname = $userService->value(['id' => Arr::get($fileInfo, 'created_by')], 'nickname');
+        return ['preview_url' => $previewService->onlinePreview($url, ['watermark' => $nickname])];
+    }
+
     /**
      * @param mixed $config
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws RedisException
      */
-    private function generateSignature(string $url, array $config = []): string
+    public function generateSignature(string $url, array $config = []): string
     {
-        return $this->uploadTool->getFileSystem()->temporaryUrl($url, Carbon::now()->addHour(), $config);
+        try {
+            return $this->uploadTool->getFileSystem()->temporaryUrl($url, Carbon::now()->addHours(6), $config);
+        } catch (Exception $e) {
+            if ($this->uploadTool->getStorageMode() == FileSystemCode::LOCAL->value) {
+                return env('APP_URL') . $url;
+            }
+            throw new BusinessException(ErrorCode::NOT_SUPPORT);
+        }
     }
 
     /**

@@ -21,9 +21,11 @@ use App\Constants\QueueMesContentTypeCode;
 use App\Exception\BusinessException;
 use App\Model\Message;
 use App\Service\FileSystemService;
+use App\Service\KkFileView\PreviewService;
 use App\Service\WsSenderService;
 use App\Vo\QueueMessageVo;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\Amqp\Producer;
 use Hyperf\Collection\Arr;
 use Hyperf\Command\Annotation\Command;
@@ -65,12 +67,23 @@ class TestCommand extends HyperfCommand
      * @throws OssException
      * @throws RedisException
      * @throws RandomException
+     * @throws GuzzleException
      */
     public function handle(): void
     {
-        $fss = di()->get(FileSystemService::class);
-        $res = $fss->getFileByHash('57dcd433720e0806140488400736a855');
-        var_dump($res);
+        $fs = di()->get(FileSystemService::class);
+        $url = $fs->generateSignature('/uploadfile/20240924/697158785982119936.xlsx');
+        $service = make(PreviewService::class);
+        //                if($service->addTask(['url' => $url])){
+        //                    var_dump('success');
+        //                }else{
+        //                    var_dump('fail');
+        //                }
+        //        $url = 'https://yunzhizhanoss2.oss-cn-hangzhou.aliyuncs.com/f5b6d64ae963a4745888898.jpg?Expires=1727205174&OSSAccessKeyId=TMP.3KjFwJwibPuzY47KUhyjZhPsRZvnEberswh9A5QttZhWJs682CzKPDrAPCjB7TC9Uu2Zi5gDfMFtA1Zj3FuEnyA44GcpaB&Signature=Fv7yl8Gc39Wl4uFk6%2BdKfLcd1Kg%3D';
+        $url = $service->onlinePreview($url, ['watermark' => '的快乐就是地方']);
+        var_dump($url);
+        //        var_dump($service->onlinePreview(['url' => $url,'watermarkTxt' => 123]));
+
         //        $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
         //        $zip_file = BASE_PATH . '/region.json.zip';
         //        file_put_contents($zip_file, $online_zip);

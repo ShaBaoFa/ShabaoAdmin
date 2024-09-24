@@ -124,7 +124,6 @@ class OrganizationService extends BaseService
             foreach ($ids as $id) {
                 if (! $this->checkChildrenExists((int) $id) && ! $this->dao->find($id)->users()->exists()) {
                     $this->dao->realDelete([$id]);
-                    $this->deleteCache((int) $id);
                 } else {
                     $ctuIds[] = $id;
                 }
