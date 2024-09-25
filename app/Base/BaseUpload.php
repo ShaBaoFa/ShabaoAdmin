@@ -74,7 +74,6 @@ class BaseUpload
 
     /**
      * 上传文件.
-     * @throws FileExistsException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws FilesystemException
@@ -110,7 +109,7 @@ class BaseUpload
      */
     public function getStorageMode(): int|string
     {
-        return FileSystemCode::OSS->value;
+        return FileSystemCode::LOCAL->value;
     }
 
     /**
@@ -122,7 +121,7 @@ class BaseUpload
     {
         $segments = explode('.', $metadata['origin_name']);
         $suffix = Str::lower((string) end($segments));
-        $path = $this->getPath($config['path'] ?? null, $this->getStorageMode() != FileSystemCode::LOCAL);
+        $path = $this->getPath($config['path'] ?? null, $this->getStorageMode() != FileSystemCode::LOCAL->value);
         $filename = $this->getNewName() . '.' . $suffix;
         return [
             'storage_mode' => $this->getStorageMode(),
@@ -149,9 +148,8 @@ class BaseUpload
     protected function handleUpload(UploadedFile $uploadedFile, array $config): array
     {
         $tmpFile = $uploadedFile->getPath() . '/' . $uploadedFile->getFilename();
-        $path = $this->getPath($config['path'] ?? null, $this->getStorageMode() != FileSystemCode::LOCAL);
+        $path = $this->getPath($config['path'] ?? null, $this->getStorageMode() != FileSystemCode::LOCAL->value);
         $filename = $this->getNewName() . '.' . Str::lower($uploadedFile->getExtension());
-
         try {
             $this->filesystem->writeStream($path . '/' . $filename, $uploadedFile->getStream()->detach());
         } catch (Exception $e) {

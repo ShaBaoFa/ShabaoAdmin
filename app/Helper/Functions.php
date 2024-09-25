@@ -160,3 +160,15 @@ if (! function_exists('base64url_encode')) {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }
+
+if (! function_exists('base64url_decode')) {
+    /**
+     * 将结果中的短划线（-）替换成加号（+）。
+     *
+     * 将结果中的下划线（_）替换成正斜线（/）。
+     */
+    function base64url_decode(string $data): string
+    {
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+    }
+}

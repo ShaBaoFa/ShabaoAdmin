@@ -21,7 +21,7 @@ use Swoole\Constant;
 
 return [
     'mode' => SWOOLE_BASE,
-    'type' => CoroutineServer::class,
+    //    'type' => CoroutineServer::class,
     'servers' => [
         [
             'name' => 'http',
@@ -32,7 +32,6 @@ return [
             'callbacks' => [
                 Event::ON_REQUEST => [Hyperf\HttpServer\Server::class, 'onRequest'],
             ],
-            'open_websocket_protocol' => false,
         ],
         [
             'name' => 'message',
@@ -55,6 +54,8 @@ return [
     'settings' => [
         // 对外部可以直接访问的目录地址，建议使用nginx反向代理访问
         Constant::OPTION_DOCUMENT_ROOT => BASE_PATH . '/public',
+        // 开启外部可以访问
+        Constant::OPTION_ENABLE_STATIC_HANDLER => true,
         Constant::OPTION_ENABLE_COROUTINE => true,
         Constant::OPTION_WORKER_NUM => swoole_cpu_num(),
         Constant::OPTION_PID_FILE => BASE_PATH . '/runtime/hyperf.pid',

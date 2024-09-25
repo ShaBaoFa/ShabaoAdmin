@@ -138,10 +138,4 @@ class UploadController extends BaseController
     {
         return $this->response->success($this->service->getPreview($hash));
     }
-
-    #[GetMapping('getThumbnail/{hash}'),Auth]
-    public function getThumbnailByHash(string $hash): ResponseInterface
-    {
-        return $this->response->success($this->service->getThumbnail($hash));
-    }
 }
