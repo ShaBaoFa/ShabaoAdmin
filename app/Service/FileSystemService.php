@@ -194,11 +194,15 @@ class FileSystemService extends BaseService
         ! $hash && throw new BusinessException(ErrorCode::HASH_VERIFICATION_FAILED);
         $data = ['hash' => $hash, 'is_uploaded' => $this->dao->isUploaded($hash)];
         if ($data['is_uploaded']) {
-            return $data;
+            $fileInfo = $this->getFileInfoByHash($hash);
+            return ['file' => $fileInfo,'is_uploaded' => $data['is_uploaded']];
         }
-        $fileInfo = $this->uploadTool->handlePreparation($metadata, Arr::merge($config, ['hash' => $hash]));
+        if (! $this->checkExists(['hash' => $hash],false)) {
+            $fileInfo = $this->uploadTool->handlePreparation($metadata, Arr::merge($config, ['hash' => $hash]));
             $this->save($fileInfo) ?? throw new BusinessException(ErrorCode::UPLOAD_FAILED);
-        return $data;
+        }
+        $fileInfo = $this->getFileInfoByHash($hash);
+        return ['file' => $fileInfo,'is_uploaded' => $data['is_uploaded']];
     }
 
     #[Cacheable(prefix: 'fileInfoByHash', value: 'fileHash_#{hash}', ttl: 3600 * 24)]
