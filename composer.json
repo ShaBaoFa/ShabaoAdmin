@@ -13,6 +13,7 @@
   "license": "MIT",
   "require": {
     "php": ">=8.1",
+    "ext-bcmath": "*",
     "ext-gd": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
@@ -61,9 +62,9 @@
     "phpoffice/phpspreadsheet": "^1.24",
     "ramsey/uuid": "^4.7",
     "wlfpanda1012/aliyun-sts": "*",
+    "wlfpanda1012/easy-sts": "^1.0",
     "xmo/jwt-auth": "^2.0",
-    "zoujingli/ip2region": "^2.0",
-    "ext-bcmath": "*"
+    "zoujingli/ip2region": "^2.0"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^3.0",

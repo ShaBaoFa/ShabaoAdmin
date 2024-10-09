@@ -42,6 +42,7 @@ use RedisException;
 use Wlfpanda1012\AliyunSts\Constants\OSSClientCode;
 use Wlfpanda1012\AliyunSts\Oss\OssRamService;
 
+use Wlfpanda1012\CommonSts\Sts;
 use function App\Helper\redis;
 use function Hyperf\Config\config;
 use function Hyperf\Support\make;
@@ -71,17 +72,19 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        $fs = di()->get(FileSystemService::class);
-        $url = $fs->generateSignature('/uploadfile/20240924/697158785982119936.xlsx');
-        $service = make(PreviewService::class);
+        $sts = make(Sts::class);
+        var_dump($sts->getToken([]));
+//        $fs = di()->get(FileSystemService::class);
+//        $url = $fs->generateSignature('/uploadfile/20240924/697158785982119936.xlsx');
+//        $service = make(PreviewService::class);
         //                if($service->addTask(['url' => $url])){
         //                    var_dump('success');
         //                }else{
         //                    var_dump('fail');
         //                }
         //        $url = 'https://yunzhizhanoss2.oss-cn-hangzhou.aliyuncs.com/f5b6d64ae963a4745888898.jpg?Expires=1727205174&OSSAccessKeyId=TMP.3KjFwJwibPuzY47KUhyjZhPsRZvnEberswh9A5QttZhWJs682CzKPDrAPCjB7TC9Uu2Zi5gDfMFtA1Zj3FuEnyA44GcpaB&Signature=Fv7yl8Gc39Wl4uFk6%2BdKfLcd1Kg%3D';
-        $url = $service->onlinePreview($url, ['watermark' => '的快乐就是地方']);
-        var_dump($url);
+//        $url = $service->onlinePreview($url, ['watermark' => '的快乐就是地方']);
+//        var_dump($url);
         //        var_dump($service->onlinePreview(['url' => $url,'watermarkTxt' => 123]));
 
         //        $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
