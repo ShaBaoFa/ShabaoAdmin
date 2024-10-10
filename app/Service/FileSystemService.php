@@ -36,7 +36,9 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use RedisException;
 use Swoole\Coroutine\System;
-use Wlfpanda1012\AliyunSts\Oss\OssRamService;
+use Wlfpanda1012\AliyunSts\Constants\OSSAction;
+use Wlfpanda1012\AliyunSts\Constants\OSSEffect;
+use Wlfpanda1012\CommonSts\Sts;
 
 use function App\Helper\user;
 use function Hyperf\Support\env;
@@ -137,10 +139,18 @@ class FileSystemService extends BaseService
         }
         $file = $this->getFileInfoByHash($hash);
         try {
-            $sts = $this->config->get('sts');
-            $ossRamService = make(OssRamService::class, ['option' => $sts]);
+            $sts = make(Sts::class);
+            $token = $sts->getToken($sts->storagePolicy(OSSEffect::ALLOW->value, [OSSAction::ALL_PUT->value], $file['url']));
+
             $customParams = ['hash' => $hash];
-            return ['callback_custom_params' => $customParams, 'credentials' => $ossRamService->allowPutObject($file['url'])];
+            return [
+                'callback_custom_params' => $customParams,
+                'credentials' => [
+                    'access_key_id' => $token->getAccessKeyId(),
+                    'access_key_secret' => $token->getAccessKeySecret(),
+                    'security_token' => $token->getSessionToken(),
+                    'expiration' => $token->getExpireTime()->getTimestamp(),
+                ]];
         } catch (Exception $e) {
             throw new BusinessException(ErrorCode::GET_STS_TOKEN_FAIL);
         }
@@ -162,8 +172,14 @@ class FileSystemService extends BaseService
         // 获取数组所有value
         $urls = array_values($hashesToUrls);
         try {
-            $ossRamService = make(OssRamService::class, ['option' => $this->config->get('sts')]);
-            return Arr::merge(['objects' => $hashesToUrls], $ossRamService->allowGetObject($urls));
+            $sts = make(Sts::class);
+            $token = $sts->getToken($sts->storagePolicy(OSSEffect::ALLOW->value, [OSSAction::ALL_GET->value], $urls));
+            return Arr::merge(['objects' => $hashesToUrls], ['credentials' => [
+                'access_key_id' => $token->getAccessKeyId(),
+                'access_key_secret' => $token->getAccessKeySecret(),
+                'security_token' => $token->getSessionToken(),
+                'expiration' => $token->getExpireTime()->getTimestamp(),
+            ]]);
         } catch (Exception $e) {
             throw new BusinessException(ErrorCode::GET_STS_TOKEN_FAIL);
         }

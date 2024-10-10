@@ -1,26 +1,9 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
 use Wlfpanda1012\EasySts\Adapter\AliyunStsAdapterFactory;
 use Wlfpanda1012\EasySts\Adapter\CtyunStsAdapterFactory;
 use Wlfpanda1012\EasySts\Adapter\LocalStsAdapterFactory;
-
-/**
- * This file is part of Hyperf.
- *
- * @see     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
 
 use function Hyperf\Support\env;
 
@@ -46,6 +29,8 @@ return [
             'driver' => CtyunStsAdapterFactory::class,
             'accessId' => env('CTYUN_STS_ACCESS_ID'),
             'accessSecret' => env('CTYUN_STS_ACCESS_SECRET'),
+            'endpoint' => env('CTYUN_STS_ENDPOINT', 'oos-cn-iam.ctyunapi.cn'),
+            'durationSeconds' => env('CTYUN_STS_DURATION_SECONDS', 3600),
         ],
     ],
 ];

@@ -62,6 +62,7 @@
     "phpoffice/phpspreadsheet": "^1.24",
     "ramsey/uuid": "^4.7",
     "wlfpanda1012/aliyun-sts": "*",
+    "wlfpanda1012/ctyun-sts": "^1.0",
     "wlfpanda1012/easy-sts": "^1.0",
     "xmo/jwt-auth": "^2.0",
     "zoujingli/ip2region": "^2.0"
