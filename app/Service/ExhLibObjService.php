@@ -19,6 +19,7 @@ use App\Constants\ErrorCode;
 use App\Dao\ExhLibObjDao;
 use App\Dao\UploadFileDao;
 use App\Exception\BusinessException;
+use App\Model\ExhLibObj;
 use Hyperf\Collection\Arr;
 
 use function App\Helper\user;
@@ -41,13 +42,59 @@ class ExhLibObjService extends BaseService
         $this->uploadFileDao = $uploadFileDao;
     }
 
-    public function info(int $id): array
+    public function update(mixed $id, array $data): bool
     {
+        // 判断是否已存在
+        if ($this->checkExists(condition: [
+            'lib_type' => Arr::get($data, 'lib_type'),
+            'title' => Arr::get($data, 'title'),
+        ], id: $id)) {
+            throw new BusinessException(ErrorCode::INVALID_PARAMS);
+        }
+        // 3个区+保存位置 都无法修改
+        $model = $this->find($id);
+        if (! $model) {
+            throw new BusinessException(ErrorCode::NOT_FOUND);
+        }
+        /**
+         * @var ExhLibObj $model
+         */
+        Arr::set($data, 'type', $model->type);
+        Arr::set($data, 'lib_type', $model->lib_type);
+        Arr::set($data, 'lib_area_type', $model->lib_area_type);
+        Arr::set($data, 'save_dir_id', $model->save_dir_id);
+        // 2 下架状态
+        Arr::set($data, 'status', BaseCode::BASE_ABNORMAL->value);
+        // 1 等待审核
+        Arr::set($data, 'audit_status', AuditCode::IN_AUDIT->value);
+
+        // 获取 hash 数组 对应的 id 数组
+        $hashes = Arr::get($data, 'files');
+        $newIds = $this->uploadFileDao->getIdsByHashes($hashes);
+        $oldIds = $model->files()->pluck('id')->toArray();
+        // 筛选新增的
+        $addIds = array_diff($newIds, $oldIds);
+        $saveFiles = [];
+        $diskService = di()->get(DiskService::class);
+        $fs = di()->get(FileSystemService::class);
+        $hashes = $fs->findMany($addIds)->pluck('hash')->toArray();
+        foreach ($hashes as $hash) {
+            $saveFiles[] = [
+                'hash' => $hash,
+                'parent_id' => Arr::get($data, 'save_dir_id'),
+            ];
+        }
+        $diskService->saveFiles($saveFiles);
+        Arr::set($data, 'files', $newIds);
+        // 获取 封面 数组
+        $covers = Arr::get($data, 'covers');
+        $coverIds = $this->uploadFileDao->getIdsByHashes($covers);
+        Arr::set($data, 'covers', $coverIds);
+        return parent::update($id, $data);
     }
 
     public function index()
     {
-
     }
 
     public function save(array $data): mixed
@@ -57,7 +104,11 @@ class ExhLibObjService extends BaseService
             throw new BusinessException(ErrorCode::INVALID_PARAMS);
         }
         // 判断是否已存在
-        $id = $this->value(['title' => Arr::get($data, 'title'), 'created_by' => user()->getId()]);
+        $id = $this->value([
+            'lib_type' => Arr::get($data, 'lib_type'),
+            'title' => Arr::get($data, 'title'),
+            'created_by' => user()->getId(),
+        ]);
         if (! empty($id)) {
             return $id;
         }

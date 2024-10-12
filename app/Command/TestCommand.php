@@ -19,7 +19,6 @@ use App\Constants\ErrorCode;
 use App\Constants\MessageContentTypeCode;
 use App\Constants\QueueMesContentTypeCode;
 use App\Exception\BusinessException;
-use App\Model\ExhLibObj;
 use App\Model\Message;
 use App\Service\FileSystemService;
 use App\Service\KkFileView\PreviewService;
@@ -74,9 +73,10 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        $obj = ExhLibObj::find(1);
-        $res = $obj->tags()->sync([1]);
-        var_dump($res);
+        $data['xxx'] = 1;
+        $data['tags'] = [123];
+        Arr::get($data, 'tags', [123]);
+        var_dump($data);
         return;
         //        $client = new OosClient('098e48ed7c020b2f7a0c','ebe41e052372b833ce8b9218febb62545f2cb8d5','oos-cn-iam.ctyunapi.cn');
         //        $policy = [

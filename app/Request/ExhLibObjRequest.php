@@ -61,7 +61,7 @@ class ExhLibObjRequest extends BaseFormRequest
             'covers' => ['required', 'array'],
             'covers.*' => ['string', 'exists:upload_files,hash'],
             'share_regions' => ['required_if:type,2', 'array'],
-            'share_regions.*' => ['integer', 'exists:regions,id'],
+            'share_regions.*' => ['integer', 'exists:region,id'],
             'redirect_url' => ['required_if:type,3', 'url'],
         ];
     }
@@ -83,9 +83,9 @@ class ExhLibObjRequest extends BaseFormRequest
             'files.*' => ['string', 'exists:upload_files,hash'],
             'covers' => ['required', 'array'],
             'covers.*' => ['string', 'exists:upload_files,hash'],
-            'share_regions' => ['require_if:type,2', 'array'],
-            'share_regions.*' => ['integer', 'exists:regions,id'],
-            'redirect_url' => ['url', 'require_if:type,3'],
+            'share_regions' => ['required_if:type,2', 'array'],
+            'share_regions.*' => ['integer', 'exists:region,id'],
+            'redirect_url' => ['url', 'required_if:type,3'],
         ];
     }
 

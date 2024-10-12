@@ -32,24 +32,32 @@ class ExhLibObjDao extends BaseDao
     #[Transactional]
     public function save(array $data): mixed
     {
-        $tags = Arr::get($data, 'tags', []);
-        $files = Arr::get($data, 'files', []);
-        $covers = Arr::get($data, 'covers', []);
-        $share_regions = Arr::get($data, 'share_regions', []);
+        $tags = Arr::has($data, 'tags') ? Arr::get($data, 'tags') : [];
+        $files = Arr::has($data, 'files') ? Arr::get($data, 'files') : [];
+        $covers = Arr::has($data, 'covers') ? Arr::get($data, 'covers') : [];
+        $share_regions = Arr::has($data, 'share_regions') ? Arr::get($data, 'share_regions') : [];
         $this->filterExecuteAttributes($data, true);
         $obj = $this->model::create($data);
-        if (! empty($tags)) {
-            $obj->tags()->sync($tags);
-        }
-        if (! empty($files)) {
-            $obj->files()->sync($files);
-        }
-        if (! empty($covers)) {
-            $obj->covers()->sync($covers);
-        }
-        if (! empty($share_regions)) {
-            $obj->share_regions()->sync($share_regions);
-        }
+        $obj->tags()->sync($tags);
+        $obj->files()->sync($files);
+        $obj->covers()->sync($covers);
+        $obj->share_regions()->sync($share_regions);
         return $obj->{$obj->getKeyName()};
+    }
+
+    #[Transactional]
+    public function update(mixed $id, array $data): bool
+    {
+        $tags = Arr::has($data, 'tags') ? Arr::get($data, 'tags') : [];
+        $files = Arr::has($data, 'files') ? Arr::get($data, 'files') : [];
+        $covers = Arr::has($data, 'covers') ? Arr::get($data, 'covers') : [];
+        $share_regions = Arr::has($data, 'share_regions') ? Arr::get($data, 'share_regions') : [];
+        $this->filterExecuteAttributes($data, true);
+        $model = $this->model::find($id);
+        $model->tags()->sync($tags);
+        $model->files()->sync($files);
+        $model->covers()->sync($covers);
+        $model->share_regions()->sync($share_regions);
+        return parent::update($id, $data);
     }
 }

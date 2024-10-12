@@ -104,9 +104,9 @@ trait ServiceTrait
         return $this->dao->save($data);
     }
 
-    public function checkExists(?array $condition, bool $isScope = true): bool
+    public function checkExists(?array $condition, bool $isScope = true, ?int $id = null): bool
     {
-        return $this->dao->checkExists($condition, $isScope);
+        return $this->dao->checkExists($condition, $isScope, $id);
     }
 
     /**

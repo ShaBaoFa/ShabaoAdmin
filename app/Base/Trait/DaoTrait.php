@@ -348,9 +348,12 @@ trait DaoTrait
         return $this->listQuerySetting($params, $isScope)->get($columns)->toArray();
     }
 
-    public function checkExists(?array $condition, bool $isScope = true): bool
+    public function checkExists(?array $condition, bool $isScope = true, ?int $id = null): bool
     {
         $query = $this->model::withTrashed()->where($condition);
+        if (! is_null($id)) {
+            $query->where($this->getModel()->getKeyName(), '<>', $id);
+        }
         $isScope && $query->userDataScope();
         return $query->exists();
     }

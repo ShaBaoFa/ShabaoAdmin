@@ -238,7 +238,7 @@ class FileSystemService extends BaseService
         return parent::update($id, $data);
     }
 
-    public function getPreview(string $hash)
+    public function getPreview(string $hash): array
     {
         $fileInfo = $this->getFileInfoByHash($hash);
         $url = $this->generateSignature(Arr::get($fileInfo, 'url'));

@@ -162,9 +162,9 @@ class MenuService extends BaseService
     protected function handleData(array $data): array
     {
         if (empty($data['parent_id']) || $data['parent_id'] == 0) {
-            Arr::has($data, 'level') && $data['level'] = '0';
-            Arr::has($data, 'parent_id') && $data['parent_id'] = 0;
-            Arr::has($data, 'type') && $data['type'] = $data['type'] === Menu::BUTTON ? Menu::MENUS_LIST : $data['type'];
+            ! Arr::has($data, 'level') && $data['level'] = '0';
+            ! Arr::has($data, 'parent_id') && $data['parent_id'] = 0;
+            ! Arr::has($data, 'type') && $data['type'] = $data['type'] === Menu::BUTTON ? Menu::MENUS_LIST : $data['type'];
         } else {
             $parentMenu = $this->dao->find((int) $data['parent_id']);
             $data['level'] = $parentMenu['level'] . ',' . $parentMenu['id'];
