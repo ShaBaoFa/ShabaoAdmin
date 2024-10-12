@@ -15,6 +15,7 @@ namespace App\Dao;
 use App\Base\BaseDao;
 use App\Model\ExhLibObj;
 use Hyperf\Collection\Arr;
+use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
 
 class ExhLibObjDao extends BaseDao
@@ -59,5 +60,55 @@ class ExhLibObjDao extends BaseDao
         $model->covers()->sync($covers);
         $model->share_regions()->sync($share_regions);
         return parent::update($id, $data);
+    }
+
+    /**
+     * 搜索处理器.
+     */
+    public function handleSearch(Builder $query, array $params): Builder
+    {
+        $query->when(
+            Arr::get($params, 'type'),
+            fn (Builder $query, $type) => $query->where('type', $type)
+        );
+
+        $query->when(
+            Arr::get($params, 'status'),
+            fn (Builder $query, $status) => $query->where('status', $status)
+        );
+
+        $query->when(
+            Arr::get($params, 'audit_status'),
+            fn (Builder $query, $auditStatus) => $query->where('audit_status', $auditStatus)
+        );
+
+        $query->when(
+            Arr::get($params, 'lib_type'),
+            fn (Builder $query, $libType) => $query->where('lib_type', $libType)
+        );
+
+        $query->when(
+            Arr::get($params, 'title'),
+            fn (Builder $query, $title) => $query->where('title', 'like', '%' . $title . '%')
+        );
+
+        $query->when(
+            Arr::get($params, 'lib_area_type'),
+            fn (Builder $query, $libAreaType) => $query->where('lib_area_type', $libAreaType)
+        );
+
+        $query->when(
+            Arr::get($params, 'created_at'),
+            function (Builder $query, $createdAt) {
+                if (is_array($createdAt) && count($createdAt) === 2) {
+                    $query->whereBetween(
+                        'created_at',
+                        [$createdAt[0] . ' 00:00:00', $createdAt[1] . ' 23:59:59']
+                    );
+                }
+            }
+        );
+
+        return $query;
     }
 }

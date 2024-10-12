@@ -268,7 +268,21 @@ trait DaoTrait
 
         $isScope && $query->userDataScope();
 
-        return $this->handleSearch($query, $params);
+        $query = $this->handleSearch($query, $params);
+
+        return $this->handleWith($query, $params);
+    }
+
+    /**
+     * 懒加载处理器.
+     */
+    public function handleWith(Builder $query, ?array &$params = null): Builder
+    {
+        if (isset($params['_with'])) {
+            $query->with($params['_with']);
+            unset($params['_with']);
+        }
+        return $query;
     }
 
     /**

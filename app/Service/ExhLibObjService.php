@@ -20,6 +20,8 @@ use App\Dao\ExhLibObjDao;
 use App\Dao\UploadFileDao;
 use App\Exception\BusinessException;
 use App\Model\ExhLibObj;
+use Hyperf\Cache\Annotation\Cacheable;
+use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Collection\Arr;
 
 use function App\Helper\user;
@@ -42,6 +44,31 @@ class ExhLibObjService extends BaseService
         $this->uploadFileDao = $uploadFileDao;
     }
 
+    public function getPublicIndex(array $params): array
+    {
+        Arr::set($params, 'select', 'id,title,author');
+        Arr::set($params, 'audit_status', AuditCode::PASS->value);
+        Arr::set($params, 'status', BaseCode::BASE_NORMAL->value);
+        Arr::set($params, '_with', ['covers']);
+        return parent::getPageList($params, false);
+    }
+
+    public function index(array $params): array
+    {
+        Arr::set($params, 'select', 'id,title,author,audit_status');
+        Arr::set($params, '_with', ['covers']);
+        return parent::getPageList($params);
+    }
+
+    public function info($id): array
+    {
+        if (! $this->checkExists(['id' => $id], false)) {
+            throw new BusinessException(ErrorCode::NOT_FOUND);
+        }
+        return $this->getCacheData($id);
+    }
+
+    #[CacheEvict(prefix: 'ExhLibObj', value: 'ExhLibObjId_#{id}')]
     public function update(mixed $id, array $data): bool
     {
         // 判断是否已存在
@@ -93,10 +120,6 @@ class ExhLibObjService extends BaseService
         return parent::update($id, $data);
     }
 
-    public function index()
-    {
-    }
-
     public function save(array $data): mixed
     {
         // 判断子分区的 lib_area_type
@@ -137,5 +160,11 @@ class ExhLibObjService extends BaseService
         // 设置 封面 ID数组
         Arr::set($data, 'covers', $coverIds);
         return $this->dao->save($data);
+    }
+
+    #[Cacheable(prefix: 'ExhLibOrg', value: 'ExhLibOrgId_#{id}', ttl: 0)]
+    private function getCacheData($id): array
+    {
+        return $this->dao->find($id)->load(['tags', 'files', 'covers', 'share_regions'])->toArray();
     }
 }

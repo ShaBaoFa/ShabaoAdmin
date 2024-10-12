@@ -41,17 +41,17 @@ class ObjController extends BaseController
     #[GetMapping('index'), Permission('exhLib:obj, exhLib:obj:index')]
     public function index(): ResponseInterface
     {
-        return $this->response->success($this->service->getList($this->request->all()));
+        return $this->response->success($this->service->index($this->request->all()));
     }
 
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('select')]
+    #[GetMapping('public_index')]
     public function select(): ResponseInterface
     {
-        return $this->response->success($this->service->getList($this->request->all()));
+        return $this->response->success($this->service->getPublicIndex($this->request->all()));
     }
 
     #[GetMapping('info/{id:\d+}'), Permission('exhLib:obj, exhLib:obj:info')]

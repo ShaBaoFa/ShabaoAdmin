@@ -54,6 +54,7 @@ trait ServiceTrait
      */
     public function getPageList(?array $params = null, bool $isScope = true): array
     {
+        var_dump($params);
         if ($params['select'] ?? null) {
             $params['select'] = explode(',', $params['select']);
         }
