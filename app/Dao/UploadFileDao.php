@@ -55,6 +55,11 @@ class UploadFileDao extends BaseDao
         return $model->toArray();
     }
 
+    public function getIdsByHashes(array $hashes): array
+    {
+        return $this->model::query()->whereIn('hash', $hashes)->where('status', UploadStatusCode::UPLOAD_FINISHED->value)->pluck('id')->toArray();
+    }
+
     /**
      * 通过hash获取上传文件的信息.
      */

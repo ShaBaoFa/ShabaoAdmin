@@ -19,6 +19,7 @@ use App\Constants\ErrorCode;
 use App\Constants\MessageContentTypeCode;
 use App\Constants\QueueMesContentTypeCode;
 use App\Exception\BusinessException;
+use App\Model\ExhLibObj;
 use App\Model\Message;
 use App\Service\FileSystemService;
 use App\Service\KkFileView\PreviewService;
@@ -32,7 +33,6 @@ use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\DbConnection\Db;
-use Hyperf\Guzzle\ClientFactory;
 use OSS\Core\OssException;
 use OSS\Http\RequestCore_Exception;
 use OSS\OssClient;
@@ -74,6 +74,10 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
+        $obj = ExhLibObj::find(1);
+        $res = $obj->tags()->sync([1]);
+        var_dump($res);
+        return;
         //        $client = new OosClient('098e48ed7c020b2f7a0c','ebe41e052372b833ce8b9218febb62545f2cb8d5','oos-cn-iam.ctyunapi.cn');
         //        $policy = [
         //            "Version" => "2012-10-17",
@@ -108,7 +112,7 @@ class TestCommand extends HyperfCommand
                 ],
             ],
         ];
-//        var_dump($sts->getToken($policy));
+        //        var_dump($sts->getToken($policy));
         //        $fs = di()->get(FileSystemService::class);
         //        $url = $fs->generateSignature('/uploadfile/20240924/697158785982119936.xlsx');
         //        $service = make(PreviewService::class);

@@ -319,6 +319,9 @@ class DiskService extends BaseService
         }
         $file = $fs->dao->getFileInfoByHash(Arr::get($data, 'hash'));
         // 文件数据
+        if (! Arr::has($data, 'name')) {
+            Arr::set($data, 'name', Arr::get($file, 'origin_name'));
+        }
         Arr::set($data, 'suffix', Arr::get($file, 'suffix'));
         Arr::set($data, 'size_byte', Arr::get($file, 'size_byte'));
         Arr::set($data, 'size_info', Arr::get($file, 'size_info'));
