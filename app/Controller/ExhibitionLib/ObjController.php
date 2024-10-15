@@ -28,7 +28,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/exhLib/obj'),Auth]
+#[Controller(prefix: 'api/v1/libManage/libExhibition'),Auth]
 class ObjController extends BaseController
 {
     #[Inject]
@@ -38,7 +38,7 @@ class ObjController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('index'), Permission('exhLib:obj, exhLib:obj:index')]
+    #[GetMapping('index'), Permission('libManage:libExhibition, libManage:libExhibition:index')]
     public function index(): ResponseInterface
     {
         return $this->response->success($this->service->index($this->request->all()));
@@ -54,7 +54,7 @@ class ObjController extends BaseController
         return $this->response->success($this->service->getPublicIndex($this->request->all()));
     }
 
-    #[GetMapping('info/{id:\d+}'), Permission('exhLib:obj, exhLib:obj:info')]
+    #[GetMapping('info/{id:\d+}'), Permission('libManage:libExhibition, libManage:libExhibition:info')]
     public function info(int $id): ResponseInterface
     {
         return $this->response->success($this->service->info($id));
@@ -65,7 +65,7 @@ class ObjController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('recycle'), Permission('exhLib:obj:recycle')]
+    #[GetMapping('recycle'), Permission('libManage:libExhibition:recycle')]
     public function recycle(): ResponseInterface
     {
         return $this->response->success($this->service->getListByRecycle($this->request->all()));
@@ -76,7 +76,7 @@ class ObjController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PostMapping('save'), Permission('exhLib:obj:save'), OperationLog]
+    #[PostMapping('save'), Permission('libManage:libExhibition:save'), OperationLog]
     public function save(ExhLibObjRequest $request): ResponseInterface
     {
         return $this->response->success(['id' => $this->service->save($request->all())]);
@@ -87,7 +87,7 @@ class ObjController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('update/{id:\d+}'), Permission('exhLib:obj:update'), OperationLog]
+    #[PutMapping('update/{id:\d+}'), Permission('libManage:libExhibition:update'), OperationLog]
     public function update(int $id, ExhLibObjRequest $request): ResponseInterface
     {
         return $this->service->update($id, $request->all()) ? $this->response->success() : $this->response->fail();
@@ -98,7 +98,7 @@ class ObjController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('delete'), Permission('exhLib:obj:delete')]
+    #[DeleteMapping('delete'), Permission('libManage:libExhibition:delete')]
     public function delete(ExhLibObjRequest $request): ResponseInterface
     {
         return $this->service->delete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -109,7 +109,7 @@ class ObjController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('realDelete'), Permission('exhLib:obj:realDelete'), OperationLog]
+    #[DeleteMapping('realDelete'), Permission('libManage:libExhibition:realDelete'), OperationLog]
     public function realDelete(ExhLibObjRequest $request): ResponseInterface
     {
         $result = $this->service->realDelete((array) $request->input('ids', []));
@@ -123,7 +123,7 @@ class ObjController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('recovery'), Permission('exhLib:obj:recovery')]
+    #[PutMapping('recovery'), Permission('libManage:libExhibition:recovery')]
     public function recovery(ExhLibObjRequest $request): ResponseInterface
     {
         return $this->service->recovery((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -134,7 +134,7 @@ class ObjController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('changeStatus'), Permission('exhLib:obj:changeStatus'), OperationLog]
+    #[PutMapping('changeStatus'), Permission('libManage:libExhibition:changeStatus'), OperationLog]
     public function changeStatus(ExhLibObjRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
@@ -146,7 +146,7 @@ class ObjController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('numberOperation'), Permission('exhLib:obj:update'), OperationLog]
+    #[PutMapping('numberOperation'), Permission('libManage:libExhibition:update'), OperationLog]
     public function numberOperation(): ResponseInterface
     {
         return $this->service->numberOperation(

@@ -28,7 +28,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/exhLib/area'),Auth]
+#[Controller(prefix: 'api/v1/libManage/precinct'),Auth]
 class AreaController extends BaseController
 {
     #[Inject]
@@ -38,7 +38,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('index'), Permission('exhLib:area, exhLib:area:index')]
+    #[GetMapping('index'), Permission('libManage:precinct, libManage:precinct:index')]
     public function index(): ResponseInterface
     {
         return $this->response->success($this->service->getList($this->request->all()));
@@ -50,7 +50,7 @@ class AreaController extends BaseController
         return $this->response->success($this->service->getList($this->request->all()));
     }
 
-    #[GetMapping('info/{id:\d+}'), Permission('exhLib:area, exhLib:area:info')]
+    #[GetMapping('info/{id:\d+}'), Permission('libManage:precinct, libManage:precinct:info')]
     public function info(int $id): ResponseInterface
     {
         return $this->response->success($this->service->info($id));
@@ -61,7 +61,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('recycle'), Permission('exhLib:area:recycle')]
+    #[GetMapping('recycle'), Permission('libManage:precinct:recycle')]
     public function recycle(): ResponseInterface
     {
         return $this->response->success($this->service->getListByRecycle($this->request->all()));
@@ -72,7 +72,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PostMapping('save'), Permission('exhLib:area:save'),OperationLog]
+    #[PostMapping('save'), Permission('libManage:precinct:save'),OperationLog]
     public function save(ExhLibAreaRequest $request): ResponseInterface
     {
         return $this->response->success(['id' => $this->service->save($request->all())]);
@@ -83,7 +83,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('update/{id:\d+}'), Permission('exhLib:area:update'), OperationLog]
+    #[PutMapping('update/{id:\d+}'), Permission('libManage:precinct:update'), OperationLog]
     public function update(int $id, ExhLibAreaRequest $request): ResponseInterface
     {
         return $this->service->update($id, $request->all()) ? $this->response->success() : $this->response->fail();
@@ -94,7 +94,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('delete'), Permission('exhLib:area:delete')]
+    #[DeleteMapping('delete'), Permission('libManage:precinct:delete')]
     public function delete(ExhLibAreaRequest $request): ResponseInterface
     {
         return $this->service->delete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -105,7 +105,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('realDelete'), Permission('exhLib:area:realDelete'), OperationLog]
+    #[DeleteMapping('realDelete'), Permission('libManage:precinct:realDelete'), OperationLog]
     public function realDelete(ExhLibAreaRequest $request): ResponseInterface
     {
         $result = $this->service->realDelete((array) $request->input('ids', []));
@@ -119,7 +119,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('recovery'), Permission('exhLib:area:recovery')]
+    #[PutMapping('recovery'), Permission('libManage:precinct:recovery')]
     public function recovery(ExhLibAreaRequest $request): ResponseInterface
     {
         return $this->service->recovery((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -130,7 +130,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('changeStatus'), Permission('exhLib:area:changeStatus'), OperationLog]
+    #[PutMapping('changeStatus'), Permission('libManage:precinct:changeStatus'), OperationLog]
     public function changeStatus(ExhLibAreaRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
@@ -142,7 +142,7 @@ class AreaController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('numberOperation'), Permission('exhLib:area:update'), OperationLog]
+    #[PutMapping('numberOperation'), Permission('libManage:precinct:update'), OperationLog]
     public function numberOperation(): ResponseInterface
     {
         return $this->service->numberOperation(
