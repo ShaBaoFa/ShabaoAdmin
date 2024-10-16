@@ -33,7 +33,16 @@ class RegionRequest extends BaseFormRequest
         return [
             'keywords' => ['nullable', 'string', 'max:20'],
             'level' => ['nullable', 'int'],
-            'parent_id' => ['nullable', 'int'],
+            'parent_id' => ['required_without_all:keywords,level', 'int'],
+        ];
+    }
+
+    public function attributes(): array
+    {
+        return [
+            'keywords' => '关键字',
+            'level' => '层级',
+            'parent_id' => '父级ID',
         ];
     }
 }
