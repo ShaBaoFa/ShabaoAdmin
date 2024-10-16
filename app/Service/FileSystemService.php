@@ -158,6 +158,20 @@ class FileSystemService extends BaseService
 
     public function getDownloaderStsToken(array|string $hashes): array
     {
+        if (is_string($hashes) && $hashes == '*') {
+            try {
+                $sts = make(Sts::class);
+                $token = $sts->getToken($sts->storagePolicy(OSSEffect::ALLOW->value, [OSSAction::ALL_GET->value], ['*']));
+                return Arr::merge(['objects' => ['*']], ['credentials' => [
+                    'access_key_id' => $token->getAccessKeyId(),
+                    'access_key_secret' => $token->getAccessKeySecret(),
+                    'security_token' => $token->getSessionToken(),
+                    'expiration' => $token->getExpireTime()->getTimestamp(),
+                ]]);
+            } catch (Exception $e) {
+                throw new BusinessException(ErrorCode::GET_STS_TOKEN_FAIL);
+            }
+        }
         if (! Arr::accessible($hashes)) {
             $hashes = [$hashes];
         }

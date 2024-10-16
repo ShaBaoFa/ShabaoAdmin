@@ -93,7 +93,7 @@ class UploadRequest extends BaseFormRequest
     public function getDownLoaderStsTokenRules(): array
     {
         return [
-            'hash' => 'required|string|min:32|max:32|exists:upload_files,hash',
+            'hash' => 'required|string',
         ];
     }
 
