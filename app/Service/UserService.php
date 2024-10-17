@@ -42,6 +42,22 @@ class UserService extends BaseService
         $this->dao = $dao;
     }
 
+    public function myCollectObjs(array $params): array
+    {
+        $ids = $this->dao->getMyCollectObjsIds();
+        $eloS = di()->get(ExhLibObjService::class);
+        Arr::set($params, 'ids', $ids);
+        return $eloS->getPublicIndex($params);
+    }
+
+    public function myPickObjs(array $params): array
+    {
+        $ids = $this->dao->getMyPickObjsIds();
+        $eloS = di()->get(ExhLibObjService::class);
+        Arr::set($params, 'ids', $ids);
+        return $eloS->getPublicIndex($params);
+    }
+
     /**
      * 新增用户.
      */

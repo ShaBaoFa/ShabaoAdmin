@@ -99,6 +99,6 @@ class ExhLibObj extends BaseModel
 
     public function collectUsers(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_favorite_obj', 'obj_id', 'user_id');
+        return $this->belongsToMany(User::class, 'user_collect_obj', 'obj_id', 'user_id');
     }
 }

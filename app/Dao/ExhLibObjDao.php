@@ -70,6 +70,11 @@ class ExhLibObjDao extends BaseDao
     public function handleSearch(Builder $query, array $params): Builder
     {
         $query->when(
+            Arr::get($params, 'ids'),
+            fn (Builder $query, $ids) => $query->whereIn('id', $ids)
+        );
+
+        $query->when(
             Arr::get($params, 'type'),
             fn (Builder $query, $type) => $query->where('type', $type)
         );

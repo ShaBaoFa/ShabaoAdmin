@@ -47,6 +47,7 @@ class UserController extends BaseController
         return $this->response->success($this->service->getPageList($this->request->all(), false));
     }
 
+
     /**
      * 回收站列表.
      * @throws ContainerExceptionInterface
@@ -176,5 +177,17 @@ class UserController extends BaseController
     public function modifyPassword(UserRequest $request): ResponseInterface
     {
         return $this->service->modifyPassword($request->validated()) ? $this->response->success() : $this->response->fail();
+    }
+
+    #[GetMapping('self/collections'),Auth]
+    public function myCollectObjs(UserRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->myCollectObjs($request->all()));
+    }
+
+    #[GetMapping('self/myPick'),Auth]
+    public function myPickObjs(UserRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->myPickObjs($request->all()));
     }
 }

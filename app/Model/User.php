@@ -117,4 +117,28 @@ class User extends BaseModel
             'share_id'
         );
     }
+
+    /**
+     * 我的展项收藏
+     * @return BelongsToMany
+     */
+    public function collectObjs(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ExhLibObj::class,
+            'user_collect_obj',
+            'user_id',
+            'obj_id'
+        );
+    }
+
+    public function pickObjs(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ExhLibObj::class,
+            'user_pick_obj',
+            'user_id',
+            'obj_id'
+        );
+    }
 }

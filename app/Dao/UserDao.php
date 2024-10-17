@@ -166,6 +166,16 @@ class UserDao extends BaseDao
         return $this->model::query()->whereIn('id', $ids)->select($select)->get()->toArray();
     }
 
+    public function getMyCollectObjsIds(): array
+    {
+        return $this->model::find(user()->getId())->collectObjs()->get()->pluck('id')->toArray();
+    }
+
+    public function getMyPickObjsIds(): array
+    {
+        return $this->model::find(user()->getId())->pickObjs()->get()->pluck('id')->toArray();
+    }
+
     /**
      * 搜索处理器.
      */
