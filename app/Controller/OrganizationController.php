@@ -42,7 +42,7 @@ class OrganizationController extends BaseController
     #[GetMapping('index'), Permission('organizations, organizations:index')]
     public function index(): ResponseInterface
     {
-        return $this->response->success($this->service->getList($this->request->all()));
+        return $this->response->success($this->service->getPageList($this->request->all()));
     }
 
     #[GetMapping('info/{id:\d+}'), Permission('organizations, organizations:info')]

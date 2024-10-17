@@ -44,6 +44,12 @@ class OrganizationService extends BaseService
         return parent::getTreeList($params, $isScope);
     }
 
+    public function getPageList(?array $params = null, bool $isScope = true): array
+    {
+        Arr::set($params, '_with', ['parent']);
+        return parent::getPageList($params);
+    }
+
     public function getTreeListByRecycle(?array $params = null, bool $isScope = true): array
     {
         $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc'], $params);

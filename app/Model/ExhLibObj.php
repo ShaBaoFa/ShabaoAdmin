@@ -17,6 +17,8 @@ use Carbon\Carbon;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
 
+use function App\Helper\user;
+
 /**
  * @property int $id
  * @property string $title 标题
@@ -38,10 +40,15 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * @property int $star_count 点赞次数
+ * @property int $collect_count 收藏次数
  * @property null|Collection|ExhLibTag[] $tags
  * @property null|Collection|UploadFile[] $covers
  * @property null|Collection|UploadFile[] $files
  * @property null|Collection|Region[] $share_regions
+ * @property null|Collection|User[] $starUsers
+ * @property null|Collection|User[] $pickUsers
+ * @property null|Collection|User[] $favoriteUsers
  */
 class ExhLibObj extends BaseModel
 {
@@ -53,12 +60,12 @@ class ExhLibObj extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'title', 'author', 'phone', 'email', 'profile', 'save_dir_id', 'redirect_url', 'type', 'lib_type', 'lib_area_type', 'status', 'audit_status', 'sort', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'title', 'author', 'phone', 'email', 'profile', 'save_dir_id', 'redirect_url', 'type', 'lib_type', 'lib_area_type', 'status', 'audit_status', 'sort', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'star_count', 'collect_count'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'int', 'type' => 'integer', 'lib_type' => 'integer', 'lib_area_type' => 'integer', 'status' => 'integer', 'sort' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'audit_status' => 'integer', 'save_dir_id' => 'integer'];
+    protected array $casts = ['id' => 'int', 'type' => 'integer', 'lib_type' => 'integer', 'lib_area_type' => 'integer', 'status' => 'integer', 'sort' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'audit_status' => 'integer', 'save_dir_id' => 'integer', 'star_count' => 'integer', 'collect_count' => 'integer'];
 
     public function tags(): BelongsToMany
     {
@@ -78,5 +85,20 @@ class ExhLibObj extends BaseModel
     public function share_regions(): BelongsToMany
     {
         return $this->belongsToMany(Region::class, 'exh_lib_obj_share_region', 'exh_lib_obj_id', 'share_region_id');
+    }
+
+    public function starUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_star_obj', 'obj_id', 'user_id');
+    }
+
+    public function pickUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_pick_obj', 'obj_id', 'user_id');
+    }
+
+    public function collectUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'user_favorite_obj', 'obj_id', 'user_id');
     }
 }

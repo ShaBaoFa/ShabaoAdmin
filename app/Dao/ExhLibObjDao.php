@@ -18,6 +18,8 @@ use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
 use Hyperf\DbConnection\Annotation\Transactional;
 
+use function App\Helper\user;
+
 class ExhLibObjDao extends BaseDao
 {
     /**
@@ -39,10 +41,10 @@ class ExhLibObjDao extends BaseDao
         $share_regions = Arr::has($data, 'share_regions') ? Arr::get($data, 'share_regions') : [];
         $this->filterExecuteAttributes($data, true);
         $obj = $this->model::create($data);
-        $obj->tags()->sync($tags);
-        $obj->files()->sync($files);
-        $obj->covers()->sync($covers);
-        $obj->share_regions()->sync($share_regions);
+        ! empty($tags) ?? $obj->tags()->sync($tags);
+        ! empty($files) ?? $obj->files()->sync($files);
+        ! empty($covers) ?? $obj->covers()->sync($covers);
+        ! empty($share_regions) ?? $obj->share_regions()->sync($share_regions);
         return $obj->{$obj->getKeyName()};
     }
 
@@ -55,10 +57,10 @@ class ExhLibObjDao extends BaseDao
         $share_regions = Arr::has($data, 'share_regions') ? Arr::get($data, 'share_regions') : [];
         $this->filterExecuteAttributes($data, true);
         $model = $this->model::find($id);
-        $model->tags()->sync($tags);
-        $model->files()->sync($files);
-        $model->covers()->sync($covers);
-        $model->share_regions()->sync($share_regions);
+        ! empty($tags) ?? $model->tags()->sync($tags);
+        ! empty($files) ?? $model->files()->sync($files);
+        ! empty($covers) ?? $model->covers()->sync($covers);
+        ! empty($share_regions) ?? $model->share_regions()->sync($share_regions);
         return parent::update($id, $data);
     }
 
@@ -110,5 +112,93 @@ class ExhLibObjDao extends BaseDao
         );
 
         return $query;
+    }
+
+    public function addStar(int $id): bool
+    {
+        $model = $this->find($id);
+        $model->increment('star_count');
+        /**
+         * @var ExhLibObj $model
+         */
+        $result = $model->starUsers()->syncWithoutDetaching([user()->getId()]);
+        return count($result['attached']) > 0;
+    }
+
+    public function cancelStar(int $id): bool
+    {
+        $model = $this->find($id);
+        $model->decrement('star_count');
+        /**
+         * @var ExhLibObj $model
+         */
+        return $model->starUsers()->detach([user()->getId()], false) > 0;
+    }
+
+    public function addCollection(int $id): bool
+    {
+        $model = $this->find($id);
+        $model->increment('collect_count');
+        /**
+         * @var ExhLibObj $model
+         */
+        $result = $model->collectUsers()->syncWithoutDetaching([user()->getId()]);
+        return count($result['attached']) > 0;
+    }
+
+    public function cancelCollection(int $id): bool
+    {
+        $model = $this->find($id);
+        $model->decrement('collect_count');
+        /**
+         * @var ExhLibObj $model
+         */
+        return $model->collectUsers()->detach([user()->getId()], false) > 0;
+    }
+
+    public function addPick(int $id): bool
+    {
+        $model = $this->find($id);
+        /**
+         * @var ExhLibObj $model
+         */
+        $result = $model->pickUsers()->syncWithoutDetaching([user()->getId()]);
+        return count($result['attached']) > 0;
+    }
+
+    public function cancelPick(int $id): bool
+    {
+        $model = $this->find($id);
+        /**
+         * @var ExhLibObj $model
+         */
+        return $model->pickUsers()->detach([user()->getId()], false) > 0;
+    }
+
+    public function hasStarred(int $id, int $userId): bool
+    {
+        $model = $this->model::find($id);
+        /**
+         * @var ExhLibObj $model
+         */
+        return $model->starUsers()->where('user_id', $userId)->exists();
+    }
+
+    public function hasPicked(int $id, int $userId): bool
+    {
+        $model = $this->model::find($id);
+        /**
+         * @var ExhLibObj $model
+         */
+        return $model->pickUsers()->where('user_id', $userId)->exists();
+    }
+
+    public function hasCollected(int $id, int $userId): bool
+    {
+        $model = $this->model::find($id);
+        /**
+         * @var ExhLibObj $model
+         */
+        return $model->collectUsers()->where('user_id', $userId)->exists();
     }
 }

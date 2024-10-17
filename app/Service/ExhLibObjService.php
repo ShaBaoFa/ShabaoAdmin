@@ -46,7 +46,7 @@ class ExhLibObjService extends BaseService
 
     public function getPublicIndex(array $params): array
     {
-        Arr::set($params, 'select', 'id,title,author');
+        Arr::set($params, 'select', 'id,title,author,star_count,collect_count');
         Arr::set($params, 'audit_status', AuditCode::PASS->value);
         Arr::set($params, 'status', BaseCode::BASE_NORMAL->value);
         Arr::set($params, '_with', ['covers']);
@@ -55,9 +55,16 @@ class ExhLibObjService extends BaseService
 
     public function index(array $params): array
     {
-        Arr::set($params, 'select', 'id,title,author,audit_status');
+        Arr::set($params, 'select', 'id,title,author,audit_status,star_count,collect_count');
         Arr::set($params, '_with', ['covers']);
         return parent::getPageList($params);
+    }
+
+    public function recycle(array $params): array
+    {
+        Arr::set($params, 'select', 'id,title,author,audit_status');
+        Arr::set($params, '_with', ['covers']);
+        return parent::getPageListByRecycle($params);
     }
 
     public function info($id): array
@@ -65,7 +72,11 @@ class ExhLibObjService extends BaseService
         if (! $this->checkExists(['id' => $id], false)) {
             throw new BusinessException(ErrorCode::NOT_FOUND);
         }
-        return $this->getCacheData($id);
+        $modelArray = $this->getCacheData($id);
+        Arr::set($modelArray, 'hasStarred', $this->dao->hasStarred($id, user()->getId()));
+        Arr::set($modelArray, 'hasCollected', $this->dao->hasCollected($id, user()->getId()));
+        Arr::set($modelArray, 'hasPicked', $this->dao->hasPicked($id, user()->getId()));
+        return $modelArray;
     }
 
     #[CacheEvict(prefix: 'ExhLibObj', value: 'ExhLibObjId_#{id}')]
@@ -160,6 +171,42 @@ class ExhLibObjService extends BaseService
         // 设置 封面 ID数组
         Arr::set($data, 'covers', $coverIds);
         return $this->dao->save($data);
+    }
+
+    public function addStar(int $id): bool
+    {
+        ! $this->dao->addStar($id) && throw new BusinessException(ErrorCode::REPEAT_OPERATION);
+        return true;
+    }
+
+    public function cancelStar(int $id): bool
+    {
+        ! $this->dao->cancelStar($id) && throw new BusinessException(ErrorCode::REPEAT_OPERATION);
+        return true;
+    }
+
+    public function addCollection(int $id): bool
+    {
+        ! $this->dao->addCollection($id) && throw new BusinessException(ErrorCode::REPEAT_OPERATION);
+        return true;
+    }
+
+    public function cancelCollection(int $id): bool
+    {
+        ! $this->dao->cancelCollection($id) && throw new BusinessException(ErrorCode::REPEAT_OPERATION);
+        return true;
+    }
+
+    public function addPick(int $id): bool
+    {
+        ! $this->dao->addPick($id) && throw new BusinessException(ErrorCode::REPEAT_OPERATION);
+        return true;
+    }
+
+    public function cancelPick(int $id): bool
+    {
+        ! $this->dao->cancelPick($id) && throw new BusinessException(ErrorCode::REPEAT_OPERATION);
+        return true;
     }
 
     #[Cacheable(prefix: 'ExhLibOrg', value: 'ExhLibOrgId_#{id}', ttl: 0)]

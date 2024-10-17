@@ -41,7 +41,7 @@ class AreaController extends BaseController
     #[GetMapping('index'), Permission('libManage:precinct, libManage:precinct:index')]
     public function index(): ResponseInterface
     {
-        return $this->response->success($this->service->getList($this->request->all()));
+        return $this->response->success($this->service->getPageList($this->request->all()));
     }
 
     #[GetMapping('select')]

@@ -25,9 +25,9 @@ use Hyperf\Database\Model\Relations\HasOne;
  * @property int $super_admin_id 企业超管ID
  * @property int $parent_id 父ID
  * @property int $province_region_id 省级ID
- * @property int $province_region_name 省级地区名称
+ * @property string $province_region_name 省级地区名称
  * @property int $city_region_id 市级ID
- * @property int $city_region_name 市级地区名称
+ * @property string $city_region_name 市级地区名称
  * @property string $level 组级集合
  * @property string $name 组织名称
  * @property string $address 组织地址
@@ -68,7 +68,7 @@ class Organization extends BaseModel
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'int', 'status' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'parent_id' => 'integer', 'super_admin_id' => 'integer', 'sort' => 'integer', 'province_region_id' => 'integer', 'city_region_id' => 'integer', 'province_region_name' => 'integer', 'city_region_name' => 'integer'];
+    protected array $casts = ['id' => 'int', 'status' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'parent_id' => 'integer', 'super_admin_id' => 'integer', 'sort' => 'integer', 'province_region_id' => 'integer', 'city_region_id' => 'integer', 'province_region_name' => 'string', 'city_region_name' => 'string'];
 
     /**
      * 通过中间表关联用户.

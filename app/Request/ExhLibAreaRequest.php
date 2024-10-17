@@ -48,7 +48,7 @@ class ExhLibAreaRequest extends BaseFormRequest
     {
         return [
             'name' => ['required', 'string', 'max:20'],
-            'icon' => ['required', 'string', 'max:20'],
+            'icon' => ['required_unless:lib_type:' . ExhibitionLibraryCode::SPECIAL->value, 'string', 'max:20'],
             'profile' => ['string'],
             'lib_type' => ['required', 'integer', Rule::in([ExhibitionLibraryCode::STRATEGIC_EMERGING_INDUSTRIES->value, ExhibitionLibraryCode::INDUSTRY->value, ExhibitionLibraryCode::THEME->value, ExhibitionLibraryCode::SPECIAL->value])],
         ];

@@ -36,6 +36,10 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.server_error')]
     case SERVER_ERROR = 500;
 
+    // 请勿重复操作
+    #[Message('common.repeat_operation')]
+    case REPEAT_OPERATION = 10000;
+
     #[Message('common.user_not_found')]
     case USER_NOT_EXIST = 10001;
 

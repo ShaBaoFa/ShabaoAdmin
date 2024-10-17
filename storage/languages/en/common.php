@@ -26,6 +26,7 @@ return [
     'user_login_failed' => 'user_login_failed',
     'user_ban' => 'user_ban',
     'user_login_type_error' => 'user_login_type_error',
+    'repeat_operation' => 'repeat_operation',
 
     // excel
     'export_data_failed' => 'export_data_failed',
