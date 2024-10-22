@@ -18,6 +18,7 @@ use App\Constants\BaseCode;
 use App\Constants\ErrorCode;
 use App\Dao\ExhLibObjDao;
 use App\Dao\UploadFileDao;
+use App\Dao\UserDao;
 use App\Exception\BusinessException;
 use App\Model\ExhLibObj;
 use Hyperf\Cache\Annotation\Cacheable;
@@ -105,7 +106,13 @@ class ExhLibObjService extends BaseService
         Arr::set($data, 'status', BaseCode::BASE_ABNORMAL->value);
         // 1 等待审核
         Arr::set($data, 'audit_status', AuditCode::IN_AUDIT->value);
-
+        // 获取 审批组织
+        $userDao = di()->get(UserDao::class);
+        $orgId = $userDao->getParentOrganization();
+        Arr::set($data, 'audit_organization_id', $orgId);
+        if ($orgId == 0) {
+            Arr::set($data, 'audit_status', AuditCode::PASS->value);
+        }
         // 获取 hash 数组 对应的 id 数组
         $hashes = Arr::get($data, 'files');
         $newIds = $this->uploadFileDao->getIdsByHashes($hashes);
@@ -133,6 +140,13 @@ class ExhLibObjService extends BaseService
 
     public function save(array $data): mixed
     {
+        // 获取 审批组织
+        $userDao = di()->get(UserDao::class);
+        $orgId = $userDao->getParentOrganization();
+        Arr::set($data, 'audit_organization_id', $orgId);
+        if ($orgId == 0) {
+            Arr::set($data, 'audit_status', AuditCode::PASS->value);
+        }
         // 判断子分区的 lib_area_type
         if (Arr::get($data, 'lib_type') != di()->get(ExhLibAreaService::class)->value(['id' => Arr::get($data, 'lib_area_type')], 'lib_type')) {
             throw new BusinessException(ErrorCode::INVALID_PARAMS);
@@ -206,6 +220,34 @@ class ExhLibObjService extends BaseService
     public function cancelPick(int $id): bool
     {
         ! $this->dao->cancelPick($id) && throw new BusinessException(ErrorCode::REPEAT_OPERATION);
+        return true;
+    }
+
+    public function auditIndex(array $params)
+    {
+        /**
+         * 暂时不进行数据范围控制.(todo::使用数据范围控制).
+         */
+        //        $ids = $this->dao->getUpAuditObjIds();
+        //        Arr::set($params, 'ids', $ids);
+        $userDao = di()->get(UserDao::class);
+        $orgIds = $userDao->getOrganizations();
+        if (! empty($orgIds)) {
+            Arr::set($params, 'audit_organization_id', $orgIds[0]);
+        }
+        Arr::set($params, 'status', BaseCode::BASE_NORMAL->value);
+        Arr::set($params, '_with', ['covers']);
+        return $this->getPageList($params, false);
+    }
+
+    public function changeAuditStatus(int $id, int $auditStatus, string $refuse_reason = ''): bool
+    {
+        if (! $this->find($id)) {
+            throw new BusinessException(ErrorCode::NOT_FOUND);
+        }
+        if (! $this->dao->changeAuditStatus($id, $auditStatus, $refuse_reason)) {
+            throw new BusinessException(ErrorCode::NOT_SUPPORT);
+        }
         return true;
     }
 

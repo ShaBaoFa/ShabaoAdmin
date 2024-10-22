@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Dao;
 
 use App\Base\BaseDao;
+use App\Constants\AuditCode;
 use App\Model\ExhLibObj;
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
@@ -72,6 +73,10 @@ class ExhLibObjDao extends BaseDao
         $query->when(
             Arr::get($params, 'ids'),
             fn (Builder $query, $ids) => $query->whereIn('id', $ids)
+        );
+        $query->when(
+            Arr::get($params, 'audit_organization_id'),
+            fn (Builder $query, $audit_organization_id) => $query->where('audit_organization_id', $audit_organization_id)
         );
 
         $query->when(
@@ -205,5 +210,36 @@ class ExhLibObjDao extends BaseDao
          * @var ExhLibObj $model
          */
         return $model->collectUsers()->where('user_id', $userId)->exists();
+    }
+
+    public function changeAuditStatus(int $id, int $auditStatus, $refuse_reason): bool
+    {
+        /**
+         * @var ExhLibObj $model
+         */
+        $model = $this->model::find($id);
+        if (! in_array($auditStatus, $this->auditMap($model->audit_status))) {
+            return false;
+        }
+        $model->audit_status = $auditStatus;
+        $model->remark = $refuse_reason;
+        $model->save();
+        return true;
+    }
+
+    /**
+     * 流程支持的操作.
+     * @param mixed $modelAuditStatus
+     */
+    private function auditMap($modelAuditStatus): array
+    {
+        // 比如 审查中的状态只能被同意或者拒绝
+        // 同意和已拒绝的则不可被修改
+        return match ($modelAuditStatus) {
+            AuditCode::IN_AUDIT->value => [
+                AuditCode::PASS->value, AuditCode::NOT_PASS->value,
+            ],
+            default => [],
+        };
     }
 }

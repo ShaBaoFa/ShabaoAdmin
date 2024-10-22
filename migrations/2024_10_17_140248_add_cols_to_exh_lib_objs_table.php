@@ -24,6 +24,8 @@ return new class extends Migration {
             $table->unsignedInteger('star_count')->default(0)->comment('点赞次数');
             // 收藏次数
             $table->unsignedInteger('collect_count')->default(0)->comment('收藏次数');
+            // 审批单位(创建的上头单位)
+            $table->unsignedInteger('audit_organization_id')->default(0)->comment('审批单位(创建的上头单位)');
         });
     }
 
@@ -35,6 +37,7 @@ return new class extends Migration {
         Schema::table('exh_lib_objs', function (Blueprint $table) {
             $table->dropColumn('star_count');
             $table->dropColumn('collect_count');
+            $table->dropColumn('audit_organization_id');
         });
     }
 };

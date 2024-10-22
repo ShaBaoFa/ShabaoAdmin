@@ -14,6 +14,8 @@ namespace App\Dao;
 
 use App\Base\BaseDao;
 use App\Model\ExhLibArea;
+use Hyperf\Collection\Arr;
+use Hyperf\Database\Model\Builder;
 
 class ExhLibAreaDao extends BaseDao
 {
@@ -25,5 +27,15 @@ class ExhLibAreaDao extends BaseDao
     public function assignModel(): void
     {
         $this->model = ExhLibArea::class;
+    }
+
+    public function handleSearch(Builder $query, array $params): Builder
+    {
+        $query->when(
+            Arr::get($params, 'lib_type'),
+            fn (Builder $query, $libType) => $query->where('lib_type', $libType)
+        );
+
+        return $query;
     }
 }

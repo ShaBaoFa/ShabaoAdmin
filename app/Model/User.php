@@ -37,10 +37,12 @@ use Hyperf\Database\Model\Relations\BelongsToMany;
  * @property string $user_type 用户类型：(100系统用户)
  * @property int $point 个人积分
  * @property null|Collection|DiskFileShare[] $sharedFiles
+ * @property null|Collection|ExhLibObj[] $pickObjs
  * @property null|Collection|Role[] $roles
  * @property null|Collection|Department[] $depts
  * @property null|Collection|Organization[] $organizations
  * @property mixed $password 密码
+ * @property null|Collection|ExhLibObj[] $collectObjs
  */
 class User extends BaseModel
 {
@@ -119,8 +121,7 @@ class User extends BaseModel
     }
 
     /**
-     * 我的展项收藏
-     * @return BelongsToMany
+     * 我的展项收藏.
      */
     public function collectObjs(): BelongsToMany
     {

@@ -42,13 +42,14 @@ use function App\Helper\user;
  * @property string $deleted_at
  * @property int $star_count 点赞次数
  * @property int $collect_count 收藏次数
+ * @property int $audit_organization_id 审批单位(创建的上头单位)
  * @property null|Collection|ExhLibTag[] $tags
  * @property null|Collection|UploadFile[] $covers
  * @property null|Collection|UploadFile[] $files
  * @property null|Collection|Region[] $share_regions
  * @property null|Collection|User[] $starUsers
  * @property null|Collection|User[] $pickUsers
- * @property null|Collection|User[] $favoriteUsers
+ * @property null|Collection|User[] $collectUsers
  */
 class ExhLibObj extends BaseModel
 {
@@ -60,12 +61,12 @@ class ExhLibObj extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'title', 'author', 'phone', 'email', 'profile', 'save_dir_id', 'redirect_url', 'type', 'lib_type', 'lib_area_type', 'status', 'audit_status', 'sort', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'star_count', 'collect_count'];
+    protected array $fillable = ['id', 'title', 'author', 'phone', 'email', 'profile', 'save_dir_id', 'redirect_url', 'type', 'lib_type', 'lib_area_type', 'status', 'audit_status', 'sort', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at', 'star_count', 'collect_count', 'audit_organization_id'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'int', 'type' => 'integer', 'lib_type' => 'integer', 'lib_area_type' => 'integer', 'status' => 'integer', 'sort' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'audit_status' => 'integer', 'save_dir_id' => 'integer', 'star_count' => 'integer', 'collect_count' => 'integer'];
+    protected array $casts = ['id' => 'int', 'type' => 'integer', 'lib_type' => 'integer', 'lib_area_type' => 'integer', 'status' => 'integer', 'sort' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'audit_status' => 'integer', 'save_dir_id' => 'integer', 'star_count' => 'integer', 'collect_count' => 'integer', 'audit_organization_id' => 'integer'];
 
     public function tags(): BelongsToMany
     {

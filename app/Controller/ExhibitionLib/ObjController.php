@@ -18,6 +18,7 @@ use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Request\ExhLibObjRequest;
 use App\Service\ExhLibObjService;
+use App\Service\ObjDlApprovalService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\DeleteMapping;
@@ -33,6 +34,9 @@ class ObjController extends BaseController
 {
     #[Inject]
     protected ExhLibObjService $service;
+
+    #[Inject]
+    protected ObjDlApprovalService $dlService;
 
     /**
      * @throws ContainerExceptionInterface
@@ -138,6 +142,18 @@ class ObjController extends BaseController
     public function changeStatus(ExhLibObjRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
+            ? $this->response->success() : $this->response->fail();
+    }
+
+    /**
+     * 更改展项状态
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[PutMapping('changeAuditStatus'), Permission('libExhibition:changeAuditStatus'), OperationLog]
+    public function changeAuditStatus(ExhLibObjRequest $request): ResponseInterface
+    {
+        return $this->service->changeAuditStatus((int) $request->input('id'), (int) $request->input('audit_status'))
             ? $this->response->success() : $this->response->fail();
     }
 

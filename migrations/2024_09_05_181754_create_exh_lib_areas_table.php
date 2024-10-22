@@ -22,7 +22,7 @@ return new class extends Migration {
         Schema::create('exh_lib_areas', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name', 10)->comment('专区名称');
-            $table->string('icon', 30)->comment('专区icon');
+            $table->string('icon', 30)->comment('专区icon')->nullable();
             $table->text('profile')->comment('专区简介')->nullable();
             $table->addColumn('smallInteger', 'lib_type', ['default' => 1, 'comment' => '大区类型 (1战新 2行业 3主题 4专场)'])->index()->nullable();
             $table->addColumn('smallInteger', 'status', ['default' => 1, 'comment' => '状态 (1正常 2停用)'])->index()->nullable();

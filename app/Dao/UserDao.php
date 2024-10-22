@@ -17,6 +17,7 @@ use App\Base\BaseModel;
 use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
 use App\Model\Department;
+use App\Model\Organization;
 use App\Model\User;
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
@@ -256,5 +257,34 @@ class UserDao extends BaseDao
         );
 
         return $query;
+    }
+
+    public function getOrganizations(int $id = 0): array
+    {
+        if (! $id) {
+            $id = user()->getId();
+        }
+        $orgIds = $this->model::find($id)->organizations()->get()->pluck('id')->toArray();
+        if ($orgIds[0]) {
+            return $orgIds;
+        }
+        return [];
+    }
+
+    public function getParentOrganization(): int
+    {
+        $orgIds = $this->getOrganizations();
+        if (empty($orgIds)) {
+            return 0;
+        }
+        $orgDao = di()->get(OrganizationDao::class);
+        $org = $orgDao->find($orgIds[0]);
+        /**
+         * @var Organization $org
+         */
+        if ($org->parent) {
+            return $org->parent->id;
+        }
+        return 0;
     }
 }

@@ -173,7 +173,7 @@ class RoleDao extends BaseDao
 
         $query->when(
             Arr::get($params, 'filterAdminRole'),
-            fn (Builder $query) => $query->whereNotIn('id', [env('ADMIN_ROLE')])
+            fn (Builder $query) => $query->whereNotIn('id', [env('ADMIN_ROLE'), env('ORG_SUPER_ROLE')])
         );
 
         $query->when(

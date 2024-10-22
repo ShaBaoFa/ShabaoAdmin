@@ -47,7 +47,6 @@ class UserController extends BaseController
         return $this->response->success($this->service->getPageList($this->request->all(), false));
     }
 
-
     /**
      * 回收站列表.
      * @throws ContainerExceptionInterface

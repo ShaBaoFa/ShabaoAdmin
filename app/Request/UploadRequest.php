@@ -64,13 +64,6 @@ class UploadRequest extends BaseFormRequest
         ];
     }
 
-    public function getUploaderStsTokenRules(): array
-    {
-        return [
-            'hash' => 'required|string|min:32|max:32|exists:upload_files,hash',
-        ];
-    }
-
     public function uploaderCallbackRules(): array
     {
         return [
@@ -93,7 +86,18 @@ class UploadRequest extends BaseFormRequest
     public function getDownLoaderStsTokenRules(): array
     {
         return [
-            'hash' => 'required|string',
+            'hash' => 'required_without:hashes|string',
+            'hashes' => 'required_without:hash|array',
+            'hashes.*' => 'string',
+        ];
+    }
+
+    public function getUploaderStsTokenRules(): array
+    {
+        return [
+            'hash' => 'required_without:hashes|string|min:32|max:32|exists:upload_files,hash',
+            'hashes' => 'required_without:hash|array',
+            'hashes.*' => 'required|string|min:32|max:32|exists:upload_files,hash',
         ];
     }
 

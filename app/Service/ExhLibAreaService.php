@@ -16,6 +16,7 @@ use App\Base\BaseService;
 use App\Constants\ErrorCode;
 use App\Dao\ExhLibAreaDao;
 use App\Exception\BusinessException;
+use Hyperf\Collection\Arr;
 
 class ExhLibAreaService extends BaseService
 {
@@ -36,6 +37,12 @@ class ExhLibAreaService extends BaseService
             throw new BusinessException(ErrorCode::NOT_FOUND);
         }
         return $info->toArray();
+    }
+
+    public function getPageList(?array $params = null, bool $isScope = true): array
+    {
+        Arr::set($params, '_with', ['createdBy' => ['fields' => ['id', 'nickname']]]);
+        return parent::getPageList($params, $isScope);
     }
 
     public function update($id, array $data): bool

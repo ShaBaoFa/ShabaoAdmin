@@ -31,4 +31,9 @@ enum AuditCode: int
      * 审核不通过.
      */
     case NOT_PASS = 3;
+
+    /**
+     * 取消审核.
+     */
+    case CANCEL = 4;
 }

@@ -45,7 +45,9 @@ class UserService extends BaseService
     public function myCollectObjs(array $params): array
     {
         $ids = $this->dao->getMyCollectObjsIds();
-        if(count($ids) == 0) return [];
+        if (count($ids) == 0) {
+            return [];
+        }
         $eloS = di()->get(ExhLibObjService::class);
         Arr::set($params, 'ids', $ids);
         return $eloS->getPublicIndex($params);
@@ -54,7 +56,9 @@ class UserService extends BaseService
     public function myPickObjs(array $params): array
     {
         $ids = $this->dao->getMyPickObjsIds();
-        if(count($ids) == 0) return [];
+        if (count($ids) == 0) {
+            return [];
+        }
         $eloS = di()->get(ExhLibObjService::class);
         Arr::set($params, 'ids', $ids);
         return $eloS->getPublicIndex($params);

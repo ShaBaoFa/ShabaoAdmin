@@ -275,11 +275,58 @@ trait DaoTrait
 
     /**
      * 懒加载处理器.
+     * $params['_with'] = [
+     * 'relation1' => [
+     * 'fields' => ['id', 'name'],
+     * 'conditions' => [
+     * ['status', '=', 'active'],              // 等于
+     * ['type', '!=', 'admin'],                // 不等于
+     * ['category', 'in', ['A', 'B', 'C']],    // whereIn
+     * ['level', 'not in', [1, 2]],            // whereNotIn
+     * ['name', 'like', '%john%']              // like 查询
+     * ]
+     * ],
+     * 'relation2' => [
+     * 'fields' => ['id', 'created_at'],
+     * 'conditions' => [
+     * ['created_at', '>=', '2023-01-01'],    // 时间范围
+     * ['is_published', '=', true]            // 布尔条件
+     * ]
+     * ]
+     * ];.
      */
     public function handleWith(Builder $query, ?array &$params = null): Builder
     {
         if (isset($params['_with'])) {
-            $query->with($params['_with']);
+            foreach ($params['_with'] as $relation => $relationParams) {
+                if (is_array($relationParams)) {
+                    $query->with([$relation => function ($q) use ($relationParams) {
+                        if (isset($relationParams['fields'])) {
+                            $q->select($relationParams['fields']);
+                        }
+                        if (isset($relationParams['conditions'])) {
+                            foreach ($relationParams['conditions'] as $condition) {
+                                // 根据操作符选择不同的查询方式
+                                switch ($condition[1]) {
+                                    case 'in':
+                                        $q->whereIn($condition[0], $condition[2]);
+                                        break;
+                                    case 'not in':
+                                        $q->whereNotIn($condition[0], $condition[2]);
+                                        break;
+                                    case 'like':
+                                        $q->where($condition[0], 'like', $condition[2]);
+                                        break;
+                                    default:
+                                        $q->where(...$condition); // 处理其他常规操作符，如 =, !=
+                                }
+                            }
+                        }
+                    }]);
+                } else {
+                    $query->with($relationParams);
+                }
+            }
             unset($params['_with']);
         }
         return $query;

@@ -14,6 +14,7 @@ namespace App\Controller;
 
 use App\Annotation\Auth;
 use App\Base\BaseController;
+use App\Constants\ErrorCode;
 use App\Request\UploadRequest;
 use App\Service\FileSystemService;
 use Hyperf\Di\Annotation\Inject;
@@ -98,7 +99,13 @@ class UploadController extends BaseController
     #[GetMapping('getDownloaderStsToken'),Auth]
     public function getDownloaderStsToken(UploadRequest $request): mixed
     {
-        return $this->response->success($this->service->getDownloaderStsToken($request->input('hash')));
+        if ($request->input('hash')) {
+            return $this->response->success($this->service->getDownloaderStsToken($request->input('hash')));
+        }
+        if ($request->input('hashes')) {
+            return $this->response->success($this->service->getDownloaderStsToken($request->input('hashes')));
+        }
+        return $this->response->fail(ErrorCode::NOT_FOUND);
     }
 
     /**
