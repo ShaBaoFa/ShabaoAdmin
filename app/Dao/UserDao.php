@@ -265,7 +265,7 @@ class UserDao extends BaseDao
             $id = user()->getId();
         }
         $orgIds = $this->model::find($id)->organizations()->get()->pluck('id')->toArray();
-        if ($orgIds[0]) {
+        if ($orgIds) {
             return $orgIds;
         }
         return [];

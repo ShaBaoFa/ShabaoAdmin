@@ -30,7 +30,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/approvalManage/LibExhibition/Rent'),Auth]
+#[Controller(prefix: 'api/v1/approvalManage/LibExhibition/rent'),Auth]
 class RentObjController extends BaseController
 {
     #[Inject]
