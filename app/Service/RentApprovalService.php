@@ -16,7 +16,6 @@ use App\Base\BaseService;
 use App\Constants\AuditCode;
 use App\Constants\ErrorCode;
 use App\Dao\ExhLibObjDao;
-use App\Dao\ObjDlApprovalDao;
 use App\Dao\RentApprovalDao;
 use App\Dao\UserDao;
 use App\Exception\BusinessException;
@@ -60,7 +59,9 @@ class RentApprovalService extends BaseService
          * 1虚拟展项素材 2实体展项素材 3平台展项素材.
          * @var ExhLibObj $obj
          */
-        if ($obj->type != 2) throw new BusinessException(ErrorCode::INVALID_PARAMS);
+        if ($obj->type != 2) {
+            throw new BusinessException(ErrorCode::INVALID_PARAMS);
+        }
         Arr::set($data, 'exh_lib_obj_name', $obj->title);
         $cover = $obj->covers()->first();
         /**

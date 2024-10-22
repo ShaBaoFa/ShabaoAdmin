@@ -32,7 +32,6 @@ class RentApprovalDao extends BaseDao
 
     public function handleSearch(Builder $query, array $params): Builder
     {
-
         $query->when(
             Arr::get($params, 'audit_status'),
             fn (Builder $query, $auditStatus) => $query->where('audit_status', $auditStatus)
