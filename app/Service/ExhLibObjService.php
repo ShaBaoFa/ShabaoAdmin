@@ -56,7 +56,7 @@ class ExhLibObjService extends BaseService
 
     public function index(array $params): array
     {
-        Arr::set($params, 'select', 'id,title,author,audit_status,star_count,collect_count');
+        Arr::set($params, 'select', 'id,title,author,status,audit_status,star_count,collect_count');
         Arr::set($params, '_with', ['covers']);
         return parent::getPageList($params);
     }
