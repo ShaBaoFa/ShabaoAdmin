@@ -51,6 +51,8 @@ class UserRequest extends BaseFormRequest
             'organization_id' => ['required', 'integer', 'exists:organizations,id'],
             'role_ids' => ['required'],
             'remark' => ['max:255'],
+            'dept' => ['required', 'string'],
+            'post' => ['required', 'string'],
         ];
     }
 

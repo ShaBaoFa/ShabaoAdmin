@@ -252,8 +252,13 @@ class UserDao extends BaseDao
         );
 
         $query->when(
-            Arr::get($params, 'org_id'),
-            fn (Builder $query, $orgId) => $query->whereHas('organizations', fn ($query) => $query->whereIn('organizations.id', $orgId))
+            Arr::get($params, 'organization_id'),
+            function (Builder $query, $organizationId) {
+                if (! is_array($organizationId)) {
+                    $organizationId = [$organizationId];
+                }
+                $query->whereHas('organizations', fn ($query) => $query->whereIn('organizations.id', $organizationId));
+            }
         );
 
         return $query;

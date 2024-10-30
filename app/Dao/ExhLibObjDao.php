@@ -42,10 +42,10 @@ class ExhLibObjDao extends BaseDao
         $share_regions = Arr::has($data, 'share_regions') ? Arr::get($data, 'share_regions') : [];
         $this->filterExecuteAttributes($data, true);
         $obj = $this->model::create($data);
-        ! empty($tags) ?? $obj->tags()->sync($tags);
-        ! empty($files) ?? $obj->files()->sync($files);
-        ! empty($covers) ?? $obj->covers()->sync($covers);
-        ! empty($share_regions) ?? $obj->share_regions()->sync($share_regions);
+        ! empty($tags) && $obj->tags()->sync($tags);
+        ! empty($files) && $obj->files()->sync($files);
+        ! empty($covers) && $obj->covers()->sync($covers);
+        ! empty($share_regions) && $obj->share_regions()->sync($share_regions);
         return $obj->{$obj->getKeyName()};
     }
 
@@ -58,10 +58,10 @@ class ExhLibObjDao extends BaseDao
         $share_regions = Arr::has($data, 'share_regions') ? Arr::get($data, 'share_regions') : [];
         $this->filterExecuteAttributes($data, true);
         $model = $this->model::find($id);
-        ! empty($tags) ?? $model->tags()->sync($tags);
-        ! empty($files) ?? $model->files()->sync($files);
-        ! empty($covers) ?? $model->covers()->sync($covers);
-        ! empty($share_regions) ?? $model->share_regions()->sync($share_regions);
+        ! empty($tags) && $model->tags()->sync($tags);
+        ! empty($files) && $model->files()->sync($files);
+        ! empty($covers) && $model->covers()->sync($covers);
+        ! empty($share_regions) && $model->share_regions()->sync($share_regions);
         return parent::update($id, $data);
     }
 

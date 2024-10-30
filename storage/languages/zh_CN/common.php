@@ -99,6 +99,7 @@ return [
     'ev_new_message' => '您有新的消息',
     'ev_new_private_message' => '您有新的私信',
     'ev_user_kick_out' => '用户被踢出',
+    'ev_new_audit_message' => '您有新的审核',
 
     // disk
     'disk_file_not_exist' => '文件不存在',

@@ -23,7 +23,6 @@ use App\Model\User;
 use Hyperf\Cache\Annotation\Cacheable;
 use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Collection\Arr;
-use Hyperf\Event\EventDispatcher;
 use Hyperf\Redis\Redis;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -31,6 +30,7 @@ use Psr\SimpleCache\InvalidArgumentException;
 use RedisException;
 use Xmo\JWTAuth\JWT;
 
+use function App\Helper\ev_dispatch;
 use function App\Helper\user;
 use function Hyperf\Config\config;
 use function Hyperf\Support\env;
@@ -40,6 +40,19 @@ class UserService extends BaseService
     public function __construct(UserDao $dao)
     {
         $this->dao = $dao;
+    }
+
+    public function getPageList(?array $params = null, bool $isScope = true): array
+    {
+        Arr::set($params, '_with', [
+            'roles' => [
+                'fields' => ['id', 'name'],
+            ],
+            'organizations' => [
+                'fields' => ['id', 'name'],
+            ],
+        ]);
+        return parent::getPageList($params, $isScope);
     }
 
     public function myCollectObjs(array $params): array
@@ -157,8 +170,7 @@ class UserService extends BaseService
             }
             unset($users);
         }
-        $evDispatcher = di()->get(EventDispatcher::class);
-        $evDispatcher->dispatch(new AfterKickUser(['uid' => $id]));
+        ev_dispatch()->dispatch(new AfterKickUser(['uid' => $id]));
         return true;
     }
 
@@ -254,7 +266,7 @@ class UserService extends BaseService
             $roleDao = di()->get(RoleDao::class);
             $roles = $roleDao->getMenuIdsByRoleIds($user->roles()->pluck('id')->toArray());
             $ids = $this->filterMenuIds($roles);
-            $data['organization'] = $user->organizations()->first(['id', 'name']);
+            $data['organization'] = $user->organizations()->first(['id', 'name'])->toArray();
             $data['roles'] = $user->roles()->get(['name', 'code'])->toArray();
             $data['routers'] = $menuDao->getRoutersByIds($ids);
             $data['codes'] = $menuDao->getMenuCode($ids);

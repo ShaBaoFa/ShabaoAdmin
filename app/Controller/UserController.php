@@ -30,7 +30,7 @@ use Psr\Http\Message\ResponseInterface;
 
 use function App\Helper\user;
 
-#[Controller(prefix: 'api/v1/users')]
+#[Controller(prefix: 'api/v1/accountManage/user')]
 class UserController extends BaseController
 {
     #[Inject]
@@ -41,7 +41,7 @@ class UserController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('index'), Permission('users, users:index')]
+    #[GetMapping('index'), Permission('accountManage:user, accountManage:user:index')]
     public function index(): ResponseInterface
     {
         return $this->response->success($this->service->getPageList($this->request->all(), false));
@@ -52,7 +52,7 @@ class UserController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('recycle'), Permission('users:recycle')]
+    #[GetMapping('recycle'), Permission('accountManage:user:recycle')]
     public function recycle(): ResponseInterface
     {
         return $this->response->success($this->service->getPageListByRecycle($this->request->all()));
@@ -63,17 +63,17 @@ class UserController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('{id:\d+}'), Permission('users:info')]
+    #[GetMapping('{id:\d+}'), Permission('accountManage:user:info')]
     public function info(int $id): ResponseInterface
     {
-        return $this->response->success($this->service->find($id));
+        return $this->response->success($this->service->info($id));
     }
 
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PostMapping('save'),Permission('users:save'), OperationLog]
+    #[PostMapping('save'),Permission('accountManage:user:save'), OperationLog]
     public function save(UserRequest $request): ResponseInterface
     {
         return $this->response->success(['id' => $this->service->save($request->validated())]);
@@ -84,7 +84,7 @@ class UserController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('update/{id}'), Permission('users:update'), OperationLog]
+    #[PutMapping('update/{id}'), Permission('accountManage:user:update'), OperationLog]
     public function update(int $id, UserRequest $request): ResponseInterface
     {
         return $this->service->update($id, $request->all()) ? $this->response->success() : $this->response->fail();
@@ -95,7 +95,7 @@ class UserController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('delete'), Permission('users:delete')]
+    #[DeleteMapping('delete'), Permission('accountManage:user:delete')]
     public function delete(UserRequest $request): ResponseInterface
     {
         return $this->service->delete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -106,7 +106,7 @@ class UserController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('realDelete'), Permission('users:realDelete'), OperationLog]
+    #[DeleteMapping('realDelete'), Permission('accountManage:user:realDelete'), OperationLog]
     public function realDelete(UserRequest $request): ResponseInterface
     {
         return $this->service->realDelete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -117,7 +117,7 @@ class UserController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('recovery'), Permission('users:recovery'), OperationLog]
+    #[PutMapping('recovery'), Permission('accountManage:user:recovery'), OperationLog]
     public function recovery(UserRequest $request): ResponseInterface
     {
         return $this->service->recovery((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -128,7 +128,7 @@ class UserController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('changeStatus'), Permission('users:changeStatus'), OperationLog]
+    #[PutMapping('changeStatus'), Permission('accountManage:user:changeStatus'), OperationLog]
     public function changeStatus(UserRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
@@ -140,7 +140,7 @@ class UserController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('initUserPassword'), Permission('users:initUserPassword'), OperationLog]
+    #[PutMapping('initUserPassword'), Permission('accountManage:user:initUserPassword'), OperationLog]
     public function initUserPassword(UserRequest $request): ResponseInterface
     {
         return $this->service->initUserPassword((int) $request->input('id')) ? $this->response->success() : $this->response->fail();

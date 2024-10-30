@@ -27,6 +27,7 @@ use Hyperf\Database\Model\Relations\BelongsTo;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * @property null|ExhLibArea $theme
  */
 class RotatingPlan extends BaseModel
 {

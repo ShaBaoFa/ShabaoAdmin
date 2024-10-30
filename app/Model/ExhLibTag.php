@@ -14,6 +14,7 @@ namespace App\Model;
 
 use App\Base\BaseModel;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -44,4 +45,9 @@ class ExhLibTag extends BaseModel
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['id' => 'int', 'status' => 'integer', 'sort' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
+    }
 }

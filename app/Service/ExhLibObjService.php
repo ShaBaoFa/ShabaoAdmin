@@ -19,12 +19,14 @@ use App\Constants\ErrorCode;
 use App\Dao\ExhLibObjDao;
 use App\Dao\UploadFileDao;
 use App\Dao\UserDao;
+use App\Events\AuditMessageSent;
 use App\Exception\BusinessException;
 use App\Model\ExhLibObj;
 use Hyperf\Cache\Annotation\Cacheable;
 use Hyperf\Cache\Annotation\CacheEvict;
 use Hyperf\Collection\Arr;
 
+use function App\Helper\ev_dispatch;
 use function App\Helper\user;
 
 class ExhLibObjService extends BaseService
@@ -248,6 +250,17 @@ class ExhLibObjService extends BaseService
         if (! $this->dao->changeAuditStatus($id, $auditStatus, $refuse_reason)) {
             throw new BusinessException(ErrorCode::NOT_SUPPORT);
         }
+        // 发送审核通知
+        $payload = [];
+        Arr::set($payload, 'send_by', user()->getId());
+        /**
+         * @var ExhLibObj $exhLibObj
+         */
+        $exhLibObj = $this->find($id);
+        Arr::set($payload, 'receive_by', [$exhLibObj->created_by]);
+        Arr::set($payload, 'content', $exhLibObj->toArray());
+        $event = new AuditMessageSent($payload);
+        ev_dispatch()->dispatch($event);
         return true;
     }
 

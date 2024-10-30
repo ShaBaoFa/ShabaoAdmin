@@ -15,6 +15,7 @@ namespace App\Service;
 use App\Base\BaseService;
 use App\Constants\BaseCode;
 use App\Dao\RotatingPlanDao;
+use Hyperf\Collection\Arr;
 
 class RotatingPlanService extends BaseService
 {
@@ -26,12 +27,21 @@ class RotatingPlanService extends BaseService
     public function index(?array $params = null, bool $isScope = true): array
     {
         $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc'], $params);
+        Arr::set($params, '_with', ['theme']);
         return parent::getPageList($params, $isScope);
     }
 
     public function publicIndex(?array $params = null, bool $isScope = false): array
     {
         $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc', 'status' => BaseCode::BASE_NORMAL->value], $params);
+        Arr::set($params, '_with', ['theme']);
         return parent::getPageList($params, $isScope);
+    }
+
+    public function getPageListByRecycle(?array $params = null, bool $isScope = true): array
+    {
+        $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc'], $params);
+        Arr::set($params, '_with', ['theme']);
+        return parent::getPageListByRecycle($params, $isScope);
     }
 }

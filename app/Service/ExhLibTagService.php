@@ -16,6 +16,7 @@ use App\Base\BaseService;
 use App\Constants\ErrorCode;
 use App\Dao\ExhLibTagDao;
 use App\Exception\BusinessException;
+use Hyperf\Collection\Arr;
 
 class ExhLibTagService extends BaseService
 {
@@ -27,6 +28,12 @@ class ExhLibTagService extends BaseService
     public function __construct(ExhLibTagDao $dao)
     {
         $this->dao = $dao;
+    }
+
+    public function getPageList(?array $params = null, bool $isScope = true): array
+    {
+        Arr::set($params, '_with', ['createdBy' => ['fields' => ['id', 'nickname']]]);
+        return parent::getPageList($params, $isScope);
     }
 
     public function info(mixed $id): array

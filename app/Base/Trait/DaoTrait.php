@@ -276,53 +276,63 @@ trait DaoTrait
     /**
      * 懒加载处理器.
      * $params['_with'] = [
-     * 'relation1' => [
-     * 'fields' => ['id', 'name'],
+     * 'comments' => [
+     * 'aggregate' => [
+     * 'count' => '*',              // 获取评论数量
+     * 'max' => 'rating',           // 获取最高评分
+     * 'avg' => 'score'             // 获取平均分
+     * ],
      * 'conditions' => [
-     * ['status', '=', 'active'],              // 等于
-     * ['type', '!=', 'admin'],                // 不等于
-     * ['category', 'in', ['A', 'B', 'C']],    // whereIn
-     * ['level', 'not in', [1, 2]],            // whereNotIn
-     * ['name', 'like', '%john%']              // like 查询
+     * ['status', '=', 'approved'] // 仅针对已批准的评论
      * ]
      * ],
      * 'relation2' => [
-     * 'fields' => ['id', 'created_at'],
+     * 'fields' => ['id', 'name'],
      * 'conditions' => [
-     * ['created_at', '>=', '2023-01-01'],    // 时间范围
-     * ['is_published', '=', true]            // 布尔条件
+     * ['category', 'in', ['A', 'B', 'C']]
      * ]
      * ]
-     * ];.
-     */
+     * ];
+ */
     public function handleWith(Builder $query, ?array &$params = null): Builder
     {
         if (isset($params['_with'])) {
             foreach ($params['_with'] as $relation => $relationParams) {
                 if (is_array($relationParams)) {
-                    $query->with([$relation => function ($q) use ($relationParams) {
-                        if (isset($relationParams['fields'])) {
-                            $q->select($relationParams['fields']);
-                        }
-                        if (isset($relationParams['conditions'])) {
-                            foreach ($relationParams['conditions'] as $condition) {
-                                // 根据操作符选择不同的查询方式
-                                switch ($condition[1]) {
-                                    case 'in':
-                                        $q->whereIn($condition[0], $condition[2]);
-                                        break;
-                                    case 'not in':
-                                        $q->whereNotIn($condition[0], $condition[2]);
-                                        break;
-                                    case 'like':
-                                        $q->where($condition[0], 'like', $condition[2]);
-                                        break;
-                                    default:
-                                        $q->where(...$condition); // 处理其他常规操作符，如 =, !=
-                                }
+                    // 检查是否有聚合查询要求
+                    if (isset($relationParams['aggregate'])) {
+                        foreach ($relationParams['aggregate'] as $type => $field) {
+                            // 根据不同的聚合类型进行查询
+                            switch ($type) {
+                                case 'count':
+                                    $query->withCount([$relation => function ($q) use ($relationParams) {
+                                        $this->applyConditions($q, $relationParams);
+                                    }]);
+                                    break;
+                                case 'max':
+                                    $query->withMax([$relation => function ($q) use ($relationParams) {
+                                        $this->applyConditions($q, $relationParams);
+                                    }], $field);
+                                    break;
+                                case 'avg':
+                                    $query->withAvg([$relation => function ($q) use ($relationParams) {
+                                        $this->applyConditions($q, $relationParams);
+                                    }], $field);
+                                    break;
+                                    // 你可以在这里添加其他聚合类型，如 min, sum 等
+                                default:
+                                    break;
                             }
                         }
-                    }]);
+                    } else {
+                        // 正常的关联查询
+                        $query->with([$relation => function ($q) use ($relationParams) {
+                            if (isset($relationParams['fields'])) {
+                                $q->select($relationParams['fields']);
+                            }
+                            $this->applyConditions($q, $relationParams);
+                        }]);
+                    }
                 } else {
                     $query->with($relationParams);
                 }
@@ -425,5 +435,27 @@ trait DaoTrait
     public function belongMe(array $condition): bool
     {
         return $this->checkExists($condition, true);
+    }
+
+    // 辅助函数，用于应用查询条件
+    private function applyConditions($q, $relationParams): void
+    {
+        if (isset($relationParams['conditions'])) {
+            foreach ($relationParams['conditions'] as $condition) {
+                switch ($condition[1]) {
+                    case 'in':
+                        $q->whereIn($condition[0], $condition[2]);
+                        break;
+                    case 'not in':
+                        $q->whereNotIn($condition[0], $condition[2]);
+                        break;
+                    case 'like':
+                        $q->where($condition[0], 'like', $condition[2]);
+                        break;
+                    default:
+                        $q->where(...$condition);
+                }
+            }
+        }
     }
 }

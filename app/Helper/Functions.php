@@ -16,11 +16,13 @@ use App\Constants\ErrorCode;
 use App\Exception\BusinessException;
 use Countable;
 use Hyperf\Contract\StdoutLoggerInterface;
+use Hyperf\Event\EventDispatcher;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\WebSocketServer\Sender;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 if (! function_exists('user')) {
     /**
@@ -170,5 +172,15 @@ if (! function_exists('base64url_decode')) {
     function base64url_decode(string $data): string
     {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT));
+    }
+}
+
+if (! function_exists('ev_dispatch')) {
+    /**
+     * 事件派发.
+     */
+    function ev_dispatch(): EventDispatcherInterface
+    {
+        return di()->get(EventDispatcher::class);
     }
 }

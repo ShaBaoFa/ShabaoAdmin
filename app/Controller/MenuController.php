@@ -28,7 +28,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/menus'),Auth]
+#[Controller(prefix: 'api/v1/accountManage/menu'),Auth]
 class MenuController extends BaseController
 {
     #[Inject]
@@ -39,7 +39,7 @@ class MenuController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('index'), Permission('menus, menus:index')]
+    #[GetMapping('index'), Permission('accountManage:menu, accountManage:menu:index')]
     public function index(): ResponseInterface
     {
         return $this->response->success($this->service->getTreeList($this->request->all()));
@@ -50,7 +50,7 @@ class MenuController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('recycle'), Permission('menus:recycle')]
+    #[GetMapping('recycle'), Permission('accountManage:menu:recycle')]
     public function recycle(): ResponseInterface
     {
         return $this->response->success($this->service->getTreeListByRecycle($this->request->all()));
@@ -72,7 +72,7 @@ class MenuController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PostMapping('save'), Permission('menus:save'), OperationLog]
+    #[PostMapping('save'), Permission('accountManage:menu:save'), OperationLog]
     public function save(MenuRequest $request): ResponseInterface
     {
         return $this->response->success(['id' => $this->service->save($request->all())]);
@@ -83,7 +83,7 @@ class MenuController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('update/{id:\d+}'), Permission('menus:update'), OperationLog]
+    #[PutMapping('update/{id:\d+}'), Permission('accountManage:menu:update'), OperationLog]
     public function update(int $id, MenuRequest $request): ResponseInterface
     {
         return $this->service->update($id, $request->all()) ? $this->response->success() : $this->response->fail();
@@ -94,7 +94,7 @@ class MenuController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('delete'), Permission('menus:delete')]
+    #[DeleteMapping('delete'), Permission('accountManage:menu:delete')]
     public function delete(MenuRequest $request): ResponseInterface
     {
         return $this->service->delete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -105,7 +105,7 @@ class MenuController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('realDelete'), Permission('menus:realDelete'), OperationLog]
+    #[DeleteMapping('realDelete'), Permission('accountManage:menu:realDelete'), OperationLog]
     public function realDelete(MenuRequest $request): ResponseInterface
     {
         return $this->service->realDelete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -116,7 +116,7 @@ class MenuController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('recovery'), Permission('menus:recovery')]
+    #[PutMapping('recovery'), Permission('accountManage:menu:recovery')]
     public function recovery(): ResponseInterface
     {
         return $this->service->recovery((array) $this->request->input('ids', [])) ? $this->response->success() : $this->response->fail();
@@ -127,7 +127,7 @@ class MenuController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('changeStatus'), Permission('menus:changeStatus'), OperationLog]
+    #[PutMapping('changeStatus'), Permission('accountManage:menu:changeStatus'), OperationLog]
     public function changeStatus(MenuRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
@@ -139,7 +139,7 @@ class MenuController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('numberOperation'), Permission('menus:update'), OperationLog]
+    #[PutMapping('numberOperation'), Permission('accountManage:menu:update'), OperationLog]
     public function numberOperation(): ResponseInterface
     {
         return $this->service->numberOperation(

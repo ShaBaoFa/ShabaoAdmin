@@ -31,4 +31,7 @@ enum WsEventCode: string
 
     #[Message('common.ev_user_kick_out')]
     case EV_USER_KICK_OUT = 'ev_user_kick_out';
+
+    #[Message('common.ev_new_audit_message')]
+    case EV_NEW_AUDIT_MESSAGE = 'ev_new_audit_message';
 }

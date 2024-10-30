@@ -21,10 +21,10 @@ use App\Dao\MessageDao;
 use App\Events\PrivateMessageSent;
 use App\Exception\BusinessException;
 use App\Vo\AmqpQueueVo;
-use Hyperf\Event\EventDispatcher;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
+use function App\Helper\ev_dispatch;
 use function App\Helper\user;
 use function Hyperf\Config\config;
 
@@ -68,9 +68,8 @@ class MessageService extends BaseService
                 return true;
             }
         }
-        $evDispatcher = di()->get(EventDispatcher::class);
         if ($this->dao->save($data) > 0) {
-            $evDispatcher->dispatch(new PrivateMessageSent($data));
+            ev_dispatch()->dispatch(new PrivateMessageSent($data));
             return true;
         }
         return false;

@@ -16,7 +16,7 @@ use App\Annotation\Auth;
 use App\Annotation\OperationLog;
 use App\Annotation\Permission;
 use App\Base\BaseController;
-use App\Request\ExhLibAreaRequest;
+use App\Request\RotatingPlanRequest;
 use App\Service\RotatingPlanService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -38,7 +38,7 @@ class RotatingPlanController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('index'), Permission('libPrecinct, libPrecinct:index')]
+    #[GetMapping('index'), Permission('libManage:rotatingPlan, libManage:rotatingPlan:index')]
     public function index(): ResponseInterface
     {
         return $this->response->success($this->service->index($this->request->all()));
@@ -55,10 +55,10 @@ class RotatingPlanController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('recycle'), Permission('libPrecinct:recycle')]
+    #[GetMapping('recycle'), Permission('libManage:rotatingPlan:recycle')]
     public function recycle(): ResponseInterface
     {
-        return $this->response->success($this->service->getListByRecycle($this->request->all()));
+        return $this->response->success($this->service->getPageListByRecycle($this->request->all()));
     }
 
     /**
@@ -66,8 +66,8 @@ class RotatingPlanController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PostMapping('save'), Permission('libPrecinct:save'),OperationLog]
-    public function save(ExhLibAreaRequest $request): ResponseInterface
+    #[PostMapping('save'), Permission('libManage:rotatingPlan:save'),OperationLog]
+    public function save(RotatingPlanRequest $request): ResponseInterface
     {
         return $this->response->success(['id' => $this->service->save($request->all())]);
     }
@@ -77,10 +77,17 @@ class RotatingPlanController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('delete'), Permission('libPrecinct:delete')]
-    public function delete(ExhLibAreaRequest $request): ResponseInterface
+    #[DeleteMapping('delete'), Permission('libManage:rotatingPlan:delete')]
+    public function delete(RotatingPlanRequest $request): ResponseInterface
     {
         return $this->service->delete((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
+    }
+
+    #[PutMapping('update/{id:\d+}'), Permission('infoManage:announcement:update')]
+    public function update(int $id, RotatingPlanRequest $request): ResponseInterface
+    {
+        return $this->service->update($id, $request->all())
+            ? $this->response->success() : $this->response->fail();
     }
 
     /**
@@ -88,8 +95,8 @@ class RotatingPlanController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[DeleteMapping('realDelete'), Permission('libPrecinct:realDelete'), OperationLog]
-    public function realDelete(ExhLibAreaRequest $request): ResponseInterface
+    #[DeleteMapping('realDelete'), Permission('libManage:rotatingPlan:realDelete'), OperationLog]
+    public function realDelete(RotatingPlanRequest $request): ResponseInterface
     {
         $result = $this->service->realDelete((array) $request->input('ids', []));
         return $result ?
@@ -102,8 +109,8 @@ class RotatingPlanController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('recovery'), Permission('libPrecinct:recovery')]
-    public function recovery(ExhLibAreaRequest $request): ResponseInterface
+    #[PutMapping('recovery'), Permission('libManage:rotatingPlan:recovery')]
+    public function recovery(RotatingPlanRequest $request): ResponseInterface
     {
         return $this->service->recovery((array) $request->input('ids', [])) ? $this->response->success() : $this->response->fail();
     }
@@ -113,8 +120,8 @@ class RotatingPlanController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('changeStatus'), Permission('libPrecinct:changeStatus'), OperationLog]
-    public function changeStatus(ExhLibAreaRequest $request): ResponseInterface
+    #[PutMapping('changeStatus'), Permission('libManage:rotatingPlan:changeStatus'), OperationLog]
+    public function changeStatus(RotatingPlanRequest $request): ResponseInterface
     {
         return $this->service->changeStatus((int) $request->input('id'), (string) $request->input('status'))
             ? $this->response->success() : $this->response->fail();

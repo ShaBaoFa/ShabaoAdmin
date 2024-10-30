@@ -256,6 +256,7 @@ class FileSystemService extends BaseService
     {
         $fileInfo = $this->getFileInfoByHash($hash);
         $url = $this->generateSignature(Arr::get($fileInfo, 'url'));
+        var_dump($url);
         $previewService = di()->get(PreviewService::class);
         $userService = di()->get(UserService::class);
         $nickname = $userService->value(['id' => Arr::get($fileInfo, 'created_by')], 'nickname');

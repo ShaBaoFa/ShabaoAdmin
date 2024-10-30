@@ -17,7 +17,6 @@ use App\Annotation\OperationLog;
 use App\Annotation\Permission;
 use App\Base\BaseController;
 use App\Request\RentApprovalRequest;
-use App\Service\ObjDlApprovalService;
 use App\Service\RentApprovalService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -28,14 +27,11 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-#[Controller(prefix: 'api/v1/approvalManage/LibExhibition/rent'),Auth]
+#[Controller(prefix: 'api/v1/approvalManage/libExhibition/rent'),Auth]
 class RentObjController extends BaseController
 {
     #[Inject]
     protected RentApprovalService $service;
-
-    #[Inject]
-    protected ObjDlApprovalService $dlService;
 
     /**
      * @throws ContainerExceptionInterface

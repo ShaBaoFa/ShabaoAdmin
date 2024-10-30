@@ -83,7 +83,7 @@ class DeptController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[PutMapping('update/{id}'), Permission('depts:update'), OperationLog]
+    #[PutMapping('update/{id:\d+}'), Permission('depts:update'), OperationLog]
     public function update(int $id, DepartmentRequest $request): ResponseInterface
     {
         return $this->service->update($id, $request->all()) ? $this->response->success() : $this->response->fail();

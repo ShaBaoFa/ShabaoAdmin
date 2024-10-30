@@ -14,18 +14,18 @@ namespace App\Events;
 
 use Hyperf\Collection\Arr;
 
-class PrivateMessageSent
+class AuditMessageSent
 {
     public int $sendBy;
 
-    public int $receiveBy;
+    public array $receiveBy;
 
     public string $content;
 
     public function __construct(array $payload)
     {
         $this->sendBy = (int) Arr::get($payload, 'send_by');
-        $this->receiveBy = (int) Arr::get($payload, 'receive_by');
+        $this->receiveBy = (array) Arr::get($payload, 'receive_by');
         $this->content = Arr::get($payload, 'content');
     }
 
@@ -34,7 +34,7 @@ class PrivateMessageSent
         return $this->sendBy;
     }
 
-    public function getReceiveBy(): int
+    public function getReceiveBy(): array
     {
         return $this->receiveBy;
     }

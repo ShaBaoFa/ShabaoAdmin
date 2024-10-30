@@ -16,6 +16,6 @@ return [
     'default' => [
         'driver' => RedisDriver::class,
         'packer' => PhpSerializerPacker::class,
-        'prefix' => 'WlfPanda1012:',
+        'prefix' => \Hyperf\Support\env('CACHE_PREFIX', 'WlfPanda1012') . ':',
     ],
 ];
