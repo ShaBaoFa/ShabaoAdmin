@@ -292,8 +292,8 @@ trait DaoTrait
      * ['category', 'in', ['A', 'B', 'C']]
      * ]
      * ]
-     * ];
- */
+     * ];.
+     */
     public function handleWith(Builder $query, ?array &$params = null): Builder
     {
         if (isset($params['_with'])) {

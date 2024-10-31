@@ -121,6 +121,18 @@ class UploadController extends BaseController
     }
 
     /**
+     * 通过HASH值获取文件.
+     * @throws NotFoundExceptionInterface
+     * @throws RedisException
+     * @throws ContainerExceptionInterface
+     */
+    #[GetMapping('getFileByHashes'),Auth]
+    public function getFilesByHashes(UploadRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->getFileInfoByHashes($request->input('hashes')) ?? []);
+    }
+
+    /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws RedisException

@@ -64,6 +64,14 @@ class UploadRequest extends BaseFormRequest
         ];
     }
 
+    public function getFilesByHashesRules(): array
+    {
+        return [
+            'hashes' => 'required|array',
+            'hashes.*' => 'string|min:32|max:32|exists:upload_files,hash',
+        ];
+    }
+
     public function uploaderCallbackRules(): array
     {
         return [

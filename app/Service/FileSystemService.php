@@ -245,6 +245,15 @@ class FileSystemService extends BaseService
         return $file;
     }
 
+    public function getFileInfoByHashes(array $hashes): array
+    {
+        $files = [];
+        foreach ($hashes as $hash) {
+            $files[] = $this->getFileInfoByHash($hash);
+        }
+        return $files;
+    }
+
     #[CacheEvict(prefix: 'fileInfoByHash', value: 'fileHash_#{hash}')]
     public function updateByHash(string $hash, array $data): bool
     {

@@ -15,7 +15,6 @@ namespace App\Controller;
 use App\Annotation\Auth;
 use App\Base\BaseController;
 use App\Request\CommentRequest;
-use App\Request\MessageRequest;
 use App\Service\CommentService;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
@@ -50,6 +49,6 @@ class CommentController extends BaseController
     #[PostMapping('addStar')]
     public function addStar(CommentRequest $request): ResponseInterface
     {
-        return $this->service->addStar((int)$request->input('id')) ? $this->response->success() : $this->response->fail();
+        return $this->service->addStar((int) $request->input('id')) ? $this->response->success() : $this->response->fail();
     }
 }

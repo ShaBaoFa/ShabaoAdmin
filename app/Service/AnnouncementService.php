@@ -96,7 +96,7 @@ class AnnouncementService extends BaseService
     public function info(int $id): array
     {
         $model = $this->find($id);
-        !$model && throw new BusinessException(ErrorCode::NOT_FOUND);
+        ! $model && throw new BusinessException(ErrorCode::NOT_FOUND);
         return $model->toArray();
     }
 

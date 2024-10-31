@@ -16,6 +16,7 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
+use Hyperf\Database\Model\Relations\MorphMany;
 
 use function App\Helper\user;
 
@@ -103,7 +104,7 @@ class ExhLibObj extends BaseModel
         return $this->belongsToMany(User::class, 'user_collect_obj', 'obj_id', 'user_id');
     }
 
-    public function comments(): \Hyperf\Database\Model\Relations\MorphMany
+    public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
     }

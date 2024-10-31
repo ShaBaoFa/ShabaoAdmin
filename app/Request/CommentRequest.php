@@ -49,6 +49,7 @@ class CommentRequest extends BaseFormRequest
             'parent_id' => ['nullable', 'int', 'exists:comments,id'],
         ];
     }
+
     /**
      * 字段映射名称
      * return array.

@@ -39,7 +39,6 @@ class ExhLibTagDao extends BaseDao
             fn (Builder $query, $name) => $query->where('name', 'like', '%' . $name . '%')
         );
 
-
         $query->when(
             Arr::get($params, 'created_at'),
             function (Builder $query, $createdAt) {

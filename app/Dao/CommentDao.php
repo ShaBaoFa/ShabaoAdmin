@@ -13,8 +13,6 @@ declare(strict_types=1);
 namespace App\Dao;
 
 use App\Base\BaseDao;
-use App\Constants\AuditCode;
-use App\Model\Announcement;
 use App\Model\Comment;
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
@@ -45,7 +43,6 @@ class CommentDao extends BaseDao
             Arr::get($params, 'commentable_type'),
             fn (Builder $query, $commentableType) => $query->where('commentable_type', $commentableType)
         );
-
 
         $query->when(
             Arr::get($params, 'created_at'),
