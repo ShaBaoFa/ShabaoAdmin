@@ -19,6 +19,7 @@ use App\Constants\ErrorCode;
 use App\Constants\MessageContentTypeCode;
 use App\Dao\MessageDao;
 use App\Events\PrivateMessageSent;
+use App\Events\ReplyToMessage;
 use App\Exception\BusinessException;
 use App\Vo\AmqpQueueVo;
 use Psr\Container\ContainerExceptionInterface;
@@ -38,6 +39,27 @@ class MessageService extends BaseService
     public function __construct(MessageDao $dao)
     {
         $this->dao = $dao;
+    }
+
+
+
+    public function replyTo(int $sentTo,string $content): bool
+    {
+        if ($sentTo === user()->getId()) {
+            throw new BusinessException(ErrorCode::MESSAGE_CANNOT_SEND_TO_YOURSELF);
+        }
+        if (! json_decode($content)) throw new BusinessException(ErrorCode::SERVER_ERROR);
+        $data = [
+            'send_by' => user()->getId(),
+            'receive_by' => $sentTo,
+            'content' => $content,
+            'content_type' => MessageContentTypeCode::TYPE_REPLY_TO->value,
+        ];
+        if ($this->dao->save($data) > 0) {
+            ev_dispatch()->dispatch(new ReplyToMessage($data));
+            return true;
+        }
+        return false;
     }
 
     /**

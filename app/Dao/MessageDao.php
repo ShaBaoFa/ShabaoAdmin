@@ -42,10 +42,13 @@ class MessageDao extends BaseDao
     public function save($data): int
     {
         $receiveBy = $data['receive_by'];
+        if (! is_array($receiveBy)) {
+            $receiveBy = [$receiveBy];
+        }
         $this->filterExecuteAttributes($data);
         Arr::get($data, 'content_type') != MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value && Arr::forget($data, 'receive_by');
         $model = $this->model::create($data);
-        $model->receiveUsers()->sync($receiveBy);
+        $model->receiveUsers()->sync(array_fill_keys($receiveBy, ['message_type' => Arr::get($data, 'content_type')]));
         return $model->{$model->getKeyName()};
     }
 

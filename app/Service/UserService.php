@@ -57,6 +57,11 @@ class UserService extends BaseService
 
     public function myCollectObjs(array $params): array
     {
+        $us = di()->get(UserService::class);
+        $currentUser = $us->find(user()->getId());
+        /**
+         * @var User $currentUser
+         */
         $ids = $this->dao->getMyCollectObjsIds();
         if (count($ids) == 0) {
             return [];

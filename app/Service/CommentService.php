@@ -35,7 +35,13 @@ class CommentService extends BaseService
     public function save(array $data): mixed
     {
         $data = $this->handleData($data);
-        return parent::save($data);
+        $id = parent::save($data);
+        if ($id > 0  && Arr::get($data, 'sent_to') > 0) {
+            $ms = di()->get(MessageService::class);
+            $model = $this->find($id);
+            $ms->replyTo((int) Arr::get($data, 'sent_to'), json_encode($model));
+        };
+        return $id;
     }
 
     public function index(array $params): array

@@ -49,7 +49,7 @@ class ExhLibObjService extends BaseService
 
     public function getPublicIndex(array $params): array
     {
-        Arr::set($params, 'select', 'id,title,author,star_count,collect_count');
+        Arr::set($params, 'select', 'id,title,author,star_count,collect_count,profile,created_at');
         Arr::set($params, 'audit_status', AuditCode::PASS->value);
         Arr::set($params, 'status', BaseCode::BASE_NORMAL->value);
         Arr::set($params, '_with', ['covers']);

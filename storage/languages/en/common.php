@@ -91,6 +91,7 @@ return [
     'message_todo' => 'message_todo',
     'message_copy_mine' => 'message_copy_mine',
     'message_private_message' => 'message_private_message',
+    'message_reply_to' => 'message_reply_to',
     'message_cannot_send_to_yourself' => 'message_cannot_send_to_yourself',
     'message_read' => 'message_read',
     'message_unread' => 'message_unread',

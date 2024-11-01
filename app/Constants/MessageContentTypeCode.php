@@ -37,6 +37,9 @@ enum MessageContentTypeCode: int
     #[Message('common.message_private_message')]
     case TYPE_PRIVATE_MESSAGE = 1005;
 
+    #[Message('common.message_reply_to')]
+    case TYPE_REPLY_TO = 1006;
+
     // 信息已读
     #[Message('common.message_read')]
     case STATUS_MESSAGE_READ = 2;

@@ -16,6 +16,7 @@ use App\Constants\WsEventCode;
 use App\Events\AfterKickUser;
 use App\Events\AuditMessageSent;
 use App\Events\PrivateMessageSent;
+use App\Events\ReplyToMessage;
 use App\Model\User;
 use App\Service\WsSenderService;
 use Hyperf\Event\Annotation\Listener;
@@ -40,7 +41,7 @@ class WsSenderListener implements ListenerInterface
         return [
             PrivateMessageSent::class,
             AfterKickUser::class,
-            AuditMessageSent::class,
+            ReplyToMessage::class,
         ];
     }
 
@@ -51,6 +52,17 @@ class WsSenderListener implements ListenerInterface
      */
     public function process(object $event): void
     {
+        if ($event instanceof ReplyToMessage) {
+            $uid = $event->getReceiveBy();
+            $sendBy = $event->getSendBy();
+            $sendByUsername = User::find($event->getSendBy())->value('username');
+            $content = $event->getContent();
+            $this->sender->sendByUid($uid, $this->sender->handleData(WsEventCode::EV_NEW_REPLY_TO, [
+                'send_by' => $sendBy,
+                'send_by_username' => $sendByUsername,
+                'content' => $content,
+            ]));
+        }
         if ($event instanceof PrivateMessageSent) {
             $uid = $event->getReceiveBy();
             $sendBy = $event->getSendBy();
