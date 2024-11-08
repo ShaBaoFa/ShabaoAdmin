@@ -34,7 +34,7 @@ enum WsEventCode: string
 
     #[Message('common.ev_new_audit_message')]
     case EV_NEW_AUDIT_MESSAGE = 'ev_new_audit_message';
-    #[Message('common.ev_new_reply_to')]
 
+    #[Message('common.ev_new_reply_to')]
     case EV_NEW_REPLY_TO = 'ev_new_reply_to';
 }

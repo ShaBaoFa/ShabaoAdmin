@@ -14,7 +14,6 @@ namespace App\Listener;
 
 use App\Constants\WsEventCode;
 use App\Events\AfterKickUser;
-use App\Events\AuditMessageSent;
 use App\Events\PrivateMessageSent;
 use App\Events\ReplyToMessage;
 use App\Model\User;

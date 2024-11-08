@@ -9,6 +9,7 @@ declare(strict_types=1);
  * @gitee    https://gitee.com/wlfpanda/web-api
  * @contact  mail@wlfpanda1012.com
  */
+use App\Constants\MessageContentTypeCode;
 use Hyperf\Database\Migrations\Migration;
 use Hyperf\Database\Schema\Blueprint;
 use Hyperf\Database\Schema\Schema;
@@ -26,7 +27,7 @@ class CreateMessageReceivesTable extends Migration
             $table->addColumn('bigInteger', 'message_id', ['unsigned' => true, 'comment' => '队列消息主键']);
             $table->addColumn('bigInteger', 'receiver_id', ['unsigned' => true, 'comment' => '接收用户主键']);
             $table->addColumn('smallInteger', 'read_status', ['default' => 1, 'comment' => '已读状态 (1未读 2已读)'])->nullable();
-            $table->addColumn('smallInteger', 'message_type', ['default' => \App\Constants\MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value, 'comment' => '消息类型'])->index();
+            $table->addColumn('smallInteger', 'message_type', ['default' => MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value, 'comment' => '消息类型'])->index();
             $table->primary(['message_id', 'receiver_id']);
         });
     }

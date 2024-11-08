@@ -41,14 +41,14 @@ class MessageService extends BaseService
         $this->dao = $dao;
     }
 
-
-
-    public function replyTo(int $sentTo,string $content): bool
+    public function replyTo(int $sentTo, string $content): bool
     {
         if ($sentTo === user()->getId()) {
             throw new BusinessException(ErrorCode::MESSAGE_CANNOT_SEND_TO_YOURSELF);
         }
-        if (! json_decode($content)) throw new BusinessException(ErrorCode::SERVER_ERROR);
+        if (! json_decode($content)) {
+            throw new BusinessException(ErrorCode::SERVER_ERROR);
+        }
         $data = [
             'send_by' => user()->getId(),
             'receive_by' => $sentTo,

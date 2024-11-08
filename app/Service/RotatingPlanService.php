@@ -33,7 +33,8 @@ class RotatingPlanService extends BaseService
 
     public function publicIndex(?array $params = null, bool $isScope = false): array
     {
-        $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc', 'status' => BaseCode::BASE_NORMAL->value], $params);
+        //        $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc', 'status' => BaseCode::BASE_NORMAL->value], $params);
+        $params = array_merge(['orderBy' => 'sort', 'orderType' => 'desc'], $params);
         Arr::set($params, '_with', ['theme']);
         return parent::getPageList($params, $isScope);
     }

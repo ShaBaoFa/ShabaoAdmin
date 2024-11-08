@@ -14,8 +14,11 @@ namespace App\Dao;
 
 use App\Base\BaseDao;
 use App\Constants\AuditCode;
+use App\Constants\RentCode;
 use App\Model\UserRentApproval;
+use Carbon\Carbon;
 use Hyperf\Collection\Arr;
+use Hyperf\Collection\Collection;
 use Hyperf\Database\Model\Builder;
 
 class RentApprovalDao extends BaseDao
@@ -30,11 +33,25 @@ class RentApprovalDao extends BaseDao
         $this->model = UserRentApproval::class;
     }
 
+    public function getTopRanking(): array
+    {
+        return [
+            'last_7_days' => $this->getTopByDateRange(Carbon::now()->subDays(7)),
+            'last_1_month' => $this->getTopByDateRange(Carbon::now()->subMonth()),
+            'last_1_year' => $this->getTopByDateRange(Carbon::now()->subYear()),
+        ];
+    }
+
     public function handleSearch(Builder $query, array $params): Builder
     {
         $query->when(
             Arr::get($params, 'audit_status'),
             fn (Builder $query, $auditStatus) => $query->where('audit_status', $auditStatus)
+        );
+
+        $query->when(
+            Arr::get($params, 'rent_status'),
+            fn (Builder $query, $rent_status) => $query->where('rent_status', $rent_status)
         );
 
         $query->when(
@@ -77,6 +94,20 @@ class RentApprovalDao extends BaseDao
         return true;
     }
 
+    public function changeRentStatus(int $id, int $rentStatus): bool
+    {
+        /**
+         * @var UserRentApproval $model
+         */
+        $model = $this->model::find($id);
+        if (! in_array($rentStatus, $this->rentMap($model->rent_status))) {
+            return false;
+        }
+        $model->rent_status = $rentStatus;
+        $model->save();
+        return true;
+    }
+
     public function save(array $data): mixed
     {
         $this->filterExecuteAttributes($data, $this->getModel()->incrementing);
@@ -98,6 +129,17 @@ class RentApprovalDao extends BaseDao
         return true;
     }
 
+    private function getTopByDateRange($startDate): Collection
+    {
+        return UserRentApproval::select('exh_lib_obj_name')
+            ->selectRaw('COUNT(*) as approval_count')
+            ->where('created_at', '>=', $startDate)
+            ->groupBy('exh_lib_obj_name')
+            ->orderByDesc('approval_count')
+            ->limit(10)
+            ->get();
+    }
+
     /**
      * 流程支持的操作.
      * @param mixed $modelAuditStatus
@@ -109,6 +151,21 @@ class RentApprovalDao extends BaseDao
         return match ($modelAuditStatus) {
             AuditCode::IN_AUDIT->value => [
                 AuditCode::PASS->value, AuditCode::NOT_PASS->value, AuditCode::CANCEL->value,
+            ],
+            default => [],
+        };
+    }
+
+    private function rentMap(int $modelRentStatus): array
+    {
+        // 比如 审查中的状态只能被同意或者拒绝
+        // 同意和已拒绝的则不可被修改
+        return match ($modelRentStatus) {
+            RentCode::NOT_RETURN->value => [
+                RentCode::RETURN->value,
+            ],
+            RentCode::RETURN->value => [
+                RentCode::NOT_RETURN->value,
             ],
             default => [],
         };

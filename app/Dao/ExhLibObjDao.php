@@ -108,7 +108,15 @@ class ExhLibObjDao extends BaseDao
             Arr::get($params, 'lib_area_type'),
             fn (Builder $query, $libAreaType) => $query->where('lib_area_type', $libAreaType)
         );
-
+        $query->when(
+            Arr::get($params, 'createdBy'),
+            function (Builder $query, $createdBy) {
+                if (! is_array($createdBy)) {
+                    $createdBy = [$createdBy];
+                }
+                $query->whereIn('created_by', $createdBy);
+            }
+        );
         $query->when(
             Arr::get($params, 'created_at'),
             function (Builder $query, $createdAt) {

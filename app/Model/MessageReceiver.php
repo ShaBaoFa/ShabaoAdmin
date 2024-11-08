@@ -18,6 +18,7 @@ use Hyperf\Database\Model\Relations\Pivot;
  * @property int $message_id 队列消息主键
  * @property int $receiver_id 接收用户主键
  * @property int $read_status 已读状态 (1未读 2已读)
+ * @property int $message_type 消息类型
  */
 class MessageReceiver extends Pivot
 {
@@ -29,10 +30,10 @@ class MessageReceiver extends Pivot
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['message_id', 'receiver_id', 'read_status'];
+    protected array $fillable = ['message_id', 'receiver_id', 'read_status', 'message_type'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['message_id' => 'integer', 'receiver_id' => 'integer', 'read_status' => 'integer'];
+    protected array $casts = ['message_id' => 'integer', 'receiver_id' => 'integer', 'read_status' => 'integer', 'message_type' => 'integer'];
 }

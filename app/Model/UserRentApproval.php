@@ -26,12 +26,14 @@ use Hyperf\Database\Model\Relations\BelongsTo;
  * @property string $rent_start_at 租用开始日期
  * @property string $rent_end_at 租用结束日期
  * @property string $contact_name 联系人
+ * @property string $shipping_address 运送地址
  * @property string $contact_phone 联系电话
  * @property int $exh_lib_obj_id 展项主键
  * @property string $exh_lib_obj_name 展项名字
  * @property string $cover 展项封面
  * @property string $refuse_reason 拒绝理由
  * @property int $status 状态 (1正常 2停用)
+ * @property int $rent_status 租赁状态(1 未归还 2 已归还)
  * @property int $audit_status 审核 (1审核中 2通过 3拒绝,4取消)
  * @property int $sort 排序
  * @property int $created_by 创建者
@@ -52,12 +54,12 @@ class UserRentApproval extends BaseModel
     /**
      * The attributes that are mass assignable.
      */
-    protected array $fillable = ['id', 'audit_organization_id', 'user_id', 'name', 'reason', 'project_name', 'rent_start_at', 'rent_end_at', 'contact_name', 'contact_phone', 'exh_lib_obj_id', 'exh_lib_obj_name', 'cover', 'refuse_reason', 'status', 'audit_status', 'sort', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at'];
+    protected array $fillable = ['id', 'audit_organization_id', 'user_id', 'name', 'reason', 'project_name', 'rent_start_at', 'rent_end_at', 'contact_name', 'shipping_address', 'contact_phone', 'exh_lib_obj_id', 'exh_lib_obj_name', 'cover', 'refuse_reason', 'status', 'rent_status', 'audit_status', 'sort', 'created_by', 'updated_by', 'remark', 'created_at', 'updated_at', 'deleted_at'];
 
     /**
      * The attributes that should be cast to native types.
      */
-    protected array $casts = ['id' => 'int', 'audit_organization_id' => 'integer', 'user_id' => 'integer', 'exh_lib_obj_id' => 'integer', 'status' => 'integer', 'audit_status' => 'integer', 'sort' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected array $casts = ['id' => 'int', 'audit_organization_id' => 'integer', 'user_id' => 'integer', 'exh_lib_obj_id' => 'integer', 'status' => 'integer', 'audit_status' => 'integer', 'sort' => 'integer', 'created_by' => 'integer', 'updated_by' => 'integer', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'rent_status' => 'integer'];
 
     public function exhibitionLibObj(): BelongsTo
     {

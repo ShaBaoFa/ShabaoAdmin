@@ -32,7 +32,7 @@ class ExhLibAreaService extends BaseService
 
     public function info(mixed $id): array
     {
-        $info = $this->find($id);
+        $info = $this->find($id)->load('createdBy');
         if (! $info) {
             throw new BusinessException(ErrorCode::NOT_FOUND);
         }

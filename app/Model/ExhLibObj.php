@@ -51,6 +51,7 @@ use function App\Helper\user;
  * @property null|Collection|User[] $starUsers
  * @property null|Collection|User[] $pickUsers
  * @property null|Collection|User[] $collectUsers
+ * @property null|Collection|Comment[] $comments
  */
 class ExhLibObj extends BaseModel
 {

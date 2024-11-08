@@ -21,6 +21,7 @@ use App\Model\Organization;
 use App\Model\User;
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
+use Hyperf\Database\Model\Collection;
 use Hyperf\DbConnection\Annotation\Transactional;
 
 use function App\Helper\user;
@@ -36,6 +37,11 @@ class UserDao extends BaseDao
     public function assignModel(): void
     {
         $this->model = User::class;
+    }
+
+    public function getAll(): Collection
+    {
+        return User::all();
     }
 
     /**

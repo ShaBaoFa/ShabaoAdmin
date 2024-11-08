@@ -28,6 +28,7 @@ use Hyperf\Database\Model\Relations\BelongsTo;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * @property null|User $createdBy
  */
 class ExhLibTag extends BaseModel
 {

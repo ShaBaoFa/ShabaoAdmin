@@ -69,6 +69,11 @@ class OrganizationDao extends BaseDao
         return $this->model->query()->find($id)->users()->get(['id', 'username'])->toArray();
     }
 
+    public function getAllStaffIds(int $id): array
+    {
+        return $this->model->query()->find($id)->users()->pluck('id')->toArray();
+    }
+
     public function getAllDeptTree(int $id): array
     {
         $deptDate = $this->model::query()->find($id)->depts()->get()->toArray();

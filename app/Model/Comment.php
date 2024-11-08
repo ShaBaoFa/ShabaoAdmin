@@ -14,6 +14,7 @@ namespace App\Model;
 
 use App\Base\BaseModel;
 use Carbon\Carbon;
+use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Model;
 use Hyperf\Database\Model\Relations\BelongsTo;
 use Hyperf\Database\Model\Relations\HasMany;
@@ -35,8 +36,10 @@ use Hyperf\Database\Model\Relations\MorphTo;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property string $deleted_at
+ * @property null|Collection|Comment[] $subComments
  * @property null|Model $commentable
  * @property null|User $createdBy
+ * @property null|User $sentTo
  */
 class Comment extends BaseModel
 {

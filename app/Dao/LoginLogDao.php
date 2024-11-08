@@ -15,6 +15,7 @@ namespace App\Dao;
 use App\Base\BaseDao;
 use App\Model\LoginLog;
 use Hyperf\Collection\Arr;
+use Hyperf\Collection\Collection;
 use Hyperf\Database\Model\Builder;
 
 class LoginLogDao extends BaseDao
@@ -27,6 +28,11 @@ class LoginLogDao extends BaseDao
     public function assignModel(): void
     {
         $this->model = LoginLog::class;
+    }
+
+    public function getAll(): Collection
+    {
+        return LoginLog::all();
     }
 
     /**

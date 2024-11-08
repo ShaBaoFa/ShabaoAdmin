@@ -82,6 +82,17 @@ class RentApprovalService extends BaseService
         return true;
     }
 
+    public function changeRentStatus(int $id, int $rentStatus): bool
+    {
+        if (! $this->find($id)) {
+            throw new BusinessException(ErrorCode::NOT_FOUND);
+        }
+        if (! $this->dao->changeRentStatus($id, $rentStatus)) {
+            throw new BusinessException(ErrorCode::NOT_SUPPORT);
+        }
+        return true;
+    }
+
     public function cancelApproval(int $id): bool
     {
         if (! $this->dao->cancelDownloadApproval($id)) {

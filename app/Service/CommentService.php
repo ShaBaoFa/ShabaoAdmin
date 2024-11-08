@@ -36,11 +36,11 @@ class CommentService extends BaseService
     {
         $data = $this->handleData($data);
         $id = parent::save($data);
-        if ($id > 0  && Arr::get($data, 'sent_to') > 0) {
+        if ($id > 0 && Arr::get($data, 'sent_to') > 0) {
             $ms = di()->get(MessageService::class);
             $model = $this->find($id);
             $ms->replyTo((int) Arr::get($data, 'sent_to'), json_encode($model));
-        };
+        }
         return $id;
     }
 

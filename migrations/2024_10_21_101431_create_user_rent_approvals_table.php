@@ -35,6 +35,11 @@ return new class extends Migration {
             $table->addColumn('string', 'contact_name', ['length' => 255, 'comment' => '联系人']);
             // 联系电话
             $table->addColumn('string', 'contact_phone', ['length' => 255, 'comment' => '联系电话']);
+            // 运送地址
+            $table->addColumn('string', 'shipping_address', ['length' => 255, 'comment' => '运送地址']);
+            // 租赁状态
+            $table->addColumn('smallInteger', 'rent_status', ['default' => 1, 'comment' => '租赁状态 (1租用中 2已归还)'])->index()->nullable();
+            $table->addColumn('string', 'shipping_address', ['length' => 255, 'comment' => '运送地址']);
             $table->addColumn('bigInteger', 'exh_lib_obj_id', ['unsigned' => true, 'comment' => '展项主键'])->index()->nullable();
             $table->addColumn('string', 'exh_lib_obj_name', ['length' => 50, 'comment' => '展项名字'])->index();
             $table->addColumn('string', 'cover', ['length' => 255, 'comment' => '展项封面']);

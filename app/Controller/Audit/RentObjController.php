@@ -49,9 +49,21 @@ class RentObjController extends BaseController
      * @throws NotFoundExceptionInterface
      */
     #[PutMapping('changeAuditStatus'), Permission('approvalManage:LibExhibition:Rent:changeAuditStatus'), OperationLog]
-    public function changeStatus(RentApprovalRequest $request): ResponseInterface
+    public function changeAuditStatus(RentApprovalRequest $request): ResponseInterface
     {
         return $this->service->changeAuditStatus((int) $request->input('id'), (int) $request->input('audit_status'), (string) $request->input('refuse_reason'))
+            ? $this->response->success() : $this->response->fail();
+    }
+
+    /**
+     * 更改展项状态
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[PutMapping('changeRentStatus'), Permission('approvalManage:LibExhibition:Rent:changeRentStatus'), OperationLog]
+    public function changeRentStatus(RentApprovalRequest $request): ResponseInterface
+    {
+        return $this->service->changeRentStatus((int) $request->input('id'), (int) $request->input('rent_status'))
             ? $this->response->success() : $this->response->fail();
     }
 
