@@ -125,10 +125,24 @@ class StatisticsService extends BaseService
         $thirtyDaysAgo = $now->copy()->subDays(29); // Last 30 days inclusive
         $oneYearAgo = $now->copy()->subYear()->startOfMonth(); // Last 1 year inclusive, starting at the beginning of the month
 
+
+        // Filter logs for each time range
+        $logs7Days = $logs->filter(function ($log) use ($sevenDaysAgo, $now) {
+            return $log->login_time >= $sevenDaysAgo && $log->login_time <= $now;
+        });
+
+        $logs30Days = $logs->filter(function ($log) use ($thirtyDaysAgo, $now) {
+            return $log->login_time >= $thirtyDaysAgo && $log->login_time <= $now;
+        });
+
+        $logs1Year = $logs->filter(function ($log) use ($oneYearAgo, $now) {
+            return $log->login_time >= $oneYearAgo && $log->login_time <= $now;
+        });
+
         // Group data for each range
-        $data7Days = $this->generateDateRangeData($logs, $sevenDaysAgo, $now, 'Y-m-d');
-        $data30Days = $this->generateDateRangeData($logs, $thirtyDaysAgo, $now, 'Y-m-d');
-        $data1Year = $this->generateDateRangeData($logs, $oneYearAgo, $now, 'Y-m');
+        $data7Days = $this->generateDateRangeData($logs7Days, $sevenDaysAgo, $now, 'Y-m-d');
+        $data30Days = $this->generateDateRangeData($logs30Days, $thirtyDaysAgo, $now, 'Y-m-d');
+        $data1Year = $this->generateDateRangeData($logs1Year, $oneYearAgo, $now, 'Y-m');
 
         return [
             '7_days' => $data7Days,
@@ -261,6 +275,7 @@ class StatisticsService extends BaseService
         // Merge grouped log data into the date range, replacing zeros with actual counts
         return $dateRangeData->merge($groupedLogs);
     }
+
 
     // Helper function to generate a complete date range and sum files_count data
     private function generateFileDateRangeData(array $dataList, int $days, string $format): array
