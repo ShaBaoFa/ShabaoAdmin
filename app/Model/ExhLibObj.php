@@ -16,6 +16,7 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
+use Hyperf\Database\Model\Relations\HasMany;
 use Hyperf\Database\Model\Relations\MorphMany;
 
 use function App\Helper\user;
@@ -108,5 +109,10 @@ class ExhLibObj extends BaseModel
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+
+    public function downloadApprovals(): HasMany
+    {
+        return $this->hasMany(UserDownloadApproval::class, 'exh_lib_obj_id', 'id');
     }
 }

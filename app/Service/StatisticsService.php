@@ -54,6 +54,21 @@ class StatisticsService extends BaseService
         $this->rentApprovalDao = $rentApprovalDao;
     }
 
+    public function activeUserRankingByPoint(): array
+    {
+        return $this->userDao->activeUserRankingByPoint();
+    }
+
+    public function collectObjectRanking(): array
+    {
+        return $this->exhLibObjDao->collectObjectRanking();
+    }
+
+    public function downloadObjectRanking(): array
+    {
+        return $this->exhLibObjDao->downloadObjectRanking();
+    }
+
     public function visit(): array
     {
         // Fetch all login logs
@@ -124,7 +139,6 @@ class StatisticsService extends BaseService
         $sevenDaysAgo = $now->copy()->subDays(6);  // Last 7 days inclusive
         $thirtyDaysAgo = $now->copy()->subDays(29); // Last 30 days inclusive
         $oneYearAgo = $now->copy()->subYear()->startOfMonth(); // Last 1 year inclusive, starting at the beginning of the month
-
 
         // Filter logs for each time range
         $logs7Days = $logs->filter(function ($log) use ($sevenDaysAgo, $now) {
@@ -275,7 +289,6 @@ class StatisticsService extends BaseService
         // Merge grouped log data into the date range, replacing zeros with actual counts
         return $dateRangeData->merge($groupedLogs);
     }
-
 
     // Helper function to generate a complete date range and sum files_count data
     private function generateFileDateRangeData(array $dataList, int $days, string $format): array

@@ -168,7 +168,7 @@ class ExhLibObjService extends BaseService
         // 1 等待审核
         Arr::set($data, 'audit_status', AuditCode::IN_AUDIT);
         // 获取 hash 数组 对应的 id 数组
-        $hashes = Arr::get($data, 'files');
+        $hashes = Arr::get($data, 'files', []);
         $saveFiles = [];
         $diskService = di()->get(DiskService::class);
         foreach ($hashes as $hash) {

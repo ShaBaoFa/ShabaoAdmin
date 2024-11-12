@@ -39,6 +39,11 @@ class UserDao extends BaseDao
         $this->model = User::class;
     }
 
+    public function activeUserRankingByPoint(): array
+    {
+        return $this->model::query()->select('username', 'nickname', 'point')->orderBy('point', 'desc')->limit(10)->get()->toArray();
+    }
+
     public function getAll(): Collection
     {
         return User::all();

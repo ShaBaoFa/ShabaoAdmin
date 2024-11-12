@@ -76,4 +76,24 @@ class StatisticsController extends BaseController
     {
         return $this->response->success($this->service->rentRanking($request->all()));
     }
+
+    #[GetMapping('activeUserRankingByPoint')]
+    public function activeUserRankingByPoint(RequestInterface $request): ResponseInterface
+    {
+        return $this->response->success($this->service->activeUserRankingByPoint($request->all()));
+    }
+
+    // 收藏展项排行
+    #[GetMapping('collectObjectRanking')]
+    public function collectObjectRanking(RequestInterface $request): ResponseInterface
+    {
+        return $this->response->success($this->service->collectObjectRanking($request->all()));
+    }
+
+    // 收藏展项排行
+    #[GetMapping('downloadObjectRanking')]
+    public function downloadObjectRanking(RequestInterface $request): ResponseInterface
+    {
+        return $this->response->success($this->service->downloadObjectRanking($request->all()));
+    }
 }

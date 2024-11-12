@@ -50,13 +50,13 @@ class ExhLibObjRequest extends BaseFormRequest
             'phone' => ['required', 'string', 'telephone_number'],
             'email' => ['required', 'string', 'email'],
             'profile' => ['required'],
-            'save_dir_id' => ['required', 'integer'],
+            'save_dir_id' => ['required_if:type,1', 'integer'],
             'tags' => ['required', 'array'],
             'tags.*' => ['integer', 'exists:exh_lib_tags,id'],
             'type' => ['required', 'integer', 'min:1', 'max:3'], // (1虚拟展项素材 2实体展项素材 3平台展项素材)
             'lib_type' => ['required', 'integer', 'min:1', 'max:4'], // (1战新 2行业 3主题 4专场)
             'lib_area_type' => ['required', 'integer', 'exists:exh_lib_areas,id'],
-            'files' => ['required', 'array'],
+            'files' => ['nullable', 'array'],
             'files.*' => ['string', 'exists:upload_files,hash'],
             'covers' => ['required', 'array'],
             'covers.*' => ['string', 'exists:upload_files,hash'],

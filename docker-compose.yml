@@ -12,7 +12,7 @@ services:
       - ./.docker/mysql:/var/lib/mysql
       - ./.github/init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - "13306:3306"
+      - "23306:3306"
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       retries: 3
@@ -52,8 +52,8 @@ services:
       REDIS_HOST: "redis"
     working_dir: "/opt/www"
     ports:
-      - "9505:9505"
-      - "9506:9506"
+      - "29505:9505"
+      - "29506:9506"
     volumes:
       - "./:/opt/www"
       - "./.env.docker:/opt/www/.env"
@@ -66,8 +66,8 @@ services:
     networks:
       - net
     ports:
-      - "5369:4369"
-      - "6672:5672"
+      - "25369:4369"
+      - "26672:5672"
       - "25672:15672"
       - "35672:25672"
     environment:

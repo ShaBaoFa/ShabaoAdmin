@@ -33,6 +33,20 @@ class ExhLibObjDao extends BaseDao
         $this->model = ExhLibObj::class;
     }
 
+    public function collectObjectRanking(): array
+    {
+        return $this->model::query()->select('id', 'title')->withCount('collectUsers')
+            ->orderBy('collect_users_count', 'desc') // Sort by the count in descending order
+            ->limit(10)->get()->toArray();
+    }
+
+    public function downloadObjectRanking(): array
+    {
+        return $this->model::query()->select('id', 'title')->withCount('downloadApprovals')
+            ->orderBy('download_approvals_count', 'desc') // Sort by the count in descending order
+            ->limit(10)->get()->toArray();
+    }
+
     #[Transactional]
     public function save(array $data): mixed
     {
