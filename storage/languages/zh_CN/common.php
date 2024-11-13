@@ -27,6 +27,8 @@ return [
     'user_ban' => '用户被禁用',
     'user_login_type_error' => '不正确的登陆方式',
     'repeat_operation' => '重复操作',
+    'user_captcha_error' => '验证码错误',
+
 
     // excel
     'export_data_failed' => '导出数据失败',

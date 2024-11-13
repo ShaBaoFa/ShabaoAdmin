@@ -24,6 +24,7 @@ use App\Service\FileSystemService;
 use App\Service\KkFileView\PreviewService;
 use App\Service\WsSenderService;
 use App\Vo\QueueMessageVo;
+use Baoziyoo\HyperfCaptcha\Captcha;
 use Carbon\Carbon;
 use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\Amqp\Producer;
@@ -73,10 +74,12 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        $data['xxx'] = 1;
-        $data['tags'] = [123];
-        Arr::get($data, 'tags', [123]);
-        var_dump($data);
+        $captcha = make(Captcha::class);
+        $code = $captcha->generateCode();
+        //        $data['xxx'] = 1;
+        //        $data['tags'] = [123];
+        //        Arr::get($data, 'tags', [123]);
+        var_dump($code);
         return;
         //        $client = new OosClient('098e48ed7c020b2f7a0c','ebe41e052372b833ce8b9218febb62545f2cb8d5','oos-cn-iam.ctyunapi.cn');
         //        $policy = [

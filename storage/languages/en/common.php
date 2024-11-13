@@ -27,6 +27,7 @@ return [
     'user_ban' => 'user_ban',
     'user_login_type_error' => 'user_login_type_error',
     'repeat_operation' => 'repeat_operation',
+    'user_captcha_error' => 'user_captcha_error',
 
     // excel
     'export_data_failed' => 'export_data_failed',

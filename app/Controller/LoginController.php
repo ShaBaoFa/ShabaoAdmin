@@ -13,6 +13,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Annotation\Auth;
+use App\Annotation\Captcha;
 use App\Base\BaseController;
 use App\Helper\currentUser;
 use App\Request\AuthRequest;
@@ -33,12 +34,18 @@ class LoginController extends BaseController
     #[Inject]
     protected AuthService $authService;
 
+    #[PostMapping('captcha')]
+    public function captcha(): ResponseInterface
+    {
+        return $this->response->success($this->authService->captcha());
+    }
+
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws InvalidArgumentException
      */
-    #[PostMapping('login')]
+    #[PostMapping('login'),Captcha]
     public function login(AuthRequest $request): ResponseInterface
     {
         $requestData = $request->validated();

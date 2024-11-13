@@ -56,6 +56,10 @@ enum ErrorCode: int implements ErrorCodeInterface
     #[Message('common.user_login_type_error')]
     case USER_LOGIN_TYPE_ERROR = 10005;
 
+    // 验证码错误
+    #[Message('common.user_captcha_error')]
+    case CAPTCHA_ERROR = 10006;
+
     # 导出数据失败
     #[Message('common.export_data_failed')]
     case EXPORT_DATA_FAILED = 20002;

@@ -82,7 +82,7 @@ class ExhLibObjService extends BaseService
         return $modelArray;
     }
 
-    #[CacheEvict(prefix: 'ExhLibObj', value: 'ExhLibObjId_#{id}')]
+    #[CacheEvict(prefix: 'ExhLibOjb', value: 'ExhLibObjId_#{id}')]
     public function update(mixed $id, array $data): bool
     {
         // 判断是否已存在
@@ -264,7 +264,7 @@ class ExhLibObjService extends BaseService
         return true;
     }
 
-    #[Cacheable(prefix: 'ExhLibOrg', value: 'ExhLibOrgId_#{id}', ttl: 0)]
+    #[Cacheable(prefix: 'ExhLibOjb', value: 'ExhLibObjId_#{id}', ttl: 3600)]
     private function getCacheData($id): array
     {
         return $this->dao->find($id)->load(['tags', 'files', 'covers', 'share_regions'])->toArray();
