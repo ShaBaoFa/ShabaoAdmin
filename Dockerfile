@@ -1,4 +1,4 @@
-FROM hyperf/hyperf:8.1-alpine-v3.18-swoole
+FROM registry.cn-hangzhou.aliyuncs.com/wlfpanda1012/hyperf:8.1-alpine-v3.18-swoole
 LABEL maintainer="Shabao Developers <wlfpanda1012@gmail.cn>" version="1.0" license="MIT" app.name="ShabaoAdmin"
 
 ##
