@@ -92,7 +92,7 @@ class AuthService extends BaseService
         $redis->setex($key, 300, $captchaCode); // 验证码5分钟有效
         return [
             'captcha_key' => $captchaKey,
-            'captcha' => Arr::get($code,'base64'),
+            'captcha' => Arr::get($code, 'base64'),
         ];
     }
 

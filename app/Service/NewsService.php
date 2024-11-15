@@ -19,6 +19,8 @@ use App\Dao\NewsDao;
 use App\Dao\UserDao;
 use App\Exception\BusinessException;
 use Hyperf\Collection\Arr;
+use Hyperf\Elasticsearch\ClientBuilderFactory;
+use stdClass;
 
 class NewsService extends BaseService
 {
@@ -30,6 +32,12 @@ class NewsService extends BaseService
     public function __construct(NewsDao $dao)
     {
         $this->dao = $dao;
+    }
+
+    public function search(array $params): array
+    {
+//        return $this->searchByEs($params);
+                return $this->getPageList($params);
     }
 
     public function save(array $data): mixed
@@ -109,5 +117,46 @@ class NewsService extends BaseService
     {
         //        Arr::set($params, 'audit_status', AuditCode::PASS->value);
         return $this->getPageList($params);
+    }
+
+    protected function searchByEs(array $params): array
+    {
+        $page = Arr::get($params, 'page', 1);
+        $size = Arr::get($params, 'size', 10);
+        $params = [
+            'index' => 'news',
+            'body' => [
+                'from' => (int) $page,
+                'size' => (int) $size,
+                'query' => [
+                    'multi_match' => [
+                        'query' => Arr::get($params, 'keywords'),
+                        'fields' => ['title', 'profile', 'content'],
+                    ],
+                ],
+                'highlight' => [
+                    'pre_tags' => ['<b>'],
+                    'post_tags' => ['</b>'],
+                    'fields' => [
+                        'title' => new stdClass(),
+                        'profile' => new stdClass(),
+                        'content' => new stdClass(),
+                    ],
+                ],
+            ],
+        ];
+        $builder = di()->get(ClientBuilderFactory::class)->create();
+        $client = $builder->setHosts(['localhost:9200'])->build();
+        $response = $client->search($params);
+        $totalCount = $response['hits']['total']['value'];
+        $hits = $response['hits']['hits'];
+        return [
+            'items' => $hits,
+            'pageInfo' => [
+                'total' => $totalCount,
+                'currentPage' => $page,
+                'totalPage' => ceil($totalCount / $size),
+            ],
+        ];
     }
 }

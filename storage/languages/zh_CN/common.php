@@ -29,7 +29,6 @@ return [
     'repeat_operation' => '重复操作',
     'user_captcha_error' => '验证码错误',
 
-
     // excel
     'export_data_failed' => '导出数据失败',
     'export_dto_not_specified' => '导出未指定DTO',

@@ -59,4 +59,9 @@ class UserDownloadApproval extends BaseModel
     {
         return $this->belongsTo(ExhLibObj::class, 'exh_lib_obj_id', 'id');
     }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

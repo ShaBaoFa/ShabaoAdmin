@@ -46,6 +46,12 @@ class NewsController extends BaseController
         return $this->response->success($this->service->index($request->all()));
     }
 
+    #[GetMapping('search')]
+    public function search(NewsRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->search($request->all()));
+    }
+
     /**
      * 审核列表.
      * @throws ContainerExceptionInterface

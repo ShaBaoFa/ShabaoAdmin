@@ -65,7 +65,7 @@ class CaptchaAspect extends AbstractAspect
         if ($redis->get($key) === $code) {
             $redis->del($key);
             return true;
-        };
+        }
         return false;
     }
 }

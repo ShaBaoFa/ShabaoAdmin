@@ -16,6 +16,7 @@ use App\Base\BaseModel;
 use Carbon\Carbon;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Relations\BelongsToMany;
+use Hyperf\Database\Model\Relations\HasMany;
 
 /**
  * @property int $id
@@ -130,6 +131,15 @@ class User extends BaseModel
             'user_collect_obj',
             'user_id',
             'obj_id'
+        );
+    }
+
+    public function applyObjs(): HasMany
+    {
+        return $this->hasMany(
+            UserDownloadApproval::class,
+            'user_id',
+            'id'
         );
     }
 

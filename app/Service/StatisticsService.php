@@ -25,6 +25,8 @@ use Carbon\Carbon;
 use Hyperf\Collection\Arr;
 use Hyperf\Collection\Collection;
 
+use Hyperf\Elasticsearch\ClientBuilderFactory;
+use stdClass;
 use function Hyperf\Collection\collect;
 
 class StatisticsService extends BaseService
@@ -71,6 +73,7 @@ class StatisticsService extends BaseService
 
     public function visit(): array
     {
+//        return $this->visitByEs();
         // Fetch all login logs
         $logs = $this->loginLogDao->getAll();
 
@@ -97,6 +100,86 @@ class StatisticsService extends BaseService
         $todayUniqueIps = $todayLogs->unique('ip')->count();
 
         // Return all metrics in an array
+        return [
+            'total_pv' => $totalPv,
+            'total_uv' => $totalUv,
+            'total_unique_ips' => $totalUniqueIps,
+            'today_pv' => $todayPv,
+            'today_uv' => $todayUv,
+            'today_unique_ips' => $todayUniqueIps,
+        ];
+    }
+
+    private function visitByEs():array
+    {
+        $builder = di()->get(ClientBuilderFactory::class)->create();
+        $client = $builder->setHosts(['localhost:9200'])->build();
+        $now = Carbon::now();  // 当前时间
+        $today = $now->toDateString();  // 今天的日期
+        // Elasticsearch 查询
+        $response = $client->search([
+            'index' => 'login_logs',
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+                'aggs' => [
+                    'total_pv' => [
+                        'value_count' => [
+                            'field' => 'id',  // 用 id 字段计算总数（假设每条日志有一个唯一的 id）
+                        ]
+                    ],
+                    'total_uv' => [
+                        'cardinality' => [
+                            'field' => 'username',  // UV 通过唯一的 username 计算
+                        ]
+                    ],
+                    'total_unique_ips' => [
+                        'cardinality' => [
+                            'field' => 'ip',  // Unique IPs 通过唯一的 ip 计算
+                        ]
+                    ],
+                    'today_stats' => [
+                        'filter' => [
+                            'range' => [
+                                'login_time' => [
+                                    'gte' => $now->startOfDay()->toDateTimeString(),
+                                    'lte' => $now->endOfDay()->toDateTimeString(),
+                                ]
+                            ]
+                        ],
+                        'aggs' => [
+                            'today_pv' => [
+                                'value_count' => [
+                                    'field' => 'id',
+                                ]
+                            ],
+                            'today_uv' => [
+                                'cardinality' => [
+                                    'field' => 'username',
+                                ]
+                            ],
+                            'today_unique_ips' => [
+                                'cardinality' => [
+                                    'field' => 'ip',
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+
+        // 解析 Elasticsearch 返回的结果
+        $totalPv = $response['aggregations']['total_pv']['value'];
+        $totalUv = $response['aggregations']['total_uv']['value'];
+        $totalUniqueIps = $response['aggregations']['total_unique_ips']['value'];
+//
+        $todayPv = $response['aggregations']['today_stats']['today_pv']['value'];
+        $todayUv = $response['aggregations']['today_stats']['today_uv']['value'];
+        $todayUniqueIps = $response['aggregations']['today_stats']['today_unique_ips']['value'];
+//        // 返回结果
         return [
             'total_pv' => $totalPv,
             'total_uv' => $totalUv,

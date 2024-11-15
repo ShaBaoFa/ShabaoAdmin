@@ -38,6 +38,7 @@
     "hyperf/db-connection": "3.1.*",
     "hyperf/di": "3.1.*",
     "hyperf/dispatcher": "3.1.*",
+    "hyperf/elasticsearch": "^3.1",
     "hyperf/engine": "^2.0",
     "hyperf/event": "3.1.*",
     "hyperf/exception-handler": "3.1.*",
@@ -98,6 +99,12 @@
     "sort-packages": true
   },
   "extra": [],
+  "repositories": {
+    "proxy": {
+      "type": "composer",
+      "url": "https://g-rtsg9040-composer.pkg.coding.net/composer/packagist"
+    }
+  },
   "scripts": {
     "post-root-package-install": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

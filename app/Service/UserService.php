@@ -99,7 +99,9 @@ class UserService extends BaseService
     public function info(?int $userId = null): array
     {
         if ($uid = (is_null($userId) ? user()->getId() : $userId)) {
-            return $this->getCacheInfo($uid);
+            $data = $this->getCacheInfo($uid);
+            $count = $this->getCacheCountData($uid);
+            return array_merge($data, $count);
         }
         throw new BusinessException(ErrorCode::USER_NOT_EXIST);
     }
@@ -243,6 +245,23 @@ class UserService extends BaseService
         # 用户更新个人资料
         unset($params['id'], $params['username'], $params['password'], $params['status'], $params['user_type']);
         return $this->dao->update($id, $params);
+    }
+
+    protected function getCacheCountData(int $id): array
+    {
+        $data = [
+            'point' => 0,
+            'pick_count' => 0,
+            'apply_count' => 0,
+            'collect_count' => 0,
+        ];
+        $user = $this->dao->getModel()->find($id);
+        /** @var User $user */
+        Arr::set($data, 'point', $user->point);
+        Arr::set($data, 'pick_count', $user->pickObjs()->count());
+        Arr::set($data, 'apply_count', $user->applyObjs()->count());
+        Arr::set($data, 'collect_count', $user->collectObjs()->count());
+        return $data;
     }
 
     /**

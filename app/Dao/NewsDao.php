@@ -57,6 +57,15 @@ class NewsDao extends BaseDao
         );
 
         $query->when(
+            $keywords = Arr::get($params, 'keywords'),
+            fn (Builder $query) => $query->where(function (Builder $builder) use ($keywords) {
+                $builder->where('title', 'like', '%' . $keywords . '%')
+                    ->orWhere('content', 'like', '%' . $keywords . '%')
+                    ->orWhere('profile', 'like', '%' . $keywords . '%');
+            })
+        );
+
+        $query->when(
             Arr::get($params, 'published_at'),
             function (Builder $query, $publishedAt) {
                 if (is_array($publishedAt) && count($publishedAt) === 2) {

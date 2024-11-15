@@ -12,48 +12,32 @@ declare(strict_types=1);
 
 namespace App\Command;
 
-use App\Amqp\Producer\DelayedMessageProducer;
-use App\Amqp\Producer\MessageProducer;
-use App\Constants\DiskFileShareExpireCode;
-use App\Constants\ErrorCode;
-use App\Constants\MessageContentTypeCode;
-use App\Constants\QueueMesContentTypeCode;
-use App\Exception\BusinessException;
-use App\Model\Message;
-use App\Service\FileSystemService;
-use App\Service\KkFileView\PreviewService;
-use App\Service\WsSenderService;
-use App\Vo\QueueMessageVo;
-use Baoziyoo\HyperfCaptcha\Captcha;
+use App\Dao\LoginLogDao;
+use App\Dao\NewsDao;
+use App\Model\News;
 use Carbon\Carbon;
+use Elasticsearch\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Hyperf\Amqp\Producer;
-use Hyperf\Collection\Arr;
 use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
-use Hyperf\Contract\ConfigInterface;
-use Hyperf\DbConnection\Db;
+use Hyperf\Elasticsearch\ClientBuilderFactory;
 use OSS\Core\OssException;
 use OSS\Http\RequestCore_Exception;
-use OSS\OssClient;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use RedisException;
-use Wlfpanda1012\AliyunSts\Constants\OSSClientCode;
-use Wlfpanda1012\AliyunSts\Oss\OssRamService;
-use Wlfpanda1012\CommonSts\Sts;
-use Wlfpanda1012\EasySts\StsFactory;
-
-use function App\Helper\redis;
-use function Hyperf\Config\config;
-use function Hyperf\Support\make;
+use stdClass;
 
 #[Command]
 class TestCommand extends HyperfCommand
 {
+
+    protected Client $esClient;
     public function __construct(protected ContainerInterface $container)
     {
+        $builder = di()->get(ClientBuilderFactory::class)->create();
+        $this->esClient = $builder->setHosts(['localhost:9200'])->build();
         parent::__construct('demo:c');
     }
 
@@ -74,257 +58,346 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        $captcha = make(Captcha::class);
-        $code = $captcha->generateCode();
-        //        $data['xxx'] = 1;
-        //        $data['tags'] = [123];
-        //        Arr::get($data, 'tags', [123]);
-        var_dump($code);
-        return;
-        //        $client = new OosClient('098e48ed7c020b2f7a0c','ebe41e052372b833ce8b9218febb62545f2cb8d5','oos-cn-iam.ctyunapi.cn');
-        //        $policy = [
-        //            "Version" => "2012-10-17",
-        //            "Statement" => [
-        //                [
-        //                    "Effect" => "Allow",
-        //                    "Action" => [
-        //                        "oos:*"
-        //                    ],
-        //                    "Resource" => [
-        //                        "arn:ctyun:oos::22r5hbr48s3la:wlf2/1.jpg",
-        //                    ]
-        //                ]
-        //            ]
-        //        ];
-        //        $PolicyDocument = json_encode($policy);
-        //        $token = $client->GetSessionToken(['PolicyDocument' => $PolicyDocument]);
-        //        var_dump($token);
-        //        return;
-        $sts = di()->get(StsFactory::class)->get('ctyun');
-        $policy = [
-            'Version' => '2012-10-17',
-            'Statement' => [
-                [
-                    'Effect' => 'Allow',
-                    'Action' => [
-                        'oos:*',
+//        $this->transNewsToEs();
+//        $this->transLogsToEs();
+//        $result = $this->visit();
+        $this->searchNews();
+//        $this->getAnalyzeSetting();
+    }
+    protected function getAnalyzeSetting()
+    {
+        $params = ['index' => 'news'];
+        $response = $this->esClient->indices()->getSettings($params);
+        print_r($response);
+
+    }
+    protected function searchNews()
+    {
+        $params = [
+            'index' => 'news',
+            'body' => [
+                'analyzer' => 'ik_smart',
+                'text' => '我是人民接班人'
+            ]
+        ];
+        $builder = di()->get(ClientBuilderFactory::class)->create();
+        $client = $builder->setHosts(['localhost:9200'])->build();
+        $response = $client->indices()->analyze($params);
+        var_dump($response);
+//        $totalCount = $response['hits']['total']['value'];
+//        $hits = $response['hits']['hits'];
+//        $data = [
+//            'items' => $hits,
+//            'pageInfo' => [
+//                'total' => $totalCount,
+//                'currentPage' => 1,
+//                'totalPage' => ceil($totalCount / 20),
+//            ]
+//        ];
+    }
+    protected function transNewsToEs()
+    {
+        $builder = di()->get(ClientBuilderFactory::class)->create();
+        $client = $builder->setHosts(['localhost:9200'])->build();
+        $indexExists = $client->indices()->exists(['index' => 'news']);
+
+        if ($indexExists) {
+            $response = $client->indices()->delete(['index' => 'news']);
+        }
+        $params = [
+            'index' => 'news',  // 索引名称
+            'body' => [
+                'settings' => [
+                    'analysis' => [
+                        'tokenizer' => [
+                            'ik_max_word' => [
+                                'type' => 'ik_max_word',  // 使用 ik_max_word 分词器
+                            ],
+                            'ik_smart' => [
+                                'type' => 'ik_smart',  // 使用 ik_smart 分词器
+                            ],
+                        ],
+                        'analyzer' => [
+                            'ik_max_word_analyzer' => [
+                                'type' => 'custom',
+                                'tokenizer' => 'ik_max_word',  // 使用 ik_max_word 分词器进行分词
+                            ],
+                            'ik_smart_analyzer' => [
+                                'type' => 'custom',
+                                'tokenizer' => 'ik_smart',  // 使用 ik_smart 分词器进行分词
+                            ],
+                        ],
                     ],
-                    'Resource' => [
-                        'arn:ctyun:oos::22r5hbr48s3la:wlf2/1.jpg',
+                ],
+                'mappings' => [
+                    'properties' => [
+                        'id' => [
+                            'type' => 'long',
+                        ],
+                        'title' => [
+                            'type' => 'text',
+                            'analyzer' => 'ik_max_word_analyzer',  // 使用 ik_max_word 分词器
+                            'search_analyzer' => 'ik_smart_analyzer',  // 搜索时使用 ik_smart 分词器
+                        ],
+                        'author' => [
+                            'type' => 'keyword',
+                        ],
+                        'lib_area_type' => [
+                            'type' => 'short',
+                        ],
+                        'profile' => [
+                            'type' => 'text',
+                            'analyzer' => 'ik_smart_analyzer',  // 使用 ik_smart 分词器
+                            'search_analyzer' => 'ik_smart_analyzer',  // 搜索时也使用 ik_smart 分词器
+                        ],
+                        'content' => [
+                            'type' => 'text',
+                            'analyzer' => 'ik_max_word_analyzer',  // 使用 ik_max_word 分词器
+                            'search_analyzer' => 'ik_smart_analyzer',  // 搜索时使用 ik_smart 分词器
+                        ],
                     ],
                 ],
             ],
         ];
-        //        var_dump($sts->getToken($policy));
-        //        $fs = di()->get(FileSystemService::class);
-        //        $url = $fs->generateSignature('/uploadfile/20240924/697158785982119936.xlsx');
-        //        $service = make(PreviewService::class);
-        //                if($service->addTask(['url' => $url])){
-        //                    var_dump('success');
-        //                }else{
-        //                    var_dump('fail');
-        //                }
-        //        $url = 'https://yunzhizhanoss2.oss-cn-hangzhou.aliyuncs.com/f5b6d64ae963a4745888898.jpg?Expires=1727205174&OSSAccessKeyId=TMP.3KjFwJwibPuzY47KUhyjZhPsRZvnEberswh9A5QttZhWJs682CzKPDrAPCjB7TC9Uu2Zi5gDfMFtA1Zj3FuEnyA44GcpaB&Signature=Fv7yl8Gc39Wl4uFk6%2BdKfLcd1Kg%3D';
-        //        $url = $service->onlinePreview($url, ['watermark' => '的快乐就是地方']);
-        //        var_dump($url);
-        //        var_dump($service->onlinePreview(['url' => $url,'watermarkTxt' => 123]));
 
-        //        $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
-        //        $zip_file = BASE_PATH . '/region.json.zip';
-        //        file_put_contents($zip_file, $online_zip);
-        //        return;
-        //        // 示例的 region_data 数据
-        //        $regionData = Db::table('region')->get()->toArray();
-        //        // 读取 Lua 脚本内容
-        //        $luaScript = file_get_contents(BASE_PATH . '/store_region_data.lua');
-        //        $redis = redis();
-        //        // 将 Lua 脚本加载到 Redis
-        //        $scriptSha = $redis->script('load', $luaScript);
-        //        var_dump($scriptSha);
-        //        // 准备 Lua 脚本的参数
-        //        $argv = [];
-        //        foreach ($regionData as $region) {
-        //            $argv[] = $region->id;
-        //            $argv[] = $region->parent_id;
-        //            $argv[] = $region->level;
-        //            $argv[] = $region->name;
-        //            $argv[] = $region->initial;
-        //            $argv[] = $region->pinyin;
-        //            $argv[] = $region->citycode;
-        //            $argv[] = $region->adcode;
-        //            $argv[] = $region->lng_lat;
-        //        }
-        //        // 执行 Lua 脚本
-        //        // 准备 KEYS 和 ARGV 参数
-        //        $keys = ['region'];
-        //        // 合并 KEYS 和 ARGV 参数
-        //        $params = array_merge($keys, $argv);
-        //
-        //        // 执行 Lua 脚本
-        //        $result = $redis->evalSha($scriptSha, $params, count($keys));
-        //        var_dump($result);
+        // 创建索引
+        $client->indices()->create($params);
 
-        //        var_dump(BASE_PATH);
-        //        print ('正在下载json数据压缩包···' . "\n");
-        //        $online_zip = file_get_contents('http://json.think-region.yupoxiong.com/region.json.zip?v=' . uniqid('region', true));
-        //        $zip_file   = BASE_PATH . '/region.json.zip';
-        //        $json_file  = BASE_PATH . '/region.json';
-        //        file_put_contents($zip_file, $online_zip);
-        //        $arr = [1, 2, 3, 4, 5, 6, 7];
-        //        $arr2 = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-        //        var_dump(in_array($arr, $arr2));
-        //        var_dump(DiskFileShareExpireCode::from(4)->getTimestamp());
-        //        make(OssRamService::class, ['a' => 'b']);
-        //        var_dump(intval(bcadd('100.01', '1.02', 2) * 100));
-        //        $ids = [];
-        //        for ($i = 0; $i < 10; ++$i) {
-        //            $ids[] = $i * 5 + 1;
-        //        }
-        //        foreach ($ids as $id) {
-        //            var_dump($id);
-        //            Arr::forget($ids, $id);
-        //            var_dump($ids);
-        //        }
-        //        di()->get(WsSenderService::class)->sendByUid(1, 'test');
-        //        $key = sprintf('%sws:uid:%s:fd:%s', config('cache.default.prefix'), '1', '20');
-        //        redis()->setex($key, config('jwt.ttl'), 1);
-        //        for ($i = 0; $i < 50; ++$i) {
-        //            // 随机一个过去的时间
-        //            $day = rand(0, 10);
-        //            $hour = rand(0, 10);
-        //            $minute = rand(0, 10);
-        //            $second = rand(0, 10);
-        //            $time = Carbon::now()->subDays($day)->subHours($hour)->subMinutes($minute)->subSeconds($second)->toDateTimeString();
-        //            $send_by = rand(1, 3);
-        //            $receive_by = rand(1, 3);
-        //            while ($send_by == $receive_by) {
-        //                $send_by = rand(1, 3);
-        //                $receive_by = rand(1, 3);
-        //            }
-        //            $messageId = Message::insertGetId(['send_by' => $send_by, 'receive_by' => $receive_by, 'content' => '123', 'content_type' => MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value, 'created_at' => $time, 'created_by' => $send_by, 'updated_by' => $send_by]);
-        //            $message = Message::find($messageId);
-        //            $message->receiveUsers()->sync([$receive_by]);
-        //        }
+        $newsDao = di()->get(NewsDao::class);
+        $news = $newsDao->model::all()->toArray();
+        $batchSize = 1000;  // 每批次导入的数据量，您可以根据实际情况调整
 
-        // 第一步：获取步骤1的结果并将其作为子查询
-        //        $subQuery = Db::table('messages')
-        //            ->selectRaw('LEAST(send_by, receive_by) AS user1, GREATEST(send_by, receive_by) AS user2, MAX(created_at) AS first_message_time')
-        //            ->where(function ($query) {
-        //                $query->where('send_by', 1)
-        //                    ->orWhere('receive_by', 1);
-        //            })
-        //            ->where('content_type', MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value)
-        //            ->groupBy(Db::raw('LEAST(send_by, receive_by), GREATEST(send_by, receive_by)'));
-        //
-        //        // 第二步：使用子查询与原表进行 JOIN
-        //        $messages = Db::table('messages')
-        //            ->joinSub($subQuery, 'sub', function ($join) {
-        //                $join->on(Db::raw('LEAST(messages.send_by, messages.receive_by)'), '=', 'sub.user1')
-        //                    ->on(Db::raw('GREATEST(messages.send_by, messages.receive_by)'), '=', 'sub.user2')
-        //                    ->on('messages.created_at', '=', 'sub.first_message_time');
-        //            })
-        //            ->select('messages.*')
-        //            ->get();
-        //        // 执行查询
-        //        var_dump(count($messages));
+        // 准备批量数据
+        $body = [];
+        $counter = 0;  // 计数器，用来控制每批次的大小
 
-        //        $vo = new QueueMessageVo();
-        //        $vo->setTitle('123');
-        //        $vo->setContent('123');
-        //        $vo->setContentType(QueueMesContentTypeCode::TYPE_ANNOUNCE);
-        //        var_dump($vo->toMap());
-        //        return;
-        //        for ($i = 0; $i < 4; ++$i) {
-        //            //            $message = new MessageProducer('produceTime:' . Carbon::now()->toDateTimeString());
-        //            $message = new DelayedMessageProducer($i);
-        //            //            $producer = di()->get(Producer::class);
-        //            //            var_dump($producer->produce($message,true));
-        //        }
-        // amqp
-        // 1.delayed + direct
-        // 发送50次 delay+direct消息
-        //        for ($i = 0; $i < 1; $i++) {
-        //            $message = new DelayedMessageProducer('delay+direct produceTime:' . Carbon::now()->toDateTimeString());
-        //            $message->setDelayMs(5000);
-        //            $producer = di()->get(Producer::class);
-        //            $producer->produce($message);
-        //        }
-        // gencallback
-        //        var_dump($this->generateOssCallback(['hash' => "333333423"]));
-        //        var_dump($this->genCallback());
-        //        var_dump($this->genCallback() === $this->generateOssCallback(['hash' => "333333423"]));
-        //        return;
-        // OSS简单上传回
-        //        $service = new OssRamService($config);
-        //        $credentials = $service->allowPutObject('2024/02/16/tdddw3ww.txt');
-        //        $client = new OssClient($credentials['access_key_id'], $credentials['access_key_secret'], 'https://oss-cn-hangzhou.aliyuncs.com', false, $credentials['security_token']);
-        //        try {
-        //            $data = $client->putObject($config['oss']['bucket'], '2024/02/16/tdddw3ww.txt', '123', $this->generateOssCallback(['hash' => '333333423']));
-        //            print_r($data['body']);
-        //            print_r($data['info']['http_code']);
-        //            //            $data = $client->getObject('wlf-upload-file', '2024/02/16/ceshice1231231shi111.txt');
-        //        } catch (OssException $e) {
-        //            var_dump($e->getMessage());
-        //        }
+        foreach ($news as $item) {
+            // 添加每条记录的index操作
+            $body[] = [
+                'index' => [
+                    '_index' => 'news',  // Elasticsearch索引名称
+                    '_id' => $item['id'],  // 使用MySQL的id作为文档ID
+                ],
+            ];
+
+            // 格式化要插入的数据
+            $body[] = [
+                'id' => $item['id'],
+                'title' => $item['title'],
+                'author' => $item['author'],
+                'lib_area_type' => $item['lib_area_type'],
+                'profile' => $item['profile'],
+                'content' => $item['content'],
+            ];
+
+            ++$counter;
+
+            // 当计数器达到batchSize时，发送一次bulk请求
+            if ($counter >= $batchSize) {
+                // 批量插入
+                $response = $client->bulk(['body' => $body]);
+
+                // 检查批量操作结果
+                if ($response['errors']) {
+                    $this->error("批量插入时发生错误！\n");
+                    print_r($response);
+                } else {
+                    $this->info("批量插入{$counter}成功！\n");
+                }
+
+                // 重置计数器和body，准备下一个批次
+                $body = [];
+                $counter = 0;
+            }
+        }
+
+        // 如果还有剩余的数据（小于batchSize的部分），也需要执行一次bulk操作
+        if ($counter > 0) {
+            $response = $client->bulk(['body' => $body]);
+
+            // 检查最后一个批次的导入结果
+            if ($response['errors']) {
+                $this->error("最后批次插入时发生错误！\n");
+                print_r($response);
+            } else {
+                $this->info("最后批次插入{$counter}成功！\n");
+            }
+        }
     }
 
-    /**
-     * @param mixed $pid
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws RedisException
-     */
-    //    private function generateOssCallback(array $customParams = []): array
-    //    {
-    //        $sts = di()->get(ConfigInterface::class)->get('sts');
-    //        $callback = $sts['oss']['callback'];
-    //        ! json_encode($callback) ?? throw new BusinessException(ErrorCode::SERVER_ERROR);
-    //        if (empty($customParams)) {
-    //            return [OSSClientCode::OSS_CALLBACK->value => json_encode($callback)];
-    //        }
-    //        $callback[OSSClientCode::OSS_CALLBACK_BODY->value] = $this->generateOssCallbackBody($customParams);
-    //        return [
-    //            OSSClientCode::OSS_CALLBACK->value => json_encode($callback),
-    //            OSSClientCode::OSS_CALLBACK_VAR->value => $this->generateOssCallbackVar($customParams),
-    //        ];
-    //    }
+    protected function visit(): array
+    {
+        $builder = di()->get(ClientBuilderFactory::class)->create();
+        $client = $builder->setHosts(['localhost:9200'])->build();
+        $now = Carbon::now();  // 当前时间
+        $today = $now->toDateString();  // 今天的日期
+        // Elasticsearch 查询
+        $response = $client->search([
+            'index' => 'login_logs',
+            'body' => [
+                'query' => [
+                    'match_all' => new stdClass(),
+                ],
+                'aggs' => [
+                    'total_pv' => [
+                        'value_count' => [
+                            'field' => 'id',  // 用 id 字段计算总数（假设每条日志有一个唯一的 id）
+                        ],
+                    ],
+                    'total_uv' => [
+                        'cardinality' => [
+                            'field' => 'username',  // UV 通过唯一的 username 计算
+                        ],
+                    ],
+                    'total_unique_ips' => [
+                        'cardinality' => [
+                            'field' => 'ip',  // Unique IPs 通过唯一的 ip 计算
+                        ],
+                    ],
+                    'today_stats' => [
+                        'filter' => [
+                            'range' => [
+                                'login_time' => [
+                                    'gte' => $now->startOfDay()->toDateTimeString(),
+                                    'lte' => $now->endOfDay()->toDateTimeString(),
+                                ],
+                            ],
+                        ],
+                        'aggs' => [
+                            'today_pv' => [
+                                'value_count' => [
+                                    'field' => 'id',
+                                ],
+                            ],
+                            'today_uv' => [
+                                'cardinality' => [
+                                    'field' => 'username',
+                                ],
+                            ],
+                            'today_unique_ips' => [
+                                'cardinality' => [
+                                    'field' => 'ip',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
-    //    private function generateOssCallbackBody(?array $customParams = null): string
-    //    {
-    //        $sts = di()->get(ConfigInterface::class)->get('sts');
-    //        $callback = $sts['oss']['callback'];
-    //        $baseParams = is_string($callback[OSSClientCode::OSS_CALLBACK_BODY->value]) ? explode(OSSClientCode::OSS_CALLBACK_SEPARATOR->value, $callback[OSSClientCode::OSS_CALLBACK_BODY->value]) : $callback[OSSClientCode::OSS_CALLBACK_BODY->value];
-    //        ! is_array($baseParams) && throw new BusinessException(ErrorCode::SERVER_ERROR);
-    //
-    //        // 遍历传入的数组，将其格式化为 'key=value' 的形式
-    //        foreach ($customParams as $key => $value) {
-    //            $variable = '${' . OSSClientCode::OSS_CALLBACK_CUSTOM_VAR_PREFIX->value . $key . '}';
-    //            $baseParams[] = "{$key}={$variable}";
-    //        }
-    //
-    //        // 将所有参数用 & 连接成一个字符串
-    //        return implode(OSSClientCode::OSS_CALLBACK_SEPARATOR->value, $baseParams);
-    //    }
-    //
-    //    private function generateOssCallbackVar($customParams): bool|string
-    //    {
-    //        // 设置发起回调请求的自定义参数，由Key和Value组成，Key必须以枚举指定的前缀开始。
-    //        $var = [];
-    //        foreach ($customParams as $key => $value) {
-    //            $var[OSSClientCode::OSS_CALLBACK_CUSTOM_VAR_PREFIX->value . $key] = $value;
-    //        }
-    //        return json_encode($var);
-    //    }
-    //
-    //    private function genCallback(): array
-    //    {
-    //        $url = '{"callbackUrl":"https:\/\/zjdx-dev.cloudvhall.com:40001\/api\/v1\/ossCallback","callbackHost":"zjdx-dev.cloudvhall.com:40001","callbackBody":"filename=${object}&size=${size}&mimeType=${mimeType}&height=${imageInfo.height}&width=${imageInfo.width}&hash=${x:hash}","callbackSNI":false,"callbackBodyType":"application\/x-www-form-urlencoded"}';
-    //
-    //        // 设置发起回调请求的自定义参数，由Key和Value组成，Key必须以x:开始。
-    //        $var =
-    //            '{"x:hash":"333333423"}';
-    //        return [OssClient::OSS_CALLBACK => $url,
-    //            OssClient::OSS_CALLBACK_VAR => $var,
-    //        ];
-    //    }
+        // 解析 Elasticsearch 返回的结果
+        $totalPv = $response['aggregations']['total_pv']['value'];
+        $totalUv = $response['aggregations']['total_uv']['value'];
+        $totalUniqueIps = $response['aggregations']['total_unique_ips']['value'];
+
+        $todayPv = $response['aggregations']['today_stats']['today_pv']['value'];
+        $todayUv = $response['aggregations']['today_stats']['today_uv']['value'];
+        $todayUniqueIps = $response['aggregations']['today_stats']['today_unique_ips']['value'];
+        //        // 返回结果
+        return [
+            'total_pv' => $totalPv,
+            'total_uv' => $totalUv,
+            'total_unique_ips' => $totalUniqueIps,
+            'today_pv' => $todayPv,
+            'today_uv' => $todayUv,
+            'today_unique_ips' => $todayUniqueIps,
+        ];
+    }
+
+    protected function transLogsToEs(): void
+    {
+        $builder = di()->get(ClientBuilderFactory::class)->create();
+        $client = $builder->setHosts(['localhost:9200'])->build();
+        $indexParams = [
+            'index' => 'login_logs',  // 设置索引名称
+            'body' => [
+                'mappings' => [
+                    'properties' => [
+                        'id' => ['type' => 'long'],
+                        'username' => ['type' => 'keyword'],
+                        'ip' => ['type' => 'ip'],
+                        'ip_location' => ['type' => 'text'],
+                        'os' => ['type' => 'keyword'],
+                        'browser' => ['type' => 'keyword'],
+                        'status' => ['type' => 'short'],
+                        'message' => ['type' => 'text'],
+                        'login_time' => [
+                            'type' => 'date',
+                            'format' => 'yyyy-MM-dd HH:mm:ss',  // 更新日期格式
+                        ],
+                    ],
+                ],
+            ],
+        ];
+        $indexExists = $client->indices()->exists(['index' => 'login_logs']);
+
+        if ($indexExists) {
+            $response = $client->indices()->delete(['index' => 'login_logs']);
+        }
+        $response = $client->indices()->create($indexParams);
+
+        // 创建索引
+        $logs = di()->get(LoginLogDao::class)->getAll()->toArray();
+        $batchSize = 1000;  // 每批次导入的数据量，您可以根据实际情况调整
+
+        // 准备批量数据
+        $body = [];
+        $counter = 0;  // 计数器，用来控制每批次的大小
+
+        foreach ($logs as $log) {
+            // 添加每条记录的index操作
+            $body[] = [
+                'index' => [
+                    '_index' => 'login_logs',  // Elasticsearch索引名称
+                    '_id' => $log['id'],  // 使用MySQL的id作为文档ID
+                ],
+            ];
+
+            // 格式化要插入的数据
+            $body[] = [
+                'id' => $log['id'],
+                'username' => $log['username'],
+                'ip' => $log['ip'],
+                'ip_location' => $log['ip_location'],
+                'os' => $log['os'],
+                'browser' => $log['browser'],
+                'status' => $log['status'],
+                'message' => $log['message'],
+                'login_time' => $log['login_time'],
+            ];
+
+            ++$counter;
+
+            // 当计数器达到batchSize时，发送一次bulk请求
+            if ($counter >= $batchSize) {
+                // 批量插入
+                $response = $client->bulk(['body' => $body]);
+
+                // 检查批量操作结果
+                if ($response['errors']) {
+                    $this->error("批量插入时发生错误！\n");
+                    print_r($response);
+                } else {
+                    $this->info("批量插入{$counter}成功！\n");
+                }
+
+                // 重置计数器和body，准备下一个批次
+                $body = [];
+                $counter = 0;
+            }
+        }
+
+        // 如果还有剩余的数据（小于batchSize的部分），也需要执行一次bulk操作
+        if ($counter > 0) {
+            $response = $client->bulk(['body' => $body]);
+
+            // 检查最后一个批次的导入结果
+            if ($response['errors']) {
+                $this->error("最后批次插入时发生错误！\n");
+                print_r($response);
+            } else {
+                $this->info("最后批次插入{$counter}成功！\n");
+            }
+        }
+    }
 }
