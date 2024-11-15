@@ -62,7 +62,7 @@ RUN set -ex && \
 ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so
 
 WORKDIR /opt/www
-
+COPY ./.auth.json /opt/www/auth.json
 COPY . /opt/www
 
 RUN composer install --no-dev -o && php bin/hyperf.php
