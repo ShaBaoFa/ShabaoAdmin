@@ -14,13 +14,13 @@ namespace App\Command;
 
 use App\Dao\LoginLogDao;
 use App\Dao\NewsDao;
-use App\Model\News;
 use Carbon\Carbon;
 use Elasticsearch\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
 use Hyperf\Elasticsearch\ClientBuilderFactory;
+use Hyperf\Redis\Redis;
 use OSS\Core\OssException;
 use OSS\Http\RequestCore_Exception;
 use Psr\Container\ContainerExceptionInterface;
@@ -32,8 +32,8 @@ use stdClass;
 #[Command]
 class TestCommand extends HyperfCommand
 {
-
     protected Client $esClient;
+
     public function __construct(protected ContainerInterface $container)
     {
         $builder = di()->get(ClientBuilderFactory::class)->create();
@@ -53,48 +53,51 @@ class TestCommand extends HyperfCommand
      * @throws ContainerExceptionInterface
      * @throws OssException
      * @throws RedisException
-     * @throws RandomException
      * @throws GuzzleException
      */
     public function handle(): void
     {
-//        $this->transNewsToEs();
-//        $this->transLogsToEs();
-//        $result = $this->visit();
-        $this->searchNews();
-//        $this->getAnalyzeSetting();
+        $redis = di()->get(Redis::class);
+        $redis->set('key', 'value');
+        //        $this->transNewsToEs();
+        //        $this->transLogsToEs();
+        //        $result = $this->visit();
+        //        $this->searchNews();
+        //        $this->getAnalyzeSetting();
     }
+
     protected function getAnalyzeSetting()
     {
         $params = ['index' => 'news'];
         $response = $this->esClient->indices()->getSettings($params);
         print_r($response);
-
     }
+
     protected function searchNews()
     {
         $params = [
             'index' => 'news',
             'body' => [
                 'analyzer' => 'ik_smart',
-                'text' => '我是人民接班人'
-            ]
+                'text' => '我是人民接班人',
+            ],
         ];
         $builder = di()->get(ClientBuilderFactory::class)->create();
         $client = $builder->setHosts(['localhost:9200'])->build();
         $response = $client->indices()->analyze($params);
         var_dump($response);
-//        $totalCount = $response['hits']['total']['value'];
-//        $hits = $response['hits']['hits'];
-//        $data = [
-//            'items' => $hits,
-//            'pageInfo' => [
-//                'total' => $totalCount,
-//                'currentPage' => 1,
-//                'totalPage' => ceil($totalCount / 20),
-//            ]
-//        ];
+        //        $totalCount = $response['hits']['total']['value'];
+        //        $hits = $response['hits']['hits'];
+        //        $data = [
+        //            'items' => $hits,
+        //            'pageInfo' => [
+        //                'total' => $totalCount,
+        //                'currentPage' => 1,
+        //                'totalPage' => ceil($totalCount / 20),
+        //            ]
+        //        ];
     }
+
     protected function transNewsToEs()
     {
         $builder = di()->get(ClientBuilderFactory::class)->create();

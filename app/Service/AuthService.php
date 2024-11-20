@@ -19,19 +19,13 @@ use App\Events\AfterLogin;
 use App\Exception\BusinessException;
 use App\Model\User;
 use App\Vo\UserServiceVo;
-use Baoziyoo\HyperfCaptcha\Captcha;
-use Carbon\Carbon;
-use Hyperf\Collection\Arr;
-use Hyperf\Redis\Redis;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 use Psr\SimpleCache\InvalidArgumentException;
 
 use function App\Helper\user;
-use function Hyperf\Config\config;
-use function Hyperf\Support\env;
-use function Hyperf\Support\make;
+use function Ella123\HyperfCaptcha\captcha_create;
 
 class AuthService extends BaseService
 {
@@ -78,27 +72,7 @@ class AuthService extends BaseService
 
     public function captcha(): array
     {
-        $captcha = make(Captcha::class);
-        if (env('APP_ENV') === 'testing') {
-            $code = $captcha->generateCode('1111');
-        } else {
-            $code = $captcha->generateCode();
-        }
-        $captchaKey = $this->genCaptchaKey($code);
-        $captchaCode = Arr::get($code, 'code');
-        $redis = di()->get(Redis::class);
-        $key = sprintf('%scaptcha:%s', config('cache.default.prefix'), $captchaKey);
-        var_dump($key);
-        $redis->setex($key, 300, $captchaCode); // 验证码5分钟有效
-        return [
-            'captcha_key' => $captchaKey,
-            'captcha' => Arr::get($code, 'base64'),
-        ];
-    }
-
-    private function genCaptchaKey(array $code): string
-    {
-        return 'captcha_' . md5(Arr::get($code, 'code') . '_' . Carbon::now()->timestamp);
+        return captcha_create();
     }
 
     private function formatToken(string $token): array

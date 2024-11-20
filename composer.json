@@ -24,7 +24,7 @@
     "ext-swoole": ">=5.0",
     "ext-xlswriter": "*",
     "ext-xml": "*",
-    "baoziyoo/hyperf-captcha": "^1.0",
+    "ella123/hyperf-captcha": "*",
     "hyperf/amqp": "^3.1",
     "hyperf/async-queue": "^3.1",
     "hyperf/cache": "3.1.*",
@@ -99,12 +99,6 @@
     "sort-packages": true
   },
   "extra": [],
-  "repositories": {
-    "proxy": {
-      "type": "composer",
-      "url": "https://g-rtsg9040-composer.pkg.coding.net/composer/packagist"
-    }
-  },
   "scripts": {
     "post-root-package-install": [
       "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""

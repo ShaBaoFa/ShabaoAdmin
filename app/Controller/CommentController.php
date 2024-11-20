@@ -51,4 +51,10 @@ class CommentController extends BaseController
     {
         return $this->service->addStar((int) $request->input('id')) ? $this->response->success() : $this->response->fail();
     }
+
+    #[PostMapping('cancelStar')]
+    public function cancelStar(CommentRequest $request): ResponseInterface
+    {
+        return $this->service->cancelStar((int) $request->input('id')) ? $this->response->success() : $this->response->fail();
+    }
 }

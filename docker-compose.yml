@@ -46,17 +46,17 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    environment:
-      APP_ENV: "${APP_ENV:-prod}"
-      DB_HOST: "mysql"
-      REDIS_HOST: "redis"
+#    environment:
+#      APP_ENV: "${APP_ENV:-prod}"
+#      DB_HOST: "mysql"
+#      REDIS_HOST: "redis"
     working_dir: "/opt/www"
     ports:
       - "29505:9505"
       - "29506:9506"
     volumes:
       - "./:/opt/www"
-      - "./.env.docker:/opt/www/.env"
+      - "./.env.dev:/opt/www/.env"
     networks:
       - net
     entrypoint: ["php", "watch", "-c"]

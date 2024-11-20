@@ -17,6 +17,7 @@ use Carbon\Carbon;
 use Hyperf\Database\Model\Collection;
 use Hyperf\Database\Model\Model;
 use Hyperf\Database\Model\Relations\BelongsTo;
+use Hyperf\Database\Model\Relations\BelongsToMany;
 use Hyperf\Database\Model\Relations\HasMany;
 use Hyperf\Database\Model\Relations\MorphTo;
 
@@ -37,6 +38,7 @@ use Hyperf\Database\Model\Relations\MorphTo;
  * @property Carbon $updated_at
  * @property string $deleted_at
  * @property null|Collection|Comment[] $subComments
+ * @property null|Collection|User[] $starUser
  * @property null|Model $commentable
  * @property null|User $createdBy
  * @property null|User $sentTo
@@ -85,5 +87,10 @@ class Comment extends BaseModel
     public function subComments(): HasMany
     {
         return $this->hasMany(Comment::class, 'parent_id', 'id');
+    }
+
+    public function starUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'comment_star_user', 'comment_id', 'user_id');
     }
 }

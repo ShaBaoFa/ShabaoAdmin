@@ -20,13 +20,12 @@ use Hyperf\Di\Annotation\Aspect;
 use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;
 use Hyperf\Di\Exception\Exception;
-use Hyperf\Redis\Redis;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
-use function Hyperf\Config\config;
+use function Ella123\HyperfCaptcha\captcha_verify;
 
 #[Aspect]
 class CaptchaAspect extends AbstractAspect
@@ -52,20 +51,10 @@ class CaptchaAspect extends AbstractAspect
     public function process(ProceedingJoinPoint $proceedingJoinPoint): ResponseInterface
     {
         $request = $this->container->get(BaseRequest::class);
-        if (! $this->checkCaptcha((string) $request->input('captcha_key'), (string) $request->input('captcha_code'))) {
+
+        if (! captcha_verify((string) $request->input('captcha_key'), (string) $request->input('captcha_code'))) {
             throw new BusinessException(ErrorCode::CAPTCHA_ERROR);
         }
         return $proceedingJoinPoint->process();
-    }
-
-    private function checkCaptcha(string $captchaKey, string $code): bool
-    {
-        $redis = $this->container->get(Redis::class);
-        $key = sprintf('%scaptcha:%s', config('cache.default.prefix'), $captchaKey);
-        if ($redis->get($key) === $code) {
-            $redis->del($key);
-            return true;
-        }
-        return false;
     }
 }

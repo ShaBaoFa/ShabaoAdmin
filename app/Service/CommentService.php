@@ -20,6 +20,8 @@ use App\Exception\BusinessException;
 use App\Model\ExhLibObj;
 use Hyperf\Collection\Arr;
 
+use function App\Helper\user;
+
 class CommentService extends BaseService
 {
     /**
@@ -51,6 +53,14 @@ class CommentService extends BaseService
         Arr::set($params, '_with', [
             'createdBy' => ['fields' => ['id', 'nickname']],
             'sentTo' => ['fields' => ['id', 'nickname']],
+            'starUsers as has_star' => [
+                'conditions' => [
+                    ['user_id', '=', user()->getId()],
+                ],
+                'aggregate' => [
+                    'count' => '*',              // 获取个人是否点赞
+                ],
+            ],
             'subComments' => [
                 'aggregate' => [
                     'count' => '*',              // 获取评论数量
@@ -80,6 +90,12 @@ class CommentService extends BaseService
     public function addStar(int $id): bool
     {
         $this->dao->addStar($id);
+        return true;
+    }
+
+    public function cancelStar(int $id): bool
+    {
+        $this->dao->cancelStar($id);
         return true;
     }
 }

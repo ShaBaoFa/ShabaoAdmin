@@ -299,6 +299,8 @@ trait DaoTrait
         if (isset($params['_with'])) {
             foreach ($params['_with'] as $relation => $relationParams) {
                 if (is_array($relationParams)) {
+                    // 处理别名（解析 "relation as alias" 格式）
+                    [$relationName, $alias] = $this->parseRelationAlias($relation);
                     // 检查是否有聚合查询要求
                     if (isset($relationParams['aggregate'])) {
                         foreach ($relationParams['aggregate'] as $type => $field) {
@@ -332,6 +334,13 @@ trait DaoTrait
                             }
                             $this->applyConditions($q, $relationParams);
                         }]);
+
+                        // 为关联添加别名
+                        if ($alias) {
+                            $query->addSelect([
+                                "{$alias}" => $relationName,
+                            ]);
+                        }
                     }
                 } else {
                     $query->with($relationParams);
@@ -435,6 +444,20 @@ trait DaoTrait
     public function belongMe(array $condition): bool
     {
         return $this->checkExists($condition, true);
+    }
+
+    /**
+     * 解析关系名称并处理 "relation as alias" 格式.
+     */
+    protected function parseRelationAlias(string $relation): array
+    {
+        $segments = explode(' as ', $relation);
+
+        if (count($segments) === 2) {
+            return [$segments[0], $segments[1]]; // [relation, alias]
+        }
+
+        return [$relation, null]; // 无别名
     }
 
     // 辅助函数，用于应用查询条件

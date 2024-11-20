@@ -13,5 +13,6 @@ vendor/
 *.cache
 *.lock
 .env.docker
+.env.dev
 /.docker/
 *.zip

@@ -13,9 +13,13 @@ declare(strict_types=1);
 namespace App\Dao;
 
 use App\Base\BaseDao;
+use App\Constants\ErrorCode;
+use App\Exception\BusinessException;
 use App\Model\Comment;
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
+
+use function App\Helper\user;
 
 class CommentDao extends BaseDao
 {
@@ -61,8 +65,43 @@ class CommentDao extends BaseDao
 
     public function addStar(int $id): bool
     {
+        /**
+         * @var Comment $model
+         */
+        $userId = user()->getId();
         $model = $this->find($id);
+        // 检查用户是否已经点赞
+        if ($model->starUsers()->where('user_id', $userId)->exists()) {
+            throw new BusinessException(ErrorCode::FORBIDDEN);
+        }
+
+        // 添加点赞关系
+        $model->starUsers()->attach($userId);
+
+        // 如果需要，更新 star_count 字段
         $model->increment('star_count');
+
+        return true;
+    }
+
+    public function cancelStar(int $id): bool
+    {
+        /**
+         * @var Comment $model
+         */
+        $userId = user()->getId();
+        $model = $this->find($id);
+        // 检查用户是否已经点赞
+        if ($model->starUsers()->where('user_id', $userId)->doesntExist()) {
+            throw new BusinessException(ErrorCode::FORBIDDEN);
+        }
+
+        // 添加点赞关系
+        $model->starUsers()->detach($userId);
+
+        // 如果需要，更新 star_count 字段
+        $model->decrement('star_count');
+
         return true;
     }
 

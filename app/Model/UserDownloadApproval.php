@@ -37,6 +37,7 @@ use Hyperf\Database\Model\Relations\BelongsTo;
  * @property Carbon $updated_at
  * @property string $deleted_at
  * @property null|ExhLibObj $exhibitionLibObj
+ * @property null|User $user
  */
 class UserDownloadApproval extends BaseModel
 {

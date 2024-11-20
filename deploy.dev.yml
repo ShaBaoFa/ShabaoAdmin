@@ -1,0 +1,28 @@
+version: '3.7'
+services:
+  zly-api:
+    image: registry.cn-hangzhou.aliyuncs.com/hzkjyzz/zly-api:latest
+    ports:
+      - "9505:9505"
+      - "9506:9506"
+    deploy:
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 5
+      update_config:
+        parallelism: 2
+        delay: 5s
+        order: start-first
+    networks:
+      - default-network
+    configs:
+      - source: v1
+        target: /opt/www/.env
+configs:
+  v1:
+    file: /var/www/zly-api/.env
+networks:
+  default-network:
+    external: true

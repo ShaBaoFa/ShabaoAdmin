@@ -38,6 +38,7 @@ use Hyperf\Database\Model\Relations\HasMany;
  * @property string $user_type 用户类型：(100系统用户)
  * @property int $point 个人积分
  * @property null|Collection|DiskFileShare[] $sharedFiles
+ * @property null|Collection|UserDownloadApproval[] $applyObjs
  * @property null|Collection|ExhLibObj[] $pickObjs
  * @property null|Collection|Role[] $roles
  * @property null|Collection|Department[] $depts
@@ -150,6 +151,16 @@ class User extends BaseModel
             'user_pick_obj',
             'user_id',
             'obj_id'
+        );
+    }
+
+    public function starComments(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Comment::class,
+            'comment_star_user',
+            'user_id',
+            'comment_id'
         );
     }
 }
