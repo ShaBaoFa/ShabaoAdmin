@@ -36,8 +36,8 @@ class NewsService extends BaseService
 
     public function search(array $params): array
     {
-        return $this->searchByEs($params);
-        //                return $this->getPageList($params);
+        //        return $this->searchByEs($params);
+        return $this->getPageList($params);
     }
 
     public function save(array $data): mixed
