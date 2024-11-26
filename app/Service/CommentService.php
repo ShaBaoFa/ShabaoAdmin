@@ -69,6 +69,7 @@ class CommentService extends BaseService
                 ],
             ],
         ]);
+        $params = array_merge(['orderBy' => 'created_at', 'orderType' => 'desc'], $params);
         return $this->getPageList($params, false);
     }
 
@@ -80,6 +81,8 @@ class CommentService extends BaseService
         };
         if (! Arr::get($params, 'sent_to')) {
             $params['sent_to'] = 0;
+        }else{
+            user()->getId() == Arr::get($params, 'sent_to') && throw new BusinessException(ErrorCode::MESSAGE_CANNOT_SEND_TO_YOURSELF);
         }
         if (! Arr::get($params, 'parent_id')) {
             $params['parent_id'] = 0;

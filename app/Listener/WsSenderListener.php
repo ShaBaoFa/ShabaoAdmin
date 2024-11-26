@@ -54,22 +54,22 @@ class WsSenderListener implements ListenerInterface
         if ($event instanceof ReplyToMessage) {
             $uid = $event->getReceiveBy();
             $sendBy = $event->getSendBy();
-            $sendByUsername = User::find($event->getSendBy())->value('username');
+            $sendByNickname = User::find($event->getSendBy())->value('nickname');
             $content = $event->getContent();
             $this->sender->sendByUid($uid, $this->sender->handleData(WsEventCode::EV_NEW_REPLY_TO, [
                 'send_by' => $sendBy,
-                'send_by_username' => $sendByUsername,
+                'send_by_nickname' => $sendByNickname,
                 'content' => $content,
             ]));
         }
         if ($event instanceof PrivateMessageSent) {
             $uid = $event->getReceiveBy();
             $sendBy = $event->getSendBy();
-            $sendByUsername = User::find($event->getSendBy())->value('username');
+            $sendByNickname = User::find($event->getSendBy())->value('nickname');
             $content = $event->getContent();
             $this->sender->sendByUid($uid, $this->sender->handleData(WsEventCode::EV_NEW_PRIVATE_MESSAGE, [
                 'send_by' => $sendBy,
-                'send_by_username' => $sendByUsername,
+                'send_by_nickname' => $sendByNickname,
                 'content' => $content,
             ]));
         }
