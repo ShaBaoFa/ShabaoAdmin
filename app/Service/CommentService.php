@@ -81,7 +81,7 @@ class CommentService extends BaseService
         };
         if (! Arr::get($params, 'sent_to')) {
             $params['sent_to'] = 0;
-        }else{
+        } else {
             user()->getId() == Arr::get($params, 'sent_to') && throw new BusinessException(ErrorCode::MESSAGE_CANNOT_SEND_TO_YOURSELF);
         }
         if (! Arr::get($params, 'parent_id')) {
