@@ -20,6 +20,8 @@ services:
     configs:
       - source: v1
         target: /opt/www/.env
+    volumes:
+      - /var/www/zly-api/logs:/opt/www/runtime/logs # 绑定宿主机目录到容器内部目录，持久化日志
 configs:
   v1:
     file: /var/www/zly-api/.env
