@@ -30,7 +30,7 @@ use RedisException;
 use stdClass;
 
 #[Command]
-class TestCommand extends HyperfCommand
+class TestEsLocal extends HyperfCommand
 {
     protected Client $esClient;
 
@@ -38,7 +38,7 @@ class TestCommand extends HyperfCommand
     {
         $builder = di()->get(ClientBuilderFactory::class)->create();
         $this->esClient = $builder->setHosts(['localhost:9200'])->build();
-        parent::__construct('demo:c');
+        parent::__construct('test:es');
     }
 
     public function configure()
@@ -57,8 +57,6 @@ class TestCommand extends HyperfCommand
      */
     public function handle(): void
     {
-        $redis = di()->get(Redis::class);
-        $redis->set('key', 'value');
         //        $this->transNewsToEs();
         //        $this->transLogsToEs();
         //        $result = $this->visit();
