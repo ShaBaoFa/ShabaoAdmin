@@ -20,7 +20,6 @@ use GuzzleHttp\Exception\GuzzleException;
 use Hyperf\Command\Annotation\Command;
 use Hyperf\Command\Command as HyperfCommand;
 use Hyperf\Elasticsearch\ClientBuilderFactory;
-use Hyperf\Redis\Redis;
 use OSS\Core\OssException;
 use OSS\Http\RequestCore_Exception;
 use Psr\Container\ContainerExceptionInterface;
