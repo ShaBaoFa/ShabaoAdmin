@@ -18,10 +18,12 @@ use App\Base\BaseService;
 use App\Constants\ErrorCode;
 use App\Constants\MessageContentTypeCode;
 use App\Dao\MessageDao;
+use App\Dao\MessageRDao;
 use App\Events\PrivateMessageSent;
 use App\Events\ReplyToMessage;
 use App\Exception\BusinessException;
 use App\Vo\AmqpQueueVo;
+use Hyperf\Collection\Arr;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
@@ -126,12 +128,36 @@ class MessageService extends BaseService
     {
         $params = [
             'user_id' => ! empty($id) ? $id : user()->getId(),
-            'orderBy' => 'created_at',
+            'orderBy' => 'message_receivers.created_at',
             'orderType' => 'desc',
             'getUnreadMessages' => true,
             'read_status' => MessageContentTypeCode::STATUS_MESSAGE_UNREAD->value,
         ];
         return $this->dao->getPageList($params, false);
+    }
+
+    /**
+     * 获取未读消息.
+     */
+    public function getAllMessages(?int $id = null): array
+    {
+        $params = [
+            'receiver_id' => ! empty($id) ? $id : user()->getId(),
+            'orderBy' => 'created_at',
+            'orderType' => 'desc',
+            'message_type' => MessageContentTypeCode::TYPE_REPLY_TO->value,
+        ];
+        Arr::set($params, '_with', ['Message' => ['fields' => ['id', 'content']]]);
+        $mrDao = di(MessageRDao::class);
+        return $mrDao->getPageList($params, false);
+    }
+
+    /**
+     * 更新中间表数据状态
+     */
+    public function updateDataStatus(array $ids, string $columnName = 'read_status', int $value = 2): bool
+    {
+        return $this->dao->updateDataStatus($ids, $columnName, $value);
     }
 
     public function handleData(array $params): array

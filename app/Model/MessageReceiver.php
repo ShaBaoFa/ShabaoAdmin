@@ -12,7 +12,8 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-use Hyperf\Database\Model\Relations\Pivot;
+use App\Base\BaseModel;
+use Hyperf\Database\Model\Relations\BelongsTo;
 
 /**
  * @property int $message_id 队列消息主键
@@ -20,7 +21,7 @@ use Hyperf\Database\Model\Relations\Pivot;
  * @property int $read_status 已读状态 (1未读 2已读)
  * @property int $message_type 消息类型
  */
-class MessageReceiver extends Pivot
+class MessageReceiver extends BaseModel
 {
     /**
      * The table associated with the model.
@@ -36,4 +37,9 @@ class MessageReceiver extends Pivot
      * The attributes that should be cast to native types.
      */
     protected array $casts = ['message_id' => 'integer', 'receiver_id' => 'integer', 'read_status' => 'integer', 'message_type' => 'integer'];
+
+    public function Message(): BelongsTo
+    {
+        return $this->belongsTo(Message::class, 'message_id', 'id');
+    }
 }

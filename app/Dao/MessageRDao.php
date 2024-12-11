@@ -15,14 +15,14 @@ namespace App\Dao;
 use App\Base\BaseDao;
 use App\Constants\MessageContentTypeCode;
 use App\Model\Message;
+use App\Model\MessageReceiver;
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Model\Builder;
-use Hyperf\DbConnection\Annotation\Transactional;
 use Hyperf\DbConnection\Db;
 
 use function App\Helper\user;
 
-class MessageDao extends BaseDao
+class MessageRDao extends BaseDao
 {
     /**
      * @var Message
@@ -31,39 +31,7 @@ class MessageDao extends BaseDao
 
     public function assignModel(): void
     {
-        $this->model = Message::class;
-    }
-
-    /**
-     * 新增信息.
-     * @param mixed $data
-     */
-    #[Transactional]
-    public function save($data): int
-    {
-        $receiveBy = $data['receive_by'];
-        if (! is_array($receiveBy)) {
-            $receiveBy = [$receiveBy];
-        }
-        $this->filterExecuteAttributes($data);
-        Arr::get($data, 'content_type') != MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value && Arr::forget($data, 'receive_by');
-        $model = $this->model::create($data);
-        $model->receiveUsers()->sync(array_fill_keys($receiveBy, ['message_type' => Arr::get($data, 'content_type')]));
-        return $model->{$model->getKeyName()};
-    }
-
-    #[Transactional]
-    public function insertByQueue($data): bool
-    {
-        $receiveBy = Arr::get($data, 'receive_by');
-        $this->filterExecuteAttributes($data);
-        Arr::get($data, 'content_type') != MessageContentTypeCode::TYPE_PRIVATE_MESSAGE->value && Arr::forget($data, 'receive_by');
-        $modelId = $this->model::insertGetId($data);
-        if (! Arr::accessible($receiveBy) && is_int($receiveBy)) {
-            $receiveBy = [$receiveBy];
-        }
-        Message::find($modelId)->receiveUsers()->sync($receiveBy);
-        return $modelId > 0;
+        $this->model = MessageReceiver::class;
     }
 
     /**
@@ -72,19 +40,11 @@ class MessageDao extends BaseDao
     public function handleSearch(Builder $query, array $params): Builder
     {
         $query->when(
-            Arr::get($params, 'title'),
-            fn (Builder $query, $title) => $query->where('title', 'like', '%' . $title . '%')
-        );
-
-        $query->when(
-            Arr::get($params, 'content_type'),
-            function (Builder $query, $contentType) {
-                if ($contentType !== 'all') {
-                    $query->where('content_type', '=', $contentType);
-                }
+            Arr::get($params, 'message_type'),
+            function (Builder $query, $messageType) {
+                $query->where('message_type', '=', $messageType);
             }
         );
-
         $query->when(
             Arr::get($params, 'receive_by'),
             function (Builder $query, $receiveBy) {

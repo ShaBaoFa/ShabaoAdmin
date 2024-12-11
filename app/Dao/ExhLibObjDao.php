@@ -207,7 +207,7 @@ class ExhLibObjDao extends BaseDao
         return $model->pickUsers()->detach([user()->getId()], false) > 0;
     }
 
-    public function hasStarred(int $id, int $userId): bool
+    public function hasStared(int $id, int $userId): bool
     {
         $model = $this->model::find($id);
         /**

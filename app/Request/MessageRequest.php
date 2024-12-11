@@ -25,6 +25,14 @@ class MessageRequest extends BaseFormRequest
         ];
     }
 
+    public function readMessage(): array
+    {
+        return [
+            'ids' => 'required|array',
+            'ids.*' => 'required|int|exists:messages,id',
+        ];
+    }
+
     /**
      * 新增数据验证规则
      * return array.

@@ -76,7 +76,7 @@ class ExhLibObjService extends BaseService
             throw new BusinessException(ErrorCode::NOT_FOUND);
         }
         $modelArray = $this->getCacheData($id);
-        Arr::set($modelArray, 'hasStarred', $this->dao->hasStarred($id, user()->getId()));
+        Arr::set($modelArray, 'hasStared', $this->dao->hasStared($id, user()->getId()));
         Arr::set($modelArray, 'hasCollected', $this->dao->hasCollected($id, user()->getId()));
         Arr::set($modelArray, 'hasPicked', $this->dao->hasPicked($id, user()->getId()));
         return $modelArray;

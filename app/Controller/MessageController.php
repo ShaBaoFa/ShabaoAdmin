@@ -70,4 +70,28 @@ class MessageController extends BaseController
     {
         return $this->response->success($this->service->getUnreadMessages());
     }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[GetMapping('getAllMessages')]
+    public function getAll(MessageRequest $request): ResponseInterface
+    {
+        return $this->response->success($this->service->getAllMessages());
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    #[PostMapping('readMessage')]
+    public function readMessage(MessageRequest $request): ResponseInterface
+    {
+        (array) $ids = $request->input('ids', []);
+        if ($this->service->updateDataStatus($ids)) {
+            return $this->response->success();
+        }
+        return $this->response->fail();
+    }
 }
