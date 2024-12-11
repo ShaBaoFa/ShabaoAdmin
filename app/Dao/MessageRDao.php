@@ -25,7 +25,7 @@ use function App\Helper\user;
 class MessageRDao extends BaseDao
 {
     /**
-     * @var Message
+     * @var MessageReceiver
      */
     public $model;
 
@@ -45,10 +45,11 @@ class MessageRDao extends BaseDao
                 $query->where('message_type', '=', $messageType);
             }
         );
+
         $query->when(
-            Arr::get($params, 'receive_by'),
+            Arr::get($params, 'receiver_id'),
             function (Builder $query, $receiveBy) {
-                $query->where('receive_by', '=', $receiveBy);
+                $query->where('receiver_id', '=', $receiveBy);
             }
         );
 

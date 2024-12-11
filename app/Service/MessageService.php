@@ -139,15 +139,17 @@ class MessageService extends BaseService
     /**
      * 获取未读消息.
      */
-    public function getAllMessages(?int $id = null): array
+    public function getAllMessages(array $params): array
     {
-        $params = [
-            'receiver_id' => ! empty($id) ? $id : user()->getId(),
+        $paramsAdd = [
+            'receiver_id' => user()->getId(),
             'orderBy' => 'created_at',
             'orderType' => 'desc',
             'message_type' => MessageContentTypeCode::TYPE_REPLY_TO->value,
         ];
+        $params = Arr::merge($params, $paramsAdd);
         Arr::set($params, '_with', ['Message' => ['fields' => ['id', 'content']]]);
+        var_dump($params);
         $mrDao = di(MessageRDao::class);
         return $mrDao->getPageList($params, false);
     }

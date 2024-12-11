@@ -24,6 +24,7 @@ use Hyperf\HttpServer\Annotation\PostMapping;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
+use function App\Helper\user;
 
 #[Controller(prefix: 'api/v1/messages'),Auth]
 class MessageController extends BaseController
@@ -65,7 +66,7 @@ class MessageController extends BaseController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    #[GetMapping('getUnreadMessages'), Permission('messages:get_unread_messages')]
+    #[GetMapping('getUnreadMessages')]
     public function getUnreadMessages(MessageRequest $request): ResponseInterface
     {
         return $this->response->success($this->service->getUnreadMessages());
@@ -78,7 +79,7 @@ class MessageController extends BaseController
     #[GetMapping('getAllMessages')]
     public function getAll(MessageRequest $request): ResponseInterface
     {
-        return $this->response->success($this->service->getAllMessages());
+        return $this->response->success($this->service->getAllMessages($request->all()));
     }
 
     /**
