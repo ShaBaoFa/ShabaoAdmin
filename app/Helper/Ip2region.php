@@ -64,6 +64,8 @@ class Ip2region
         }
         return $country;
     }
+    
+    
 
     private function getLoader(): ClassLoader
     {

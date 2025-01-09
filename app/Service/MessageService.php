@@ -132,8 +132,9 @@ class MessageService extends BaseService
             'orderType' => 'desc',
             'getUnreadMessages' => true,
             'read_status' => MessageContentTypeCode::STATUS_MESSAGE_UNREAD->value,
+            '_with' => ['sendUser' => ['fields' => ['id', 'nickname']]],
         ];
-        return $this->dao->getPageList($params, false);
+        return $this->dao->getList($params, false);
     }
 
     /**

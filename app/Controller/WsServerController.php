@@ -76,7 +76,7 @@ class WsServerController implements OnMessageInterface, OnOpenInterface, OnClose
                     'event' => WsEventCode::EV_NEW_MESSAGE->value,
                     'success' => true,
                     'message' => WsEventCode::EV_NEW_MESSAGE->getMessage(),
-                    'data' => $service->getUnreadMessages(Context::get('uid'))['items'],
+                    'data' => $service->getUnreadMessages(Context::get('uid')),
                 ]);
                 $this->send($server, $frame, $data);
                 break;
